@@ -1,31 +1,33 @@
 "use client";
 import Link from "next/link";
+import { Lexend } from "next/font/google";
+
+const lexend = Lexend({ subsets: ["latin"], weight: ["100","200","300","400","500","600","700","800","900"] });
 
 export default function Navbar() {
-  return (
-    <nav className="flex items-center justify-between px-6 py-4 bg-white shadow-md">
-      {/* Logo */}
-      <Link href="/" className="text-2xl font-bold text-blue-600">
-        TrapiHaus
-      </Link>
+    return (
+        <nav className={`${lexend.className} w-full mx-[24px] bg-blue-600 rounded-full px-6 py-3 shadow-md mt-[24px]`}>
+            <div className="max-w-6xl mx-auto flex items-center">
+                <Link href="/" className="flex items-center flex-none">
+                    <img src="/logo.png" alt="TrapiHaus" className="h-8" />
+                </Link>
 
-      {/* Links */}
-      <div className="hidden md:flex space-x-6 text-gray-700 font-medium">
-        <Link href="#">Browse Stays</Link>
-        <Link href="#">About</Link>
-        <Link href="#">List Property</Link>
-        <Link href="#">Contact</Link>
-      </div>
+                <div className="flex-1 hidden md:flex justify-center space-x-8 text-white font-medium text-[18px]">
+                    <Link href="#">Browse Stays</Link>
+                    <Link href="#">About</Link>
+                    <Link href="#">List Property</Link>
+                    <Link href="#">Contact</Link>
+                </div>
 
-      {/* Buttons */}
-      <div className="space-x-3">
-        <button className="px-4 py-2 border border-blue-600 text-blue-600 rounded-full">
-          Sign In
-        </button>
-        <button className="px-4 py-2 bg-blue-600 text-white rounded-full">
-          Register
-        </button>
-      </div>
-    </nav>
-  );
+                <div className="flex items-center space-x-3">
+                    <button className="px-4 py-2 bg-[#83C12C] hover:bg-green-500 text-white rounded-full font-medium shadow-sm focus:outline-none focus:ring-2 focus:ring-green-300">
+                        Sign In
+                    </button>
+                    <button className="px-4 py-2 bg-[#F68109] hover:bg-orange-500 text-white rounded-full font-medium shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-300">
+                        Register
+                    </button>
+                </div>
+            </div>
+        </nav>
+    );
 }
