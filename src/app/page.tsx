@@ -11,8 +11,8 @@ export default function Home() {
     <main className="min-h-screen bg-white max-w-full overflow-hidden mx-[24px]">
       <Navbar />
       <Hero />
-      <TopPicks />
       <WhyChoose />
+      <TopPicks />
     </main>
   );
 }
