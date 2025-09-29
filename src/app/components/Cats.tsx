@@ -16,9 +16,11 @@ const CategoryCard = ({ title, description, image, className = "" }: CategoryCar
           src={image}
           alt={title}
           className="w-full h-full object-cover"
+          onError={() => console.log(`Failed to load: ${image}`)}
+          onLoad={() => console.log(`Loaded: ${image}`)}
         />
-        {/* Dark Overlay */}
-        <div className="absolute inset-0 bg-black bg-opacity-40"></div>
+        {/* Gradient Overlay - Black to Transparent from bottom to top */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent"></div>
       </div>
       
       {/* Content */}
@@ -49,19 +51,19 @@ export default function Categories() {
             <CategoryCard
             title="Apartments"
             description="A comfortable space built for longer stays."
-            image="https://images.unsplash.com/photo-1555854877-bab0e564b8d5?w=600&h=400&fit=crop&crop=center"
+            image="https://github.com/Inv8Solutions/trapihaus/blob/master/public/apartments.jpg?raw=true"
           />
             
             <CategoryCard
             title="Transients"
             description="Affordable short stays, perfect for quick trips."
-            image="https://images.unsplash.com/photo-1631049552240-59c37f38802b?w=600&h=400&fit=crop&crop=center"
+            image="https://github.com/Inv8Solutions/trapihaus/blob/master/public/transients.jpg?raw=true"
             />
           {/* Bottom Row - Hotels spanning full width */}
           <CategoryCard
             title="Hotels"
             description="Full service comfort with modern convenience."
-            image="https://images.unsplash.com/photo-1566073771259-6a8506099945?w=600&h=400&fit=crop&crop=center"
+            image="https://github.com/Inv8Solutions/trapihaus/blob/master/public/hotels.jpg?raw=true"
             className="md:col-span-2"
           />
         </div>
