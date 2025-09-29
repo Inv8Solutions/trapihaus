@@ -36,8 +36,8 @@ export default function Categories() {
       <div className="max-w-7xl mx-auto px-6">
         {/* Header */}
         <div className="text-center mb-12">
-          <h2 className="text-4xl md:text-5xl font-bold mb-4 font-lexend">
-            Find the <span className="text-blue-600">Stay</span> That Fits You
+          <h2 className="text-4xl md:text-[48px] font-bold mb-4 font-lexend">
+            <span className="text-blue-600">Find the Stay</span> That Fits You
           </h2>
           <p className="text-gray-600 text-lg max-w-3xl mx-auto font-lexend">
             Choose from budget-friendly apartments, flexible transient houses, or trusted hotels for your Baguio experience.
@@ -45,27 +45,24 @@ export default function Categories() {
         </div>
 
         {/* Category Grid */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {/* Apartments - Takes full height on larger screens */}
-          <CategoryCard
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <CategoryCard
             title="Apartments"
             description="A comfortable space built for longer stays."
-            image="https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=600&h=400&fit=crop&crop=center"
-            className="md:row-span-2"
+            image="https://images.unsplash.com/photo-1555854877-bab0e564b8d5?w=600&h=400&fit=crop&crop=center"
           />
-          
-          {/* Transients */}
-          <CategoryCard
+            
+            <CategoryCard
             title="Transients"
             description="Affordable short stays, perfect for quick trips."
-            image="https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=600&h=400&fit=crop&crop=center"
-          />
-          
-          {/* Hotels */}
+            image="https://images.unsplash.com/photo-1631049552240-59c37f38802b?w=600&h=400&fit=crop&crop=center"
+            />
+          {/* Bottom Row - Hotels spanning full width */}
           <CategoryCard
             title="Hotels"
             description="Full service comfort with modern convenience."
             image="https://images.unsplash.com/photo-1566073771259-6a8506099945?w=600&h=400&fit=crop&crop=center"
+            className="md:col-span-2"
           />
         </div>
       </div>
