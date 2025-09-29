@@ -22,7 +22,7 @@ export default function Lastt() {
         </h2>
         
         <p className="text-lg md:text-xl mb-8 font-lexend opacity-90 max-w-2xl mx-auto">
-          Whether you're looking for a safe, budget-friendly stay or want to earn as a host,<br />
+          Whether you&apos;re looking for a safe, budget-friendly stay or want to earn as a host,<br />
           Trapihaus makes it simple.
         </p>
 
