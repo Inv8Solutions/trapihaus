@@ -6,7 +6,7 @@ const lexend = Lexend({ subsets: ["latin"], weight: ["100","200","300","400","50
 
 export default function Navbar() {
     return (
-        <nav className={`${lexend.className} w-full bg-blue-600 rounded-full px-6 py-3 shadow-md mt-[24px]`}>
+        <nav className={`${lexend.className} w-full bg-blue-600 rounded-full py-3 shadow-md mt-[24px]`}>
             <div className="max-w-6xl mx-auto flex items-center">
                 <Link href="/" className="flex items-center flex-none">
                     <img src="/logo.png" alt="TrapiHaus" className="h-8" />
