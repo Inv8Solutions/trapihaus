@@ -1,0 +1,74 @@
+"use client";
+
+interface CategoryCardProps {
+  title: string;
+  description: string;
+  image: string;
+  className?: string;
+}
+
+const CategoryCard = ({ title, description, image, className = "" }: CategoryCardProps) => {
+  return (
+    <div className={`relative rounded-3xl overflow-hidden group cursor-pointer ${className}`}>
+      {/* Background Image */}
+      <div className="relative h-64 md:h-80">
+        <img
+          src={image}
+          alt={title}
+          className="w-full h-full object-cover"
+        />
+        {/* Dark Overlay */}
+        <div className="absolute inset-0 bg-black bg-opacity-40"></div>
+      </div>
+      
+      {/* Content */}
+      <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
+        <h3 className="text-2xl font-bold mb-2 font-lexend">{title}</h3>
+        <p className="text-sm opacity-90 font-lexend">{description}</p>
+      </div>
+    </div>
+  );
+};
+
+export default function Categories() {
+  return (
+    <section className="py-16 bg-gray-50">
+      <div className="max-w-7xl mx-auto px-6">
+        {/* Header */}
+        <div className="text-center mb-12">
+          <h2 className="text-4xl md:text-5xl font-bold mb-4 font-lexend">
+            Find the <span className="text-blue-600">Stay</span> That Fits You
+          </h2>
+          <p className="text-gray-600 text-lg max-w-3xl mx-auto font-lexend">
+            Choose from budget-friendly apartments, flexible transient houses, or trusted hotels for your Baguio experience.
+          </p>
+        </div>
+
+        {/* Category Grid */}
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {/* Apartments - Takes full height on larger screens */}
+          <CategoryCard
+            title="Apartments"
+            description="A comfortable space built for longer stays."
+            image="https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=600&h=400&fit=crop&crop=center"
+            className="md:row-span-2"
+          />
+          
+          {/* Transients */}
+          <CategoryCard
+            title="Transients"
+            description="Affordable short stays, perfect for quick trips."
+            image="https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=600&h=400&fit=crop&crop=center"
+          />
+          
+          {/* Hotels */}
+          <CategoryCard
+            title="Hotels"
+            description="Full service comfort with modern convenience."
+            image="https://images.unsplash.com/photo-1566073771259-6a8506099945?w=600&h=400&fit=crop&crop=center"
+          />
+        </div>
+      </div>
+    </section>
+  );
+}

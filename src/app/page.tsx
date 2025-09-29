@@ -5,6 +5,7 @@ import Hero from "./components/Hero";
 import TopPicks from "./components/TopPicks";
 import WhyChoose from "./components/WhyChoose";
 import React from "react";
+import Cats from "./components/Cats";
 
 export default function Home() {
   return (
@@ -13,6 +14,7 @@ export default function Home() {
       <Hero />
       <WhyChoose />
       <TopPicks />
+      <Cats />
     </main>
   );
 }
