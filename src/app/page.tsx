@@ -6,6 +6,7 @@ import TopPicks from "./components/TopPicks";
 import WhyChoose from "./components/WhyChoose";
 import Cats from "./components/Cats";
 import HowItWorks from "./components/HowItWorks";
+import JoinUs from "./components/JoinUs";
 import React from "react";
 
 export default function Home() {
@@ -17,6 +18,7 @@ export default function Home() {
       <TopPicks />
       <Cats />
       <HowItWorks />
+      <JoinUs />
     </main>
   );
 }
