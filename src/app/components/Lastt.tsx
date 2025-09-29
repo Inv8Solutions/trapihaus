@@ -2,16 +2,16 @@
 
 export default function Lastt() {
   return (
-    <section className="relative py-24 overflow-hidden rounded-t-[40px] mx-[24px]">
+    <section className="relative pt-24 pb-40 overflow-hidden rounded-t-[40px] mx-[24px] translate-y-2 z-0">
       {/* Background Image */}
       <div className="absolute inset-0">
         <img
-          src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1200&h=600&fit=crop&crop=center"
+          src="https://github.com/Inv8Solutions/trapihaus/blob/master/public/lastbg.jpg?raw=true"
           alt="Baguio mountains landscape"
           className="w-full h-full object-cover"
         />
         {/* Dark Overlay */}
-        <div className="absolute inset-0 bg-black bg-opacity-50"></div>
+        <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent"></div>
       </div>
 
       {/* Content */}
@@ -28,11 +28,11 @@ export default function Lastt() {
 
         {/* CTA Buttons */}
         <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-          <button className="bg-green-500 hover:bg-green-600 text-white font-semibold py-4 px-8 rounded-full transition-colors duration-200 font-lexend text-lg min-w-[200px]">
+          <button className="bg-[#83C12C] hover:bg-green-600 text-white font-semibold py-4 px-8 rounded-2xl transition-colors duration-200 font-lexend text-lg min-w-[200px]">
             Browse Accommodations
           </button>
           
-          <button className="bg-orange-500 hover:bg-orange-600 text-white font-semibold py-4 px-8 rounded-full transition-colors duration-200 font-lexend text-lg min-w-[200px]">
+          <button className="bg-orange-500 hover:bg-orange-600 text-white font-semibold py-4 px-8 rounded-2xl transition-colors duration-200 font-lexend text-lg min-w-[200px]">
             Become a Host
           </button>
         </div>
