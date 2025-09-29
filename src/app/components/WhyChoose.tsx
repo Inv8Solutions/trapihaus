@@ -149,7 +149,7 @@ const SectionHeader = () => {
         Why Choose Trapihaus?
       </h2>
       <p className="text-gray-500 text-lg font-lexend">
-        We're dedicated to providing safe, affordable, and verified accommodations for everyone visiting Baguio City
+        We&apos;re dedicated to providing safe, affordable, and verified accommodations for everyone visiting Baguio City
       </p>
     </div>
   );

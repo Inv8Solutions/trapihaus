@@ -26,7 +26,7 @@ const TestimonialCard = ({ quote, name, role, avatar, rating }: TestimonialProps
       </div>
 
       {/* Quote */}
-      <p className="text-gray-700 text-sm mb-6 font-lexend leading-relaxed">"{quote}"</p>
+      <p className="text-gray-700 text-sm mb-6 font-lexend leading-relaxed">&quot;{quote}&quot;</p>
 
       {/* User Info */}
       <div className="flex items-center gap-3">
