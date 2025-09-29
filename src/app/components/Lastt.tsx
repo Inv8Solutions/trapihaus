@@ -2,7 +2,7 @@
 
 export default function Lastt() {
   return (
-    <section className="relative py-24 overflow-hidden">
+    <section className="relative py-24 overflow-hidden rounded-t-[40px] mx-[24px]">
       {/* Background Image */}
       <div className="absolute inset-0">
         <img

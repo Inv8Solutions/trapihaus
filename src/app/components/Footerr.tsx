@@ -2,7 +2,7 @@
 
 export default function Footerr() {
   return (
-    <footer className="bg-blue-600 text-white -mx-[24px]">
+    <footer className="bg-blue-600 text-white rounded-t-[40px]">
       <div className="max-w-7xl mx-auto px-6 py-12">
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
           {/* Brand Section */}
