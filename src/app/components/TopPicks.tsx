@@ -27,10 +27,10 @@ const PropertyTypeTab = ({
 }) => (
   <button
     onClick={onClick}
-    className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
+    className={`flex items-center gap-2 px-4 py-3 rounded-full text-[18px] font-medium transition-all duration-200 ${
       isActive
-        ? 'bg-gray-800 text-white'
-        : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+        ? 'bg-blue-100 text-[#1078CF]'
+        : 'bg-gray-100 text-black hover:bg-gray-200'
     }`}
   >
     {icon}
@@ -97,6 +97,23 @@ const PropertyCard = ({ listing }: { listing: Listing }) => {
 
 export default function TopPicks() {
   const [activeTab, setActiveTab] = useState<'apartment' | 'transient' | 'hotel'>('apartment');
+  const [lastPressed, setLastPressed] = useState<'prev' | 'next' | null>(null);
+
+  const tabOrder: ('apartment' | 'transient' | 'hotel')[] = ['apartment', 'transient', 'hotel'];
+
+  const handlePrevious = () => {
+    setLastPressed('prev');
+    const currentIndex = tabOrder.indexOf(activeTab);
+    const prevIndex = currentIndex === 0 ? tabOrder.length - 1 : currentIndex - 1;
+    setActiveTab(tabOrder[prevIndex]);
+  };
+
+  const handleNext = () => {
+    setLastPressed('next');
+    const currentIndex = tabOrder.indexOf(activeTab);
+    const nextIndex = currentIndex === tabOrder.length - 1 ? 0 : currentIndex + 1;
+    setActiveTab(tabOrder[nextIndex]);
+  };
 
   const listings: Listing[] = [
     // Apartments
@@ -340,13 +357,37 @@ export default function TopPicks() {
             
             {/* Navigation Arrows */}
             <div className="flex items-center gap-2 ml-4">
-              <button className="w-10 h-10 bg-gray-100 hover:bg-gray-200 rounded-full flex items-center justify-center transition-colors">
-                <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <button 
+                onClick={handlePrevious}
+                className={`w-10 h-10 rounded-full flex items-center justify-center transition-colors ${
+                  lastPressed === 'prev' 
+                    ? 'bg-green-500 hover:bg-green-600' 
+                    : 'bg-gray-100 hover:bg-gray-200'
+                }`}
+              >
+                <svg 
+                  className={`w-5 h-5 ${lastPressed === 'prev' ? 'text-white' : 'text-gray-600'}`} 
+                  fill="none" 
+                  stroke="currentColor" 
+                  viewBox="0 0 24 24"
+                >
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                 </svg>
               </button>
-              <button className="w-10 h-10 bg-green-500 hover:bg-green-600 rounded-full flex items-center justify-center transition-colors">
-                <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <button 
+                onClick={handleNext}
+                className={`w-10 h-10 rounded-full flex items-center justify-center transition-colors ${
+                  lastPressed === 'next' 
+                    ? 'bg-green-500 hover:bg-green-600' 
+                    : 'bg-gray-100 hover:bg-gray-200'
+                }`}
+              >
+                <svg 
+                  className={`w-5 h-5 ${lastPressed === 'next' ? 'text-white' : 'text-gray-600'}`} 
+                  fill="none" 
+                  stroke="currentColor" 
+                  viewBox="0 0 24 24"
+                >
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                 </svg>
               </button>
