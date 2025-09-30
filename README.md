@@ -61,39 +61,6 @@ To provide a trusted platform where students and tourists can find safe, complia
 - **Linting**: ESLint with Next.js configuration
 
 
-```
-trapihaus/
-├── public/                     # Static assets
-│   ├── apartments.jpg         # Apartment category image
-│   ├── hotels.jpg            # Hotel category image
-│   ├── lastbg.jpg           # Call-to-action background
-│   ├── logo.png             # Trapihaus logo
-│   ├── transients.jpg       # Transient category image
-│   ├── trapihaus-hero.jpg   # Hero section background
-│   └── Vector (1).png       # Additional graphics
-├── src/
-│   └── app/
-│       ├── components/        # React components
-│       │   ├── Cats.tsx      # Property categories
-│       │   ├── Footerr.tsx   # Footer with links & contact
-│       │   ├── Hero.tsx      # Hero section with search
-│       │   ├── HowItWorks.tsx # Process explanation
-│       │   ├── JoinUs.tsx    # Testimonials carousel
-│       │   ├── Lastt.tsx     # Call-to-action section
-│       │   ├── Navbar.tsx    # Navigation header
-│       │   ├── TopPicks.tsx  # Featured properties
-│       │   └── WhyChoose.tsx # Value propositions
-│       ├── globals.css       # Global styles
-│       ├── layout.tsx        # Root layout
-│       └── page.tsx          # Home page
-├── package.json              # Dependencies & scripts
-├── tailwind.config.js        # Tailwind configuration
-├── tsconfig.json            # TypeScript configuration
-├── next.config.ts           # Next.js configuration
-├── postcss.config.mjs       # PostCSS configuration
-└── eslint.config.mjs        # ESLint configuration
-```
-
 ## 🎨 Components Overview
 
 ### Core Components
