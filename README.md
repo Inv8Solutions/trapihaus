@@ -60,7 +60,6 @@ To provide a trusted platform where students and tourists can find safe, complia
 - **Build Tool**: Turbopack (Next.js built-in)
 - **Linting**: ESLint with Next.js configuration
 
-## 📁 Project Structure
 
 ```
 trapihaus/
