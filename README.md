@@ -1,19 +1,54 @@
 # Trapihaus 🏠
+*Baguio Accommodation Finder*
 
-A modern, responsive landing page for Trapihaus - your trusted hyperlocal marketplace for safe, compliant, and affordable stays in Baguio City, Philippines.
+A hyperlocal digital marketplace that connects accommodation owners with students and tourists looking for safe, compliant, and affordable stays in Baguio City, Philippines.
 
-## 🌟 About Trapihaus
+## 🌟 About the Project
 
-Trapihaus is a platform designed to connect students, tourists, and travelers with verified local hosts offering safe and affordable accommodations in Baguio City. The platform focuses on providing budget-friendly stays while ensuring compliance with local regulations and safety standards.
+**Trapihaus (Baguio Accommodation Finder)** is a hyperlocal digital marketplace designed to bridge the gap between accommodation owners (apartments, transients, hotels) and visitors seeking quality stays in Baguio City. 
 
-## 🚀 Features
+### Our Mission
+To provide a trusted platform where students and tourists can find safe, compliant, and affordable accommodations while helping local property owners reach their target market effectively.
 
-- **Safe & Compliant Accommodations** - All listings are verified for safety standards and local compliance
-- **Verified Local Hosts** - Connect with trusted hosts who know Baguio City
-- **Budget-Friendly Options** - Find accommodations that fit your budget without sacrificing quality
-- **Multiple Property Types** - Apartments, transients, and hotels
-- **User Testimonials** - Real reviews from students and tourists
-- **Responsive Design** - Optimized for desktop, tablet, and mobile devices
+### Development Roadmap
+- **Phase 1 (MVP)**: Web-based product focused on Baguio City validation
+- **Phase 2**: Expansion to BLISST area (Baguio, La Trinidad, Itogon, Sablan, Tuba)
+- **Phase 3**: Nationwide expansion across the Philippines
+
+## 🎯 Target Market
+
+### Accommodation Seekers
+- **Students** - University students needing affordable, safe housing near campuses
+- **Tourists** - Travelers looking for budget-friendly, verified accommodations
+- **Business Travelers** - Professionals seeking compliant, convenient stays
+
+### Accommodation Providers
+- **Apartment Owners** - Long-term rental properties
+- **Transient Operators** - Short-term accommodation providers
+- **Hotel Managers** - Boutique and budget hotel establishments
+
+## 🚀 Platform Features
+
+### For Accommodation Seekers
+- **Verified Listings** - All accommodations verified for safety and compliance
+- **Property Categories** - Apartments, transients, and hotels in one platform
+- **Budget Filtering** - Find stays that match your financial needs
+- **Local Insights** - Connect with hosts who know Baguio City
+- **Safety Assurance** - Compliance with local regulations and safety standards
+- **User Reviews** - Real testimonials from students and tourists
+
+### For Accommodation Providers
+- **Local Marketplace** - Reach students and tourists directly
+- **Listing Management** - Easy property posting and management
+- **Verification System** - Build trust through platform verification
+- **Direct Communication** - Connect with potential guests efficiently
+
+### Current MVP Features (Landing Page)
+- **Property Showcase** - Featured accommodations across categories
+- **Search Interface** - Easy property discovery
+- **Trust Indicators** - Safety and compliance messaging
+- **User Testimonials** - Social proof from real users
+- **Host Onboarding** - Clear path for property owners to join
 
 ## 🛠️ Tech Stack
 
@@ -117,59 +152,99 @@ trapihaus/
 - `npm run start` - Start production server
 - `npm run lint` - Run ESLint for code quality
 
-## 🎯 Key Sections
+## 🎯 Key Platform Sections
 
 ### 1. Hero Section
-- Eye-catching headline and value proposition
-- Search functionality placeholder
-- Key feature highlights with icons
-- Call-to-action button
+- Value proposition for the hyperlocal marketplace
+- Search functionality for property discovery
+- Key benefits highlighting safety, compliance, and affordability
+- Clear calls-to-action for both guests and hosts
 
-### 2. Why Choose Trapihaus
-- Three main value propositions:
-  - Safe & Compliant accommodations
-  - Verified Local Hosts
-  - Budget-Friendly Stays
-- Animated feature cards with connecting lines
+### 2. Why Choose Our Marketplace
+- **Safe & Compliant**: Verified accommodations meeting local standards
+- **Hyperlocal Focus**: Deep understanding of Baguio City market
+- **Budget-Friendly**: Connecting budget-conscious students and tourists with affordable options
+- Animated feature presentation with connecting workflows
 
-### 3. Top Picks
-- Tabbed interface for different property types
-- Property cards with ratings and amenities
-- Navigation arrows for browsing
-- "View All Properties" call-to-action
+### 3. Property Categories Showcase
+- **Apartments**: Long-term rentals for students and extended stays
+- **Transients**: Short-term accommodations for tourists and visitors  
+- **Hotels**: Traditional hospitality options with platform integration
+- Visual cards with category-specific messaging
 
-### 4. Property Categories
-- Visual cards for Apartments, Transients, and Hotels
-- Engaging descriptions for each category
+### 4. Featured Properties (Top Picks)
+- Curated selection across all accommodation types
+- Interactive tabs for easy category navigation
+- Property cards with ratings, amenities, and pricing indicators
+- "View All Properties" pathway to full marketplace
 
-### 5. How It Works
-- Step-by-step process explanation
-- Clear workflow for users
+### 5. How the Marketplace Works
+- Clear 3-step process for accommodation seekers
+- Simplified onboarding flow for property owners
+- Trust-building through process transparency
 
-### 6. Customer Testimonials
-- Real user reviews with photos
-- Pagination through multiple testimonial sets
-- Mix of English and Filipino testimonials
-- Student and tourist perspectives
+### 6. Community Trust & Social Proof
+- Real testimonials from Baguio students and tourists
+- Mix of English and Filipino reviews for local authenticity
+- Rotating testimonial carousel showing diverse user experiences
+- Star ratings and detailed feedback
 
-### 7. Call-to-Action
-- Mountain landscape background
-- Dual action buttons for guests and hosts
-- Compelling final message
+### 7. Marketplace Call-to-Action
+- Dual pathways: "Browse Accommodations" and "Become a Host"
+- Baguio-themed background imagery
+- Final conversion point for both user types
 
-## 📱 Responsive Design
+## �️ Expansion Strategy
 
-The website is fully responsive with breakpoints:
-- **Mobile**: < 768px
+### Phase 1: Baguio City MVP
+- **Current Focus**: Validate hyperlocal marketplace model
+- **Target Area**: Baguio City proper
+- **Key Metrics**: User acquisition, property listings, booking conversion
+- **Timeline**: Initial validation and product-market fit
+
+### Phase 2: BLISST Area Expansion  
+- **Target Region**: Baguio, La Trinidad, Itogon, Sablan, Tuba
+- **Strategy**: Leverage Baguio success to expand to surrounding municipalities
+- **Focus**: Regional accommodation network for broader Cordillera tourism
+
+### Phase 3: Nationwide Scaling
+- **Vision**: Replicate hyperlocal model across Philippine tourist destinations
+- **Approach**: City-by-city expansion with local partnerships
+- **Goal**: Become the leading accommodation marketplace for students and budget travelers
+
+## 📈 Business Model
+
+### Revenue Streams (Future Implementation)
+- **Commission-based**: Percentage from successful bookings
+- **Listing Fees**: Premium placement for accommodation providers
+- **Verification Services**: Enhanced trust and safety features
+- **Local Partnerships**: Integration with Baguio tourism ecosystem
+
+### Competitive Advantages
+- **Hyperlocal Focus**: Deep understanding of Baguio market dynamics
+- **Student-Centric**: Tailored specifically for student accommodation needs
+- **Compliance First**: Emphasis on local regulation adherence
+- **Community-Driven**: Built by and for the Baguio community
+
+## 📱 Technical Implementation
+
+### Responsive Design
+The marketplace landing page is fully responsive with breakpoints:
+- **Mobile**: < 768px (Mobile-first approach for student users)
 - **Tablet**: 768px - 1024px  
-- **Desktop**: 1024px+
+- **Desktop**: 1024px+ (Full marketplace experience)
 
-## 🎨 Brand Colors
+### Brand Identity
+- **Primary Blue**: #1078CF (Trust and reliability)
+- **Success Green**: #83C12C (Growth and success)
+- **Accent Orange**: #F68109 (Energy and action)
+- **Background Gray**: #F9FAFB (Clean, professional)
 
-- **Primary Blue**: #1078CF
-- **Success Green**: #83C12C
-- **Accent Orange**: #F68109
-- **Background Gray**: #F9FAFB
+### Performance Optimization
+- **Next.js 15** with Turbopack for fast development and builds
+- **React 19** for modern component architecture
+- **Tailwind CSS 4** for efficient styling and small bundle sizes
+- **TypeScript** for code reliability and developer experience
 
 ## 🤝 Contributing
 
