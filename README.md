@@ -94,7 +94,7 @@ To provide a trusted platform where students and tourists can find safe, complia
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/Inv8Solutions/trapihaus.git
+   git clone [repository-url]
    cd trapihaus
    ```
 
@@ -178,19 +178,13 @@ To provide a trusted platform where students and tourists can find safe, complia
 - **Approach**: City-by-city expansion with local partnerships
 - **Goal**: Become the leading accommodation marketplace for students and budget travelers
 
-## 📈 Business Model
+## 📈 Platform Vision
 
-### Revenue Streams (Future Implementation)
-- **Commission-based**: Percentage from successful bookings
-- **Listing Fees**: Premium placement for accommodation providers
-- **Verification Services**: Enhanced trust and safety features
-- **Local Partnerships**: Integration with Baguio tourism ecosystem
-
-### Competitive Advantages
-- **Hyperlocal Focus**: Deep understanding of Baguio market dynamics
+### Key Differentiators
+- **Hyperlocal Focus**: Deep understanding of local market dynamics
 - **Student-Centric**: Tailored specifically for student accommodation needs
 - **Compliance First**: Emphasis on local regulation adherence
-- **Community-Driven**: Built by and for the Baguio community
+- **Community-Driven**: Built by and for the local community
 
 ## 📱 Technical Implementation
 
@@ -222,14 +216,13 @@ The marketplace landing page is fully responsive with breakpoints:
 
 ## 📄 License
 
-This project is proprietary and belongs to Inv8Solutions.
+This project is proprietary. All rights reserved.
 
 ## 📞 Contact
 
 **Trapihaus Team**
 - 📍 Baguio City, Philippines
-- 📞 +63 912 4567 890
-- 📧 Trapihaus@Email.Com
+- � [Contact information available upon request]
 
 ---
 
