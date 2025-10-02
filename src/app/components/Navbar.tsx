@@ -13,8 +13,8 @@ export default function Navbar() {
                 </Link>
 
                 <div className="flex-1 hidden md:flex justify-center space-x-8 text-white font-medium text-[18px]">
-                    <Link href="#">Browse Stays</Link>
-                    <Link href="#">About</Link>
+                    <Link href="/">Browse Stays</Link>
+                    <Link href="/about">About</Link>
                     <Link href="#">List Property</Link>
                     <Link href="#">Contact</Link>
                 </div>
