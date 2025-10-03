@@ -68,7 +68,7 @@ export default function Discover({
 }: DiscoverProps) {
   return (
     <section className="py-16 bg-white">
-      <div className="max-w-7xl mx-auto px-6">
+      <div className="max-w-full mx-auto px-6">
         <div className="text-center mb-12">
           <h2 className="text-4xl md:text-5xl font-bold mb-4 font-lexend text-[#1078CF]">
             {title}

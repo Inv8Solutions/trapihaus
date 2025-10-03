@@ -13,13 +13,11 @@ export default function WhoWeAre({
 }: WhoWeAreProps) {
   return (
     <section className="py-16 bg-white">
-      <div className="max-w-7xl mx-auto px-6">
+      <div className="max-w-full mx-auto px-6">
         <div className="grid lg:grid-cols-2 gap-12 items-center">
           <div className="relative">
-            <div 
-              className="w-full h-[618px] rounded-2xl shadow-lg bg-center"
-              style={{ backgroundImage: `url(${image})` }}
-            >
+            <div className="rounded-2xl shadow-lg overflow-hidden">
+              <img src={image} alt={title} className="w-full h-[618px] object-cover block" />
             </div>
           </div>
           
