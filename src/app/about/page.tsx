@@ -3,8 +3,8 @@
 import Navbar from "../components/layout/Navbar";
 import Footerr from "../components/layout/Footerr";
 import AboutHero from "../components/ui/AboutHero";
-import MissionSection from "../components/ui/MissionSection";
-import ValuesGrid from "../components/ui/ValuesGrid";
+import WhoWeAre from "../components/ui/WhoWeAre";
+import MissionVision from "../components/ui/MissionVision";
 import VisionSection from "../components/ui/VisionSection";
 import ContactSection from "../components/ui/ContactSection";
 
@@ -44,8 +44,9 @@ export default function About() {
 
   // Mission content
   const missionParagraphs = [
-    "Trapihaus is a hyperlocal digital marketplace designed to bridge the gap between accommodation owners and visitors seeking quality stays in Baguio City. We provide a trusted platform where students and tourists can find safe, compliant, and affordable accommodations while helping local property owners reach their target market effectively.",
-    "Whether you&apos;re a student looking for budget-friendly housing near campus or a tourist seeking verified accommodations, Trapihaus makes finding your perfect stay simple and secure."
+    "Trapihaus started in Baguio with a simple idea: make local stays safer, more affordable, and compliant for everyone — from students to tourists.",
+    "We recognized that students and travelers needed trustworthy accommodation options, while local hosts wanted a reliable platform to offer their spaces. Our hyperlocal approach ensures we understand the unique needs of the Baguio community.",
+    "Today, we're building bridges between those who need quality accommodations and those who provide them, creating a sustainable ecosystem that benefits everyone."
   ];
 
   // Vision phases
@@ -90,15 +91,15 @@ export default function About() {
       
       <AboutHero 
         title="About Trapihaus"
-        subtitle="Your trusted hyperlocal marketplace for safe, compliant, and affordable stays in Baguio City"
+        subtitle="Building safe, affordable, and compliant stays for students and travelers in Baguio and beyond."
       />
 
-      <MissionSection 
+      <WhoWeAre 
         title="Our Mission"
         paragraphs={missionParagraphs}
       />
 
-      <ValuesGrid 
+      <MissionVision 
         title="Our Values"
         subtitle="These core values guide everything we do at Trapihaus"
         values={valuesData}
