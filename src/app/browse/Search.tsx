@@ -24,7 +24,7 @@ export default function Search() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div className="bg-gray-50 py-8">
       {/* Blue Container with Iridescence Background */}
       <div className="max-w-full mx-auto px-6">
         <div className="relative rounded-3xl overflow-hidden shadow-2xl">
