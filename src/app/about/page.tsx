@@ -5,8 +5,10 @@ import Footerr from "../components/layout/Footerr";
 import AboutHero from "../components/ui/AboutHero";
 import WhoWeAre from "../components/ui/WhoWeAre";
 import MissionVision from "../components/ui/MissionVision";
-import VisionSection from "../components/ui/VisionSection";
-import ContactSection from "../components/ui/ContactSection";
+import Cats from "../components/sections/Cats";
+import HowItWorks from "../components/sections/HowItWorks";
+import JoinUs from "../components/sections/JoinUs";
+import Discover from "../components/ui/Discover";
 
 export default function About() {
   // Values data
@@ -100,22 +102,19 @@ export default function About() {
       />
 
       <MissionVision 
-        title="Our Values"
-        subtitle="These core values guide everything we do at Trapihaus"
-        values={valuesData}
+        missionText="To connect travelers with safe and affordable accommodations while supporting compliant local hosts. We strive to create a marketplace where trust, transparency, and community values are at the forefront of every interaction."
+        visionText="To become the most trusted local accommodation marketplace across the Philippines. We envision a future where every Filipino city has access to our platform, connecting quality accommodations with travelers while fostering economic growth in local communities."
+        missionImage="/mission.jpg"
+        visionImage="/vision.jpg"
       />
 
-      <VisionSection 
-        title="Our Vision"
-        description="To become the leading accommodation marketplace for students and budget travelers across the Philippines, starting with our hyperlocal focus in Baguio City and expanding throughout the region."
-        phases={visionPhases}
-      />
+      <Cats />
 
-      <ContactSection 
-        title="Built for Baguio"
-        description="Created by locals who understand the unique accommodation needs of students, tourists, and the Baguio community."
-        buttons={contactButtons}
-      />
+      <HowItWorks />
+
+      <Discover />
+
+      <JoinUs />
 
       <Footerr />
     </main>

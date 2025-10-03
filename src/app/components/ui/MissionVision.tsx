@@ -1,59 +1,62 @@
 "use client";
 
-interface ValueCardProps {
-  icon: React.ReactNode;
-  title: string;
-  description: string;
-  bgColor: string;
-  iconColor: string;
+interface MissionVisionProps {
+  missionText: string;
+  visionText: string;
+  missionImage?: string;
+  visionImage?: string;
 }
 
-const ValueCard = ({ icon, title, description, bgColor, iconColor }: ValueCardProps) => {
+export default function MissionVision({ 
+  missionText, 
+  visionText,
+  missionImage = "/mission_image.jpg",
+  visionImage = "/vision_image.jpg"
+}: MissionVisionProps) {
   return (
-    <div className="bg-white p-8 rounded-2xl text-center shadow-sm">
-      <div className={`w-16 h-16 ${bgColor} rounded-full flex items-center justify-center mx-auto mb-6`}>
-        <div className={iconColor}>
-          {icon}
-        </div>
-      </div>
-      <h3 className="text-xl font-bold mb-4 font-lexend">{title}</h3>
-      <p className="text-gray-600 font-lexend">
-        {description}
-      </p>
-    </div>
-  );
-};
-
-interface ValuesGridProps {
-  title: string;
-  subtitle: string;
-  values: Array<{
-    icon: React.ReactNode;
-    title: string;
-    description: string;
-    bgColor: string;
-    iconColor: string;
-  }>;
-}
-
-export default function ValuesGrid({ title, subtitle, values }: ValuesGridProps) {
-  return (
-    <section className="py-16 bg-gray-50">
-      <div className="max-w-7xl mx-auto px-6">
-        <div className="text-center mb-12">
-          <h2 className="text-4xl md:text-5xl font-bold mb-4 font-lexend text-[#1078CF]">
-            {title}
-          </h2>
-          <p className="text-gray-600 text-lg max-w-3xl mx-auto font-lexend">
-            {subtitle}
-          </p>
+    <section className="py-16 bg-white">
+      <div className="max-w-7xl mx-auto px-6 space-y-16">
+        
+        {/* Mission Section */}
+        <div className="grid lg:grid-cols-2 gap-12 items-center">
+          <div>
+            <h2 className="text-4xl md:text-5xl font-bold mb-6 font-lexend">
+              Our <span className="text-[#1078CF]">Mission</span>
+            </h2>
+            <p className="text-gray-600 text-lg font-lexend leading-relaxed">
+              <span className="text-[#83C12C] font-semibold">To connect travelers with safe and affordable accommodations</span> while supporting compliant local hosts. We strive to create a marketplace where trust, transparency, and community values are at the forefront of every interaction.
+            </p>
+          </div>
+          
+          <div className="relative">
+            <div 
+              className="w-full h-80 rounded-2xl shadow-lg bg-cover bg-center bg-no-repeat"
+              style={{ backgroundImage: `url(${missionImage})` }}
+            >
+            </div>
+          </div>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-8">
-          {values.map((value, index) => (
-            <ValueCard key={index} {...value} />
-          ))}
+        {/* Vision Section */}
+        <div className="grid lg:grid-cols-2 gap-12 items-center">
+          <div className="relative lg:order-1">
+            <div 
+              className="w-full h-80 rounded-2xl shadow-lg bg-cover bg-center bg-no-repeat"
+              style={{ backgroundImage: `url(${visionImage})` }}
+            >
+            </div>
+          </div>
+          
+          <div className="lg:order-2">
+            <h2 className="text-4xl md:text-5xl font-bold mb-6 font-lexend">
+              Our <span className="text-[#1078CF]">Vision</span>
+            </h2>
+            <p className="text-gray-600 text-lg font-lexend leading-relaxed">
+              <span className="text-[#F68109] font-semibold">To become the most trusted local accommodation marketplace across the Philippines.</span> We envision a future where every Filipino city has access to our platform, connecting quality accommodations with travelers while fostering economic growth in local communities.
+            </p>
+          </div>
         </div>
+        
       </div>
     </section>
   );
