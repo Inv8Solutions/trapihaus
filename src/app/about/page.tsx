@@ -9,6 +9,7 @@ import Cats from "../components/sections/Cats";
 import HowItWorks from "../components/sections/HowItWorks";
 import JoinUs from "../components/sections/JoinUs";
 import Discover from "../components/ui/Discover";
+import Lastt from "../components/sections/Lastt";
 
 export default function About() {
   // Values data
@@ -115,7 +116,7 @@ export default function About() {
       <Discover />
 
       <JoinUs />
-
+      <Lastt />
       <Footerr />
     </main>
   );
