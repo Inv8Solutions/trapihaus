@@ -35,7 +35,7 @@ const CategoryCard = ({ title, description, image, className = "" }: CategoryCar
 export default function Categories() {
   return (
     <section className="py-16 bg-gray-50">
-      <div className="max-w-7xl mx-auto px-6">
+      <div className="max-w-full mx-auto px-6">
         {/* Header */}
         <div className="text-center mb-12">
           <h2 className="text-4xl md:text-[48px] font-bold mb-4 font-lexend">

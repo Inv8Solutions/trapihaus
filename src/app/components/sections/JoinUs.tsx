@@ -188,7 +188,7 @@ export default function JoinUs() {
 
   return (
     <section className="py-12 bg-gray-50 mb-[100px]">
-      <div className="max-w-7xl mx-auto px-6">
+      <div className="max-w-full mx-auto px-6">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <div>

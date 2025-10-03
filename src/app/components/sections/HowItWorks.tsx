@@ -27,8 +27,8 @@ const Step = ({ number, title, description, bgColor, textColor }: StepProps) => 
 
 export default function HowItWorks() {
   return (
-    <section className="py-16 bg-white">
-      <div className="max-w-7xl mx-auto px-6">
+    <section className="py-16 bg-white mb-[100px]">
+      <div className="max-w-full mx-auto px-6">
         <div className="grid lg:grid-cols-2 gap-12 items-center">
           {/* Images Section */}
           <div className="relative">
@@ -37,7 +37,7 @@ export default function HowItWorks() {
               <img
                 src="https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=500&h=400&fit=crop&crop=center"
                 alt="Modern apartment interior"
-                className="w-full h-96 object-cover rounded-2xl"
+                className="w-full h-[480px] object-cover rounded-2xl"
               />
               
               {/* Floating Bottom Image - Positioned on bottom right */}
@@ -45,7 +45,7 @@ export default function HowItWorks() {
                 <img
                   src="https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=400&h=300&fit=crop&crop=center"
                   alt="Cozy apartment living area"
-                  className="w-full h-full object-cover rounded-2xl shadow-lg border-8 border-white"
+                  className="w-full h-[242px] object-cover rounded-2xl shadow-lg border-8 border-white"
                 />
               </div>
             </div>
