@@ -11,12 +11,12 @@ export default function Navbar() {
     return (
         <nav className={`${lexend.className} w-full bg-blue-600 rounded-full py-3 shadow-md mt-[24px]`}>
             <div className="max-w-6xl mx-auto flex items-center">
-                <Link href="/" className="flex items-center flex-none">
-                    <img src="/logo.png" alt="TrapiHaus" className="h-8" />
+                <Link href="/" className="flex items-center flex-none hover:opacity-80 transition-opacity duration-200">
+                    <img src="/logo.png" alt="TrapiHaus" className="h-8 cursor-pointer" />
                 </Link>
 
                 <div className="flex-1 hidden md:flex justify-center space-x-8 text-white text-[18px]">
-                    <Link href="/" className={pathname === "/" ? "font-black" : "font-medium"}>Browse Stays</Link>
+                    <Link href="/browse" className={pathname === "/browse" ? "font-black" : "font-medium"}>Browse Stays</Link>
                     <Link href="/about" className={pathname === "/about" ? "font-black" : "font-medium"}>About</Link>
                     <Link href="#" className="font-medium">List Property</Link>
                     <Link href="#" className="font-medium">Contact</Link>
