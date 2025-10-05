@@ -6,27 +6,28 @@ Concise, project-specific instructions to help AI agents produce high-quality, c
 - Styling: Tailwind CSS v4 (utility-first, no custom CSS frameworks) in `globals.css` + component classes.
 - Fonts loaded via `next/font` (`Geist`, `Lexend`) in `src/app/layout.tsx` using CSS variables.
 - Image handling standardized with `next/image`; remote domains configured in `next.config.ts` (`images.unsplash.com`, `github.com`). Use `<Image />` or the lightweight wrapper `AppImage` in `src/app/components/ui/AppImage.tsx`.
-- Landing‑page style MVP; no backend or data fetching logic yet—content is static arrays inside components.
+- Landing-page style MVP; no backend or data fetching logic yet—content is static arrays inside components.
 
 ## 2. Directory & Component Conventions
+
 ```
 src/app/
-  page.tsx                // Landing page
-  about/page.tsx          // About page composition
-  browse/                 // Browse feature (static placeholder lists)
-  components/
-    layout/               // Global layout atoms (Navbar, Footerr)
-    sections/             // Home/marketing sections (Hero, Cats, TopPicks, etc.)
-    ui/                   // Reusable UI blocks (AboutHero, MissionVision, AppImage, etc.)
+page.tsx // Landing page
+about/page.tsx // About page composition
+browse/ // Browse feature (static placeholder lists)
+components/
+layout/ // Global layout atoms (Navbar, Footerr)
+sections/ // Home/marketing sections (Hero, Cats, TopPicks, etc.)
+ui/ // Reusable UI blocks (AboutHero, MissionVision, AppImage, etc.)
 ```
 Guidelines:
 - Co-locate presentational logic inside section files. If logic becomes stateful/shared, extract to `ui/`.
-- Keep components client or server appropriately. Add "use client" only when using hooks or browser APIs.
+- Keep components client or server appropriately. Add `"use client"` only when using hooks or browser APIs.
 - Use PascalCase filenames for React components.
 
 ## 3. Styling Patterns
 - Tailwind utility classes only; stay consistent with existing naming (e.g., `font-lexend`, custom brand colors as hex directly when needed: `#1078CF`, `#83C12C`, `#F68109`).
-- Prefer semantic grouping: structure (layout, spacing), typography, color, effects.
+- Prefer semantic grouping: structure (layout, spacing), typography, color, effects.  
   Example order: `"flex items-center gap-4 px-6 py-4 rounded-2xl bg-blue-600 text-white shadow"`.
 - Avoid inline `<style>` or custom CSS unless absolutely required (then consider a wrapper utility instead).
 
@@ -86,7 +87,73 @@ Ask before adding. Acceptable categories: lightweight animation, accessibility h
 If adding async data later, co-locate fetch logic in `src/app/lib/` with a thin server function and call in a Server Component when possible; hydrate client pieces only where interaction required.
 
 ---
-Provide diffs only via file edits (no pasted blobs) and keep changes minimal & purposeful.
-If something is ambiguous, leave a short `// TODO:` comment with context.
 
-Let me know if any area (data modeling, testing approach, deployment assumptions) needs clarification to expand this guide.
+## 13. Linting & Quality Enforcement
+- ESLint + TypeScript rules are strict; maintain a **zero-error** policy before pushing.  
+- To automatically fix common issues, use:
+  ```bash
+  npm run lint -- --fix
+
+14. Security & Data Protection Guidelines
+
+Follow these practices for all code touching user data, authentication, or payment logic:
+
+🔐 General
+
+Never commit API keys, Firebase configs, or tokens directly.
+Store secrets in .env.local and access via process.env.
+
+Avoid exposing environment variables on the client unless they start with NEXT_PUBLIC_.
+
+Don’t log sensitive user data in console.log() or error traces.
+
+🧾 Payment Handling
+
+All payment or transaction logic must occur via trusted third-party SDKs (e.g., Stripe Checkout, PayPal SDK).
+
+Never store card numbers or payment tokens in local state or Firestore.
+
+Sanitize all user-submitted form data before sending to APIs.
+
+👤 Authentication
+
+Use Firebase Auth or NextAuth.js (recommended when backend introduced).
+
+Verify onAuthStateChanged responses server-side before showing protected UI.
+
+Don’t rely solely on client-side conditions for route access; always add guards on both ends.
+
+🧱 Database & API Safety
+
+Validate and sanitize all Firestore writes; use Firestore Security Rules or server validation.
+
+For form submissions, escape HTML entities and strip scripts (DOMPurify if needed).
+
+When fetching or displaying user-generated content, prefer dangerouslySetInnerHTML={undefined}.
+
+🔒 Privacy
+
+Follow minimum data retention: store only what’s needed.
+
+When building analytics or telemetry, anonymize user identifiers.
+
+If adding cookies or sessions, configure them as:
+
+{ secure: true, httpOnly: true, sameSite: "strict" }
+
+
+Provide visible privacy disclaimers for all user-facing data inputs.
+
+15. Copilot & AI Integration Notes
+
+Copilot and AI agents should follow this file’s conventions for:
+
+Strict linting and formatting (ESLint + Prettier + TypeScript).
+
+Safe and minimal data handling.
+
+Avoidance of unused imports, hardcoded secrets, or inline styles.
+
+AI-generated code should be reviewed and tested before committing.
+
+When adding new sections or utilities, prefer small, modular, and type-safe implementations aligned with this guide.
