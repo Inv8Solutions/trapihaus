@@ -30,6 +30,7 @@ Guidelines:
 - Prefer semantic grouping: structure (layout, spacing), typography, color, effects.  
   Example order: `"flex items-center gap-4 px-6 py-4 rounded-2xl bg-blue-600 text-white shadow"`.
 - Avoid inline `<style>` or custom CSS unless absolutely required (then consider a wrapper utility instead).
+- take note of the responsiveness to mobile view
 
 ## 4. Images & Media
 - Never add raw `<img>`; always use `next/image` (or `AppImage`). Provide either explicit `width`/`height` or `fill` with a sized/relative parent.

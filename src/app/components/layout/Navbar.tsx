@@ -19,7 +19,7 @@ export default function Navbar() {
                 <div className="flex-1 hidden md:flex justify-center space-x-8 text-white text-[18px]">
                     <Link href="/browse" className={pathname === "/browse" ? "font-black" : "font-medium"}>Browse Stays</Link>
                     <Link href="/about" className={pathname === "/about" ? "font-black" : "font-medium"}>About</Link>
-                    <Link href="#" className="font-medium">List Property</Link>
+                    <Link href="/ListProperty" className={pathname === "/ListProperty" ? "font-black" : "font-medium"}>List Property</Link>
                     <Link href="#" className="font-medium">Contact</Link>
                 </div>
 
