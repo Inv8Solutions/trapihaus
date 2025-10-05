@@ -6,7 +6,7 @@ import Link from "next/link";
 export default function ReadyToEarn() {
   return (
     <div className="px-8">
-        <section className="relative w-full h-[260px] md:h-[300px] lg:h-[320px] overflow-hidden rounded-2xl bg-gradient-to-r from-blue-600 to-blue-500 mb-[100px]">
+        <section className="relative w-full h-[290px] md:h-[430px] lg:h-[461px] overflow-hidden rounded-2xl bg-gradient-to-r from-blue-600 to-blue-500 mb-[100px]">
         {/* Animated background */}
         <div className="absolute inset-0 z-0 pointer-events-none">
             <Iridescence color={[0.06, 0.47, 0.91]} speed={0.8} amplitude={0.08} mouseReact={true} />
@@ -14,7 +14,7 @@ export default function ReadyToEarn() {
 
         <div className="relative z-10 flex items-center justify-center h-full backdrop-blur-[1px]">
             <div className="max-w-4xl w-full text-center px-6">
-            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white font-lexend mb-3">
+            <h2 className="text-3xl md:text-4xl lg:text-[72px] font-bold text-white font-lexend mb-3">
                 Ready to Earn From
                 <br />
                 Your Property?
