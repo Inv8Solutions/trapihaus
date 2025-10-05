@@ -1,5 +1,6 @@
 "use client";
 import { useState } from 'react';
+import Image from 'next/image';
 
 interface TestimonialProps {
   quote: string;
@@ -31,11 +32,9 @@ const TestimonialCard = ({ quote, name, role, avatar, rating }: TestimonialProps
       {/* User Info */}
       
       <div className="flex items-center gap-3">
-        <img
-          src={avatar}
-          alt={name}
-          className="w-10 h-10 rounded-full object-cover"
-        />
+        <div className="relative w-10 h-10 rounded-full overflow-hidden">
+          <Image src={avatar} alt={name} fill className="object-cover" sizes="40px" />
+        </div>
         <div>
           <h4 className="font-semibold text-gray-900 text-sm font-lexend">{name}</h4>
           <p className="text-gray-500 text-xs font-lexend">{role}</p>

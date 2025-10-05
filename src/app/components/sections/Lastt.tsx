@@ -1,14 +1,17 @@
 "use client";
-
+import Image from 'next/image';
 export default function Lastt() {
   return (
     <section className="relative pt-24 pb-40 overflow-hidden rounded-t-[40px] mx-[24px] translate-y-2 z-0">
       {/* Background Image */}
       <div className="absolute inset-0">
-        <img
+        <Image
           src="https://github.com/Inv8Solutions/trapihaus/blob/master/public/lastbg.jpg?raw=true"
           alt="Baguio mountains landscape"
-          className="w-full h-full object-cover"
+          fill
+          className="object-cover"
+          sizes="100vw"
+          priority={false}
         />
         {/* Dark Overlay */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent"></div>

@@ -1,5 +1,5 @@
 "use client";
-
+import Image from 'next/image';
 interface StepProps {
   number: string;
   title: string;
@@ -34,19 +34,28 @@ export default function HowItWorks() {
           <div className="relative">
             {/* Main Top Image */}
             <div className="relative">
-              <img
-                src="https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=500&h=400&fit=crop&crop=center"
-                alt="Modern apartment interior"
-                className="w-full h-[480px] object-cover rounded-2xl"
-              />
+              <div className="w-full h-[480px] relative rounded-2xl overflow-hidden">
+                <Image
+                  src="https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=800&h=640&fit=crop&crop=center"
+                  alt="Modern apartment interior"
+                  fill
+                  className="object-cover"
+                  sizes="(max-width:768px) 100vw, 50vw"
+                  priority={false}
+                />
+              </div>
               
               {/* Floating Bottom Image - Positioned on bottom right */}
               <div className="absolute -bottom-16 -right-8 w-2/3 h-48">
-                <img
-                  src="https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=400&h=300&fit=crop&crop=center"
-                  alt="Cozy apartment living area"
-                  className="w-full h-[242px] object-cover rounded-2xl shadow-lg border-8 border-white"
-                />
+                <div className="w-full h-[242px] relative rounded-2xl shadow-lg border-8 border-white overflow-hidden">
+                  <Image
+                    src="https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=640&h=480&fit=crop&crop=center"
+                    alt="Cozy apartment living area"
+                    fill
+                    className="object-cover"
+                    sizes="(max-width:768px) 100vw, 33vw"
+                  />
+                </div>
               </div>
             </div>
           </div>

@@ -27,44 +27,11 @@ const LandmarkCard = ({ image, title, description }: LandmarkCardProps) => {
 interface DiscoverProps {
   title?: string;
   subtitle?: string;
-  landmarks?: LandmarkCardProps[];
 }
 
 export default function Discover({ 
   title = "Discover Baguio's Iconic Landmarks",
-  subtitle = "Explore the city's heritage, culture, and natural beauty",
-  landmarks = [
-    {
-      image: "/diplomat.png",
-      title: "Diplomat Hotel",
-      description: "A historic site known for its architecture and legacy"
-    },
-    {
-      image: "/mines.png",
-      title: "Mines View Park",
-      description: "Panoramic mountain views of Baguio and Benguet"
-    },
-    {
-      image: "/cathedral.png",
-      title: "Baguio Cathedral",
-      description: "A city landmark of faith and heritage"
-    },
-    {
-      image: "/botanical.png",
-      title: "Botanical Garden",
-      description: "A serene showcase of Baguio's natural heritage"
-    },
-    {
-      image: "/burnham.png",
-      title: "Burnham Park",
-      description: "The central hub for recreation and leisure in Baguio"
-    },
-    {
-      image: "/lion.png",
-      title: "Lions Head",
-      description: "An iconic landmark welcoming travelers to Baguio"
-    }
-  ]
+  subtitle = "Explore the city's heritage, culture, and natural beauty"
 }: DiscoverProps) {
   return (
     <section className="py-16 bg-white">

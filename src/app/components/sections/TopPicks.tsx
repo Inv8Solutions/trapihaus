@@ -1,5 +1,6 @@
 "use client";
 import { useState } from 'react';
+import Image from 'next/image';
 
 interface Listing {
   id: number;
@@ -13,13 +14,11 @@ interface Listing {
 }
 
 const PropertyTypeTab = ({ 
-  type, 
   label, 
   icon, 
   isActive, 
   onClick 
 }: { 
-  type: string;
   label: string;
   icon: React.ReactNode;
   isActive: boolean;
@@ -43,19 +42,21 @@ const PropertyCard = ({ listing }: { listing: Listing }) => {
     <div className="bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300 border border-gray-100">
       {/* Image Container */}
       <div className="relative h-48 rounded-3xl overflow-hidden">
-        <img
-          src={`https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=400&h=300&fit=crop&crop=center`}
-          alt={listing.title}
-          className="w-full h-full object-cover p-[16px] rounded-3xl"
-        />
+        <div className="absolute inset-0 p-[16px]">
+          <div className="relative w-full h-full rounded-3xl overflow-hidden">
+            <Image
+              src={`https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=640&h=480&fit=crop&crop=center`}
+              alt={listing.title}
+              fill
+              className="object-cover"
+              sizes="(max-width:768px) 100vw, 25vw"
+            />
+          </div>
+        </div>
         {/* Verified Badge */}
         {listing.verified && (
           <div className="absolute top-5 right-5 bg-[#83C12C] text-white px-3 py-1 rounded-full text-sm font-semibold flex items-center gap-1">
-            <img 
-              src="/Vector (1).png" 
-              alt="Verified checkmark" 
-              className="w-4 h-4"
-            />
+            <Image src="/Vector (1).png" alt="Verified checkmark" width={16} height={16} className="w-4 h-4" />
             Verified
           </div>
         )}
@@ -322,7 +323,6 @@ export default function TopPicks() {
           {/* Property Type Tabs */}
           <div className="flex items-center gap-3">
             <PropertyTypeTab
-              type="apartment"
               label="Apartment"
               icon={
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -333,7 +333,6 @@ export default function TopPicks() {
               onClick={() => setActiveTab('apartment')}
             />
             <PropertyTypeTab
-              type="transient"
               label="Transient"
               icon={
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -344,7 +343,6 @@ export default function TopPicks() {
               onClick={() => setActiveTab('transient')}
             />
             <PropertyTypeTab
-              type="hotel"
               label="Hotel"
               icon={
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

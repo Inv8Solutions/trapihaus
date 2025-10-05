@@ -1,5 +1,5 @@
 "use client";
-
+import Image from "next/image";
 interface CategoryCardProps {
   title: string;
   description: string;
@@ -12,12 +12,13 @@ const CategoryCard = ({ title, description, image, className = "" }: CategoryCar
     <div className={`relative rounded-3xl overflow-hidden group cursor-pointer ${className}`}>
       {/* Background Image */}
       <div className="relative h-64 md:h-80">
-        <img
+        <Image
           src={image}
           alt={title}
-          className="w-full h-full object-cover"
-          onError={() => console.log(`Failed to load: ${image}`)}
-          onLoad={() => console.log(`Loaded: ${image}`)}
+          fill
+          className="object-cover"
+          sizes="(max-width:768px) 100vw, 50vw"
+          priority={false}
         />
         {/* Gradient Overlay - Black to Transparent from bottom to top */}
         <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent"></div>

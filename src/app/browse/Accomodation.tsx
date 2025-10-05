@@ -2,46 +2,17 @@
 
 import { useState } from 'react';
 
-// Custom styles for the slider
-const sliderStyles = `
-  .slider::-webkit-slider-thumb {
-    appearance: none;
-    wi  return (
-    <div className="bg-gray-50">
-      <style dangerouslySetInnerHTML={{ __html: sliderStyles }} />
-      <div className="max-w-7xl mx-auto px-6 pb-8">: 24px;
-    height: 24px;
-    border-radius: 50%;
-    background: #83C12C;
-    border: 4px solid white;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
-    cursor: pointer;
-  }
-  
-  .slider::-moz-range-thumb {
-    width: 24px;
-    height: 24px;
-    border-radius: 50%;
-    background: #83C12C;
-    border: 4px solid white;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
-    cursor: pointer;
-    border: none;
-  }
-`;
-
 interface AccommodationCardProps {
   id: string;
   name: string;
   location: string;
   price: number;
-  currency: string;
   rating: number;
   image: string;
   verified: boolean;
 }
 
-const AccommodationCard = ({ name, location, price, currency, rating, image, verified }: AccommodationCardProps) => {
+const AccommodationCard = ({ name, location, price, rating, image, verified }: AccommodationCardProps) => {
   return (
     <div className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300">
       <div className="relative">
@@ -98,7 +69,6 @@ export default function Accommodation() {
       name: 'Loakan Heights Residences',
       location: 'Near Police Station',
       price: 6300,
-      currency: 'PHP',
       rating: 4.6,
       image: '/hotel1.jpg',
       verified: true
@@ -108,7 +78,6 @@ export default function Accommodation() {
       name: 'Sunrise Pines Lodge',
       location: 'Near Saint Louis University',
       price: 1450,
-      currency: 'PHP',
       rating: 4.8,
       image: '/hotel2.jpg',
       verified: true
@@ -118,7 +87,6 @@ export default function Accommodation() {
       name: 'Loakan Heights Residences',
       location: 'Near Police Station',
       price: 6300,
-      currency: 'PHP',
       rating: 4.6,
       image: '/hotel1.jpg',
       verified: true
@@ -128,7 +96,6 @@ export default function Accommodation() {
       name: 'Sunrise Pines Lodge',
       location: 'Near Saint Louis University',
       price: 1450,
-      currency: 'PHP',
       rating: 4.8,
       image: '/hotel2.jpg',
       verified: true
@@ -138,7 +105,6 @@ export default function Accommodation() {
       name: 'Loakan Heights Residences',
       location: 'Near Police Station',
       price: 6300,
-      currency: 'PHP',
       rating: 4.6,
       image: '/hotel1.jpg',
       verified: true
@@ -148,7 +114,6 @@ export default function Accommodation() {
       name: 'Sunrise Pines Lodge',
       location: 'Near Saint Louis University',
       price: 1450,
-      currency: 'PHP',
       rating: 4.8,
       image: '/hotel2.jpg',
       verified: true

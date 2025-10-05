@@ -1,5 +1,5 @@
 "use client";
-
+import Image from 'next/image';
 interface WhoWeAreProps {
   title: string;
   paragraphs: string[];
@@ -17,7 +17,9 @@ export default function WhoWeAre({
         <div className="grid lg:grid-cols-2 gap-12 items-center">
           <div className="relative">
             <div className="rounded-2xl shadow-lg overflow-hidden">
-              <img src={image} alt={title} className="w-full h-[618px] object-cover block" />
+              <div className="relative w-full h-[618px]">
+                <Image src={image} alt={title} fill className="object-cover" sizes="(max-width:768px) 100vw, 50vw" />
+              </div>
             </div>
           </div>
           
