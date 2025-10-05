@@ -11,7 +11,7 @@ export default function Footerr() {
           {/* Brand Section */}
           <div className="lg:col-span-1">
             <Link href="/" className="flex items-center flex-none">
-              <Image src="/logo.png" alt="TrapiHaus" width={160} height={80} className="h-[80px] w-auto" />
+              <Image src="/logo.png" alt="TrapiHaus" width={160} height={80} className="h-[80px] w-auto" style={{ width: 'auto' }} />
             </Link>
             <p className="text-blue-100 font-lexend leading-relaxed mb-6 mt-4 text-[20px]">
               Your trusted hyperlocal marketplace for safe, compliant, and affordable stays in Baguio City.

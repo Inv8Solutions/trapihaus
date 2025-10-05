@@ -13,7 +13,7 @@ export default function Navbar() {
         <nav className={`${lexend.className} w-full bg-blue-600 rounded-full py-3 shadow-md mt-[24px]`}>
             <div className="max-w-6xl mx-auto flex items-center">
                 <Link href="/" className="flex items-center flex-none hover:opacity-80 transition-opacity duration-200">
-                    <Image src="/logo.png" alt="TrapiHaus" width={120} height={32} className="h-8 w-auto cursor-pointer" priority />
+                    <Image src="/logo.png" alt="TrapiHaus" width={120} height={32} className="h-8 w-auto cursor-pointer" style={{ width: 'auto' }} priority />
                 </Link>
 
                 <div className="flex-1 hidden md:flex justify-center space-x-8 text-white text-[18px]">

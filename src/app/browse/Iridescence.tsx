@@ -68,7 +68,7 @@ export default function Iridescence({
     const gl = renderer.gl;
     gl.clearColor(1, 1, 1, 1);
 
-    const geometry = new Triangle(gl);
+  const geometry = new Triangle(gl);
     const program = new Program(gl, {
       vertex: vertexShader,
       fragment: fragmentShader,
@@ -86,7 +86,14 @@ export default function Iridescence({
 
     function resize() {
       const scale = 1;
-      renderer.setSize(ctn.offsetWidth * scale, ctn.offsetHeight * scale);
+      const w = ctn.offsetWidth * scale;
+      const h = ctn.offsetHeight * scale;
+      renderer.setSize(w, h);
+      // Ensure CSS sizing doesn't exceed container and cause horizontal scroll
+      gl.canvas.style.width = '100%';
+      gl.canvas.style.height = '100%';
+      gl.canvas.style.maxWidth = '100%';
+      gl.canvas.style.maxHeight = '100%';
       program.uniforms.uResolution.value = new Color(
         gl.canvas.width,
         gl.canvas.height,
@@ -94,18 +101,31 @@ export default function Iridescence({
       );
     }
     window.addEventListener('resize', resize, false);
-    resize();
 
     const mesh = new Mesh(gl, { geometry, program });
-    let animateId: number;
 
+    // Container layout & overflow control
+    if (!ctn.style.position) ctn.style.position = 'relative';
+    ctn.style.overflow = 'hidden';
+
+    // Canvas layout
+    Object.assign(gl.canvas.style, {
+      position: 'absolute',
+      top: '0',
+      left: '0',
+      display: 'block'
+    });
+
+    ctn.appendChild(gl.canvas);
+    resize();
+
+    let animateId: number;
     function update(t: number) {
       animateId = requestAnimationFrame(update);
       program.uniforms.uTime.value = t * 0.001;
       renderer.render({ scene: mesh });
     }
     animateId = requestAnimationFrame(update);
-    ctn.appendChild(gl.canvas);
 
     function handleMouseMove(e: MouseEvent) {
       const rect = ctn.getBoundingClientRect();
@@ -125,7 +145,18 @@ export default function Iridescence({
       if (mouseReact) {
         ctn.removeEventListener('mousemove', handleMouseMove);
       }
-      ctn.removeChild(gl.canvas);
+      if (gl && gl.canvas && ctn.contains(gl.canvas)) {
+        ctn.removeChild(gl.canvas);
+      }
+      // don't overwrite container position if it had a prior value
+      // (we only set it if it was falsy)
+      try {
+        if (ctn.style && ctn.style.position === 'relative') {
+          ctn.style.position = '';
+        }
+      } catch (e) {
+        // ignore
+      }
       gl.getExtension('WEBGL_lose_context')?.loseContext();
     };
   }, [color, speed, amplitude, mouseReact]);

@@ -5,6 +5,8 @@ import ListHero from "./ListHero";
 import WhyList from "./WhyList";
 import ListHowItWorks from "./ListHowItWorks";
 import ListJoinUs from "./ListJoinUs";
+import ReadyToEarn from "./ReadyToEarn";
+import Footerr from "../components/layout/Footerr";
 
 export default function ListPropertyPage() {
   return (
@@ -15,6 +17,8 @@ export default function ListPropertyPage() {
         <WhyList />
         <ListHowItWorks />
         <ListJoinUs />
+        <ReadyToEarn />
+        <Footerr />
       </main>
     </>
   );

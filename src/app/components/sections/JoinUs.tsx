@@ -33,7 +33,7 @@ const TestimonialCard = ({ quote, name, role, avatar, rating }: TestimonialProps
       
       <div className="flex items-center gap-3">
         <div className="relative w-10 h-10 rounded-full overflow-hidden">
-          <Image src={avatar} alt={name} fill className="object-cover" sizes="40px" />
+          <Image src={avatar} alt={name} fill className="object-cover" sizes="40px" unoptimized />
         </div>
         <div>
           <h4 className="font-semibold text-gray-900 text-sm font-lexend">{name}</h4>
