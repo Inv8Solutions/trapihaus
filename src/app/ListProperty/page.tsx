@@ -4,6 +4,7 @@ import Navbar from "../components/layout/Navbar";
 import ListHero from "./ListHero";
 import WhyList from "./WhyList";
 import ListHowItWorks from "./ListHowItWorks";
+import ListJoinUs from "./ListJoinUs";
 
 export default function ListPropertyPage() {
   return (
@@ -13,6 +14,7 @@ export default function ListPropertyPage() {
         <ListHero />
         <WhyList />
         <ListHowItWorks />
+        <ListJoinUs />
       </main>
     </>
   );
