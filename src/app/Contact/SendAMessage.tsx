@@ -9,10 +9,10 @@ interface SendAMessageProps {
 
 const categories = [
 	"Booking Issue",
-	"Listing Support",
-	"Payment",
-	"Account",
-	"Other",
+	"Listing / Host Support",
+	"Payments & Refunds",
+	"Compliance / Accreditation",
+	"General Inquiry",
 ];
 
 export default function SendAMessage({ title = "Send us a Message" }: SendAMessageProps) {
