@@ -24,12 +24,18 @@ export default function Navbar() {
                 </div>
 
                 <div className="flex items-center space-x-3">
-                    <button className="px-4 py-2 bg-[#83C12C] hover:bg-green-500 text-white rounded-full font-medium shadow-sm focus:outline-none focus:ring-2 focus:ring-green-300">
+                    <Link
+                      href="/login"
+                      className={`px-4 py-2 rounded-full font-medium shadow-sm focus:outline-none focus:ring-2 focus:ring-green-300 transition-colors ${pathname === "/login" ? "bg-[#6AA71F] text-white" : "bg-[#83C12C] hover:bg-green-500 text-white"}`}
+                    >
                         Sign In
-                    </button>
-                    <button className="px-4 py-2 bg-[#F68109] hover:bg-orange-500 text-white rounded-full font-medium shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-300">
+                    </Link>
+                    <Link
+                      href="/signup"
+                      className="px-4 py-2 bg-[#F68109] hover:bg-orange-500 text-white rounded-full font-medium shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-300"
+                    >
                         Register
-                    </button>
+                    </Link>
                 </div>
             </div>
         </nav>
