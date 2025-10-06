@@ -20,7 +20,7 @@ export default function Navbar() {
                     <Link href="/browse" className={pathname === "/browse" ? "font-black" : "font-medium"}>Browse Stays</Link>
                     <Link href="/about" className={pathname === "/about" ? "font-black" : "font-medium"}>About</Link>
                     <Link href="/ListProperty" className={pathname === "/ListProperty" ? "font-black" : "font-medium"}>List Property</Link>
-                    <Link href="#" className="font-medium">Contact</Link>
+                    <Link href="/Contact" className={pathname === "/Contact" ? "font-black" : "font-medium"}>Contact</Link>
                 </div>
 
                 <div className="flex items-center space-x-3">
