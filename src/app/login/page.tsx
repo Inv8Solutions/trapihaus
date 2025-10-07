@@ -24,8 +24,8 @@ export default function LoginPage() {
   <div className="relative flex w-full lg:w-1/2 items-center justify-center px-6 md:px-14 lg:px-20 py-10 lg:py-0 lg:h-screen">
         <div className="w-full max-w-md">
         <div className="mb-10">
-          <Link href="/" className="inline-flex items-center gap-2">
-            <Image src="/logo.png" alt="Trapihaus logo" width={160} height={48} priority />
+          <Link href="/" className="inline-flex items-center">
+            <Image src="/mainLogo.png" alt="Trapihaus main logo" width={170} height={52} priority />
           </Link>
         </div>
         <h1 className="text-3xl font-extrabold font-lexend tracking-tight mb-2 text-[#111827]">Sign In</h1>
@@ -93,7 +93,7 @@ export default function LoginPage() {
         </form>
         <p className="mt-8 text-center text-sm font-lexend text-[#374151]">
           Don’t have an account? {" "}
-          <Link href="/signup" className="font-semibold text-[#111827] hover:underline">
+          <Link href="/Register" className="font-semibold text-[#111827] hover:underline">
             Sign Up
           </Link>
         </p>
@@ -106,7 +106,7 @@ export default function LoginPage() {
           alt="Modern furnished apartment interior with mountain view through windows"
           fill
           priority
-          className="object-cover rounded-4xl"
+          className="object-cover"
           sizes="(max-width: 1024px) 100vw, 50vw"
         />
         <div className="absolute inset-0" />

@@ -30,12 +30,12 @@ export default function Navbar() {
                     >
                         Sign In
                     </Link>
-                    <Link
-                      href="/signup"
-                      className="px-4 py-2 bg-[#F68109] hover:bg-orange-500 text-white rounded-full font-medium shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-300"
-                    >
-                        Register
-                    </Link>
+                                        <Link
+                                            href="/Register"
+                                            className={`px-4 py-2 rounded-full font-medium shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-300 transition-colors ${pathname === "/Register" ? "bg-[#D96A04] text-white" : "bg-[#F68109] hover:bg-orange-500 text-white"}`}
+                                        >
+                                                Register
+                                        </Link>
                 </div>
             </div>
         </nav>
