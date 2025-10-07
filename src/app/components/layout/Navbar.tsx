@@ -19,7 +19,7 @@ export default function Navbar() {
                 <div className="flex-1 hidden md:flex justify-center space-x-8 text-white text-[18px]">
                     <Link href="/browse" className={pathname === "/browse" ? "font-black" : "font-medium"}>Browse Stays</Link>
                     <Link href="/about" className={pathname === "/about" ? "font-black" : "font-medium"}>About</Link>
-                    <Link href="/ListProperty" className={pathname === "/ListProperty" ? "font-black" : "font-medium"}>List Property</Link>
+                    <Link href="/List" className={pathname === "/List" ? "font-black" : "font-medium"}>List Property</Link>
                     <Link href="/Contact" className={pathname === "/Contact" ? "font-black" : "font-medium"}>Contact</Link>
                 </div>
 
@@ -30,12 +30,12 @@ export default function Navbar() {
                     >
                         Sign In
                     </Link>
-                                        <Link
-                                            href="/Register"
-                                            className={`px-4 py-2 rounded-full font-medium shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-300 transition-colors ${pathname === "/Register" ? "bg-[#D96A04] text-white" : "bg-[#F68109] hover:bg-orange-500 text-white"}`}
-                                        >
-                                                Register
-                                        </Link>
+                    <Link
+                        href="/Register"
+                        className={`px-4 py-2 rounded-full font-medium shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-300 transition-colors ${pathname === "/Register" ? "bg-[#D96A04] text-white" : "bg-[#F68109] hover:bg-orange-500 text-white"}`}
+                    >
+                            Register
+                    </Link>
                 </div>
             </div>
         </nav>

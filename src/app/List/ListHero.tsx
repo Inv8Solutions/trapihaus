@@ -29,9 +29,12 @@ export default function ListHero() {
             Turn your space into income. Connect with travelers looking for safe, quality, and affordable accommodations in Baguio City and beyond.
           </p>
           <div className="flex flex-wrap gap-4">
-            <button className="bg-[#83C12C] hover:bg-green-600 text-white font-semibold px-10 py-4 rounded-2xl text-lg transition-colors font-lexend shadow-sm">
+            <a
+              href="/ListProperty"
+              className="inline-block bg-[#83C12C] hover:bg-green-600 text-white font-semibold px-10 py-4 rounded-2xl text-lg transition-colors font-lexend shadow-sm"
+            >
               Get Started
-            </button>
+            </a>
           </div>
 
           <div className="mt-14 grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-2xl">
