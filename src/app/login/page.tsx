@@ -19,9 +19,9 @@ export default function LoginPage() {
   };
 
   return (
-    <main className="min-h-screen w-full flex flex-col lg:flex-row p-0">
+  <main className="h-screen w-full flex flex-col lg:flex-row p-0 overflow-hidden">
       {/* Left: Form */}
-      <div className="relative flex w-full lg:w-1/2 items-center justify-center px-6 md:px-14 lg:px-20 py-10">
+  <div className="relative flex w-full lg:w-1/2 items-center justify-center px-6 md:px-14 lg:px-20 py-10 lg:py-0 lg:h-screen">
         <div className="w-full max-w-md">
         <div className="mb-10">
           <Link href="/" className="inline-flex items-center gap-2">
@@ -100,16 +100,16 @@ export default function LoginPage() {
         </div>
       </div>
       {/* Right: Feature Image */}
-      <div className="relative w-full lg:w-1/2 h-[300px] sm:h-[400px] md:h-[500px] lg:h-auto min-h-[50vh] lg:min-h-screen overflow-hidden">
+      <div className="relative w-full lg:w-1/2 h-[300px] sm:h-[400px] md:h-[500px] lg:h-[calc(100vh-48px)] overflow-hidden mt-6 mb-6 mr-6">
         <Image
           src="/apartments.jpg"
           alt="Modern furnished apartment interior with mountain view through windows"
           fill
           priority
-          className="object-cover"
+          className="object-cover rounded-4xl"
           sizes="(max-width: 1024px) 100vw, 50vw"
         />
-        <div className="absolute inset-0 bg-black/10" />
+        <div className="absolute inset-0" />
       </div>
     </main>
   );
