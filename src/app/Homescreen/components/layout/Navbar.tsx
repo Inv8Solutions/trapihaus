@@ -10,10 +10,7 @@ const lexend = Lexend({ subsets: ["latin"], weight: ["100","200","300","400","50
 
 export default function Navbar() {
     const pathname = usePathname();
-    // Placeholder user object. Replace with real auth state (e.g., Firebase) once implemented.
-    // Example: const { currentUser } = getFirebaseAuth();
-    // For now keep null to show Login/Register by default.
-    const user = null as User | null; // set to an object to simulate logged-in state
+    const user = null as User | null; // placeholder; integrate real auth
     
     return (
         <nav className={`${lexend.className} w-full bg-blue-600 rounded-full py-3 shadow-md mt-[24px]`}>
