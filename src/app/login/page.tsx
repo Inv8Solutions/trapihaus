@@ -1,21 +1,38 @@
 "use client";
 
 import { useState } from "react";
+import { signInEmailPassword } from "@/lib/auth/firebaseClient";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
-// NOTE: This UI is Firebase-ready but does not initialize auth yet.
-// After adding Firebase, import signIn / related helpers from a client module.
 
 export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const [error, setError] = useState<string | null>(null);
+  const router = useRouter();
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setError(null);
     setLoading(true);
-    // Placeholder: integrate Firebase auth (signInWithEmailAndPassword) here.
-    setTimeout(() => setLoading(false), 800);
+    const fd = new FormData(e.currentTarget);
+    const email = String(fd.get("email") || "").trim();
+    const password = String(fd.get("password") || "");
+    try {
+      await signInEmailPassword(email, password);
+      router.push("/Homescreen/home");
+    } catch (err: any) {
+      const code = err?.code || "";
+      let msg = err?.message || "Failed to sign in";
+      if (code.includes("auth/invalid-credential")) msg = "Incorrect email or password.";
+      if (code.includes("auth/invalid-email")) msg = "Please enter a valid email address.";
+      if (msg.toLowerCase().includes("firebase") && msg.toLowerCase().includes("api key")) msg = "Firebase is not configured. Add your NEXT_PUBLIC_FIREBASE_* keys in .env.local and restart dev server.";
+      setError(msg);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -33,6 +50,7 @@ export default function LoginPage() {
           Sign in to manage your bookings, explore stays, or list your property.
         </p>
         <form onSubmit={handleSubmit} className="space-y-6" noValidate>
+          {error && <p className="text-sm text-red-600">{error}</p>}
           {/* Email */}
             <div className="flex flex-col gap-2">
               <label htmlFor="email" className="text-sm font-medium font-lexend text-[#374151]">

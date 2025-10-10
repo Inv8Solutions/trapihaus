@@ -1,20 +1,47 @@
 "use client";
 
 import { useState } from "react";
+import { registerEmailPassword } from "@/lib/auth/firebaseClient";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 
 export default function RegisterPage() {
-	const [showPassword, setShowPassword] = useState(false);
-	const [showConfirm, setShowConfirm] = useState(false);
-	const [loading, setLoading] = useState(false);
+		const [showPassword, setShowPassword] = useState(false);
+		const [showConfirm, setShowConfirm] = useState(false);
+		const [loading, setLoading] = useState(false);
+		const [error, setError] = useState<string | null>(null);
+		const router = useRouter();
 
-	const handleSubmit = (e: React.FormEvent) => {
-		e.preventDefault();
-		setLoading(true);
-		// TODO: integrate Firebase createUserWithEmailAndPassword then profile update
-		setTimeout(() => setLoading(false), 900);
-	};
+		const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+			e.preventDefault();
+			setError(null);
+			setLoading(true);
+			const fd = new FormData(e.currentTarget);
+			const fullName = String(fd.get("fullName") || "").trim();
+			const email = String(fd.get("email") || "").trim();
+			const password = String(fd.get("password") || "");
+			const confirmPassword = String(fd.get("confirmPassword") || "");
+			if (!email || !password) {
+				setError("Email and password are required.");
+				setLoading(false);
+				return;
+			}
+			if (password !== confirmPassword) {
+				setError("Passwords do not match.");
+				setLoading(false);
+				return;
+			}
+				try {
+					await registerEmailPassword(fullName, email, password);
+					// Option: go straight to login so user signs in; alternatively, push to homescreen.
+					router.push("/login");
+			} catch (err: any) {
+				setError(err?.message || "Failed to create account");
+			} finally {
+				setLoading(false);
+			}
+		};
 
 	return (
 		<main className="h-screen w-full flex flex-col lg:flex-row p-0 overflow-hidden">
@@ -29,7 +56,8 @@ export default function RegisterPage() {
 					<h1 className="text-3xl font-extrabold font-lexend tracking-tight mb-2 text-[#111827]">Create an Account</h1>
 					<p className="text-sm text-[#6B7280] font-lexend mb-8 max-w-sm">Create your account and unlock your Trapihaus experience.</p>
 
-					<form onSubmit={handleSubmit} className="space-y-6" noValidate>
+								<form onSubmit={handleSubmit} className="space-y-6" noValidate>
+									{error && <p className="text-sm text-red-600">{error}</p>}
 						{/* Full Name */}
 						<div className="flex flex-col gap-2">
 							<label htmlFor="fullName" className="text-sm font-medium font-lexend text-[#374151]">Full Name</label>
