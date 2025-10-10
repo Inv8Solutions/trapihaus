@@ -30,6 +30,9 @@ export default function Checkout() {
 	const [cvv, setCvv] = useState("");
 	const [agree, setAgree] = useState(true);
 	const [promo, setPromo] = useState("");
+	const [confirmed, setConfirmed] = useState(false);
+
+	const CURRENCY = String.fromCharCode(0x20b1);
 
 	const nights = useMemo(() => {
 		const ci = new Date(checkIn);
@@ -41,7 +44,6 @@ export default function Checkout() {
 	const subtotal = nights * PRICE_PER_NIGHT;
 	const vat = Math.round(subtotal * VAT_RATE);
 	const total = subtotal + SERVICE_FEE + vat;
-	const CURRENCY = String.fromCharCode(0x20b1);
 
 	const formatDate = (iso: string) =>
 		new Date(iso).toLocaleDateString(undefined, {
@@ -50,6 +52,124 @@ export default function Checkout() {
 			day: "numeric",
 			year: "numeric",
 		});
+
+	// Simple booking reference generator
+	const bookingRef = useMemo(() => {
+		const d = new Date();
+		const pad = (n: number) => String(n).padStart(2, "0");
+		return `TH-BG-${d.getFullYear()}-${pad(d.getMonth()+1)}${pad(d.getDate())}-${pad(d.getHours())}${pad(d.getMinutes())}${pad(d.getSeconds())}`;
+	}, []);
+
+	if (confirmed) {
+		return (
+			<main className="max-w-full mx-auto px-6 py-10 bg-[#F5F5F5]">
+				{/* Success banner */}
+				<div className="mb-6 rounded-[24px] bg-white border border-[#F3F4F6] p-6 flex items-center gap-3">
+					<span className="inline-flex items-center justify-center w-7 h-7 rounded-full bg-emerald-500 text-white">
+						<svg className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor" aria-hidden>
+							<path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-7.071 7.07a1 1 0 01-1.415 0L3.293 9.95a1 1 0 011.414-1.414l3.1 3.1 6.364-6.364a1 1 0 011.536.021z" clipRule="evenodd" />
+						</svg>
+					</span>
+					<div>
+						<h1 className="text-2xl md:text-3xl font-extrabold font-lexend">You’re Booked!</h1>
+						<p className="text-gray-500 text-sm">Booking reference {bookingRef}. A receipt and itinerary were sent to your email.</p>
+					</div>
+				</div>
+
+				<div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+					{/* Booking Summary Card */}
+					<div className="bg-white rounded-[24px] p-6 border border-[#F3F4F6] shadow-sm">
+						<h2 className="text-lg font-semibold mb-4">Booking Summary</h2>
+						<div className="flex items-center gap-4 mb-4">
+							<div className="relative w-24 h-20 rounded-xl overflow-hidden">
+								<AppImage src="https://images.unsplash.com/photo-1560066984-138dadb4c035?auto=format&fit=crop&w=320&q=60" alt="Room thumbnail" fillParent className="object-cover" />
+							</div>
+							<div className="flex-1">
+								<p className="font-semibold">Loakan Heights Residences</p>
+								<p className="text-xs text-gray-500">Baguio City • Transient</p>
+								<span className="mt-1 inline-flex items-center gap-1 bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full text-[10px] font-medium">
+									<svg className="w-3 h-3" viewBox="0 0 20 20" fill="currentColor" aria-hidden>
+										<path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-7.071 7.07a1 1 0 01-1.415 0L3.293 9.95a1 1 0 011.414-1.414l3.1 3.1 6.364-6.364a1 1 0 011.536.021z" clipRule="evenodd" />
+									</svg>
+									Verified
+								</span>
+							</div>
+						</div>
+						<div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-sm">
+							<div>
+								<p className="text-gray-500">Check-in</p>
+								<div className="mt-1 flex items-center gap-2 rounded-lg border border-gray-200 px-3 py-2 bg-gray-50">
+									<CalendarIcon />
+									<span>{formatDate(new Date(checkIn).toISOString())}</span>
+								</div>
+							</div>
+							<div>
+								<p className="text-gray-500">Check-out</p>
+								<div className="mt-1 flex items-center gap-2 rounded-lg border border-gray-200 px-3 py-2 bg-gray-50">
+									<CalendarIcon />
+									<span>{formatDate(new Date(checkOut).toISOString())}</span>
+								</div>
+							</div>
+							<div>
+								<p className="text-gray-500">Guests</p>
+								<div className="mt-1 flex items-center gap-2 rounded-lg border border-gray-200 px-3 py-2 bg-gray-50">
+									<UserIcon />
+									<span>{guests} Adults</span>
+								</div>
+							</div>
+						</div>
+						<div className="mt-5 flex flex-wrap gap-3">
+							<button className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-blue-600 text-white">
+								<svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 11l19-9-9 19-2-7-8-3z"/></svg>
+								Open in Maps
+							</button>
+							<button className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-orange-500 text-white">
+								<svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+								Message Host
+							</button>
+						</div>
+					</div>
+
+					{/* Receipt */}
+					<div className="bg-white rounded-[24px] p-6 border border-[#F3F4F6] shadow-sm">
+						<h2 className="text-lg font-semibold mb-4">Receipt</h2>
+						<div className="space-y-2 text-sm">
+							<Row label={`${CURRENCY}${PRICE_PER_NIGHT.toLocaleString()} x ${nights} nights`} value={`${CURRENCY}${subtotal.toLocaleString(undefined,{minimumFractionDigits:2})}`} />
+							<Row label="Cleaning Fee" value={`${CURRENCY}${SERVICE_FEE.toLocaleString(undefined,{minimumFractionDigits:2})}`} />
+							<Row label={`VAT (${Math.round(VAT_RATE*100)}%)`} value={`${CURRENCY}${vat.toLocaleString(undefined,{minimumFractionDigits:2})}`} />
+							<div className="my-2 h-px bg-gray-100" />
+							<div className="flex items-center justify-between text-base font-semibold">
+								<span>Total Paid</span>
+								<span>{`${CURRENCY}${total.toLocaleString(undefined,{minimumFractionDigits:2})}`}</span>
+							</div>
+						</div>
+						<button className="mt-4 w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl font-semibold inline-flex items-center justify-center gap-2">
+							<svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2l6 6-8 8H4V10l8-8z"/></svg>
+							PDF
+						</button>
+						<button className="mt-3 w-full bg-gray-100 text-gray-500 py-2.5 rounded-xl font-medium">Back to Homescreen</button>
+					</div>
+				</div>
+
+				{/* Next Steps */}
+				<div className="mt-6 bg-white rounded-[24px] p-6 border border-[#F3F4F6] shadow-sm">
+					<h2 className="text-lg font-semibold mb-4">Next Steps</h2>
+					<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+						<div className="rounded-2xl border border-gray-200 p-5">
+							<p className="font-semibold">Share Itinerary</p>
+							<p className="text-sm text-gray-500">Send trip details to your companions</p>
+							<button className="mt-4 px-5 py-2 rounded-xl bg-blue-600 text-white font-medium">Share</button>
+						</div>
+						<div className="rounded-2xl border border-gray-200 p-5">
+							<p className="font-semibold">Download Receipt</p>
+							<p className="text-sm text-gray-500">PDF copy for reimbursement or visa.</p>
+							<button className="mt-4 px-5 py-2 rounded-xl bg-blue-600 text-white font-medium">Download</button>
+						</div>
+					</div>
+				</div>
+			</main>
+		);
+	}
 
 	return (
 		<main className="max-w-full mx-auto px-6 py-10 bg-[#F5F5F5]">
@@ -209,7 +329,7 @@ export default function Checkout() {
 								By clicking this, I agree to Trapihaus <a className="text-blue-600 hover:underline" href="#">Terms & Conditions</a> and <a className="text-blue-600 hover:underline" href="#">Privacy Policy</a>
 							</span>
 						</label>
-						<button disabled={!agree} className="mt-4 w-full bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white py-3 rounded-xl font-semibold">Pay My Booking</button>
+						<button disabled={!agree} onClick={() => setConfirmed(true)} className="mt-4 w-full bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white py-3 rounded-xl font-semibold">Pay My Booking</button>
 						<p className="mt-2 text-[11px] text-gray-400">Listings are vetted for safety and compliance (Mayor’s permit / DOT: Tourist Inn / Transient accreditation where applicable).</p>
 					</div>
 				</aside>
