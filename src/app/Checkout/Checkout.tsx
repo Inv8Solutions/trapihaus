@@ -1,27 +1,18 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { useSearchParams } from "next/navigation";
 import AppImage from "../components/ui/AppImage";
 
 export default function Checkout() {
-	const searchParams = useSearchParams();
 	// Mocked booking info — in a real app, this would come from prev page/state
 	const PRICE_PER_NIGHT = 2500;
 	const SERVICE_FEE = 500; // matches screenshot
 	const VAT_RATE = 0.12; // 12%
 
-		// Example selected details (overridden by query params if present)
-		const qCheckIn = searchParams.get("checkIn");
-		const qCheckOut = searchParams.get("checkOut");
-		const qGuests = searchParams.get("guests");
-		const qNights = searchParams.get("nights");
-		const qSubtotal = searchParams.get("subtotal");
-		const qTotal = searchParams.get("total");
-
-		const checkIn = qCheckIn ?? new Date().toISOString().slice(0, 10);
-		const checkOut = qCheckOut ?? new Date(Date.now() + 2 * 86400000).toISOString().slice(0, 10);
-		const guests = Number.isFinite(Number(qGuests)) && Number(qGuests) > 0 ? Number(qGuests) : 2;
+	// Example selected details
+	const [checkIn] = useState<string>(new Date().toISOString().slice(0, 10));
+	const [checkOut] = useState<string>(new Date(Date.now() + 2 * 86400000).toISOString().slice(0, 10));
+	const [guests] = useState<number>(2);
 
 	// Guest details form
 	const [firstName, setFirstName] = useState("");
@@ -40,22 +31,16 @@ export default function Checkout() {
 	const [agree, setAgree] = useState(true);
 	const [promo, setPromo] = useState("");
 
-		const nights = useMemo(() => {
-			if (qNights) {
-				const n = Number(qNights);
-				if (!Number.isNaN(n) && n > 0) return n;
-			}
-			const ci = new Date(checkIn);
-			const co = new Date(checkOut);
-			const ms = co.getTime() - ci.getTime();
-			return Math.max(1, Math.ceil(ms / 86400000));
-		}, [qNights, checkIn, checkOut]);
+	const nights = useMemo(() => {
+		const ci = new Date(checkIn);
+		const co = new Date(checkOut);
+		const ms = co.getTime() - ci.getTime();
+		return Math.max(1, Math.ceil(ms / 86400000));
+	}, [checkIn, checkOut]);
 
-		const computedSubtotal = nights * PRICE_PER_NIGHT;
-		const subtotal = qSubtotal ? Number(qSubtotal) || computedSubtotal : computedSubtotal;
-		const vat = Math.round(subtotal * VAT_RATE);
-		const computedTotal = subtotal + SERVICE_FEE + vat;
-		const total = qTotal ? Number(qTotal) || computedTotal : computedTotal;
+	const subtotal = nights * PRICE_PER_NIGHT;
+	const vat = Math.round(subtotal * VAT_RATE);
+	const total = subtotal + SERVICE_FEE + vat;
 	const CURRENCY = String.fromCharCode(0x20b1);
 
 	const formatDate = (iso: string) =>
@@ -67,7 +52,7 @@ export default function Checkout() {
 		});
 
 	return (
-		<main className="max-w-7xl mx-auto px-6 py-10">
+		<main className="max-w-full mx-auto px-6 py-10 bg-[#F5F5F5]">
 			<header className="mb-6">
 				<h1 className="text-3xl font-extrabold font-lexend">Complete your Booking</h1>
 				<p className="text-gray-500 mt-1">You're just a few steps away from your perfect stay</p>

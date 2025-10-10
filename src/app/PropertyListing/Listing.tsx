@@ -1,9 +1,11 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import AppImage from "../components/ui/AppImage";
 
 export default function Listing() {
+	const router = useRouter();
 	const [guests, setGuests] = useState(0);
 	const [checkIn, setCheckIn] = useState("");
 	const [checkOut, setCheckOut] = useState("");
@@ -254,7 +256,22 @@ export default function Listing() {
 											<span>Total</span>
 											<span>{CURRENCY}{quote.total.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
 										</div>
-										<button className="mt-4 w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl font-semibold">Reserve</button>
+										<button
+											className="mt-4 w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl font-semibold"
+											onClick={() => {
+												const params = new URLSearchParams({
+													checkIn,
+													checkOut,
+													guests: String(guests),
+													nights: String(quote.nights),
+													subtotal: String(quote.subtotal),
+													total: String(quote.total),
+												});
+												router.push(`/Checkout?${params.toString()}`);
+											}}
+										>
+											Reserve
+										</button>
 										<p className="mt-2 text-center text-xs text-gray-400">You won't be charged yet</p>
 										<div className="mt-2 w-full flex justify-center">
 											<span className="inline-flex items-center rounded-full bg-gray-100 text-gray-600 text-xs px-3 py-1">Free cancellation for 24 hours</span>
