@@ -96,7 +96,6 @@ export default function Navbar() {
                                                 setMenuOpen(false);
                                                 router.push("/");
                                             } catch (e) {
-                                                // eslint-disable-next-line no-console
                                                 console.error("Sign out failed", e);
                                             }
                                         }}

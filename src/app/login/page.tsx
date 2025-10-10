@@ -23,9 +23,10 @@ export default function LoginPage() {
     try {
       await signInEmailPassword(email, password);
       router.push("/Homescreen/home");
-    } catch (err: any) {
-      const code = err?.code || "";
-      let msg = err?.message || "Failed to sign in";
+    } catch (err: unknown) {
+      const e = err as { code?: string; message?: string };
+      const code = e?.code || "";
+      let msg = e?.message || "Failed to sign in";
       if (code.includes("auth/invalid-credential")) msg = "Incorrect email or password.";
       if (code.includes("auth/invalid-email")) msg = "Please enter a valid email address.";
       if (msg.toLowerCase().includes("firebase") && msg.toLowerCase().includes("api key")) msg = "Firebase is not configured. Add your NEXT_PUBLIC_FIREBASE_* keys in .env.local and restart dev server.";

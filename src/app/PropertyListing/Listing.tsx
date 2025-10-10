@@ -223,7 +223,7 @@ export default function Listing() {
 											const total = subtotal + SERVICE_FEE;
 											setQuote({ nights, subtotal, total });
 											setErrorMsg(null);
-										} catch (e) {
+										} catch {
 											setErrorMsg("Something went wrong. Try again.");
 											setQuote(null);
 										}
@@ -272,7 +272,7 @@ export default function Listing() {
 										>
 											Reserve
 										</button>
-										<p className="mt-2 text-center text-xs text-gray-400">You won't be charged yet</p>
+										<p className="mt-2 text-center text-xs text-gray-400">You won’t be charged yet</p>
 										<div className="mt-2 w-full flex justify-center">
 											<span className="inline-flex items-center rounded-full bg-gray-100 text-gray-600 text-xs px-3 py-1">Free cancellation for 24 hours</span>
 										</div>
@@ -317,9 +317,9 @@ export default function Listing() {
 						</div>
 					</div>
 
-					{/* Where you'll be section */}
+					{/* Where you’ll be section */}
 					<div className="bg-white rounded-[28px] p-6 shadow-md border border-[#F3F4F6]">
-						<h3 className="text-lg font-semibold mb-4">Where you'll be</h3>
+						<h3 className="text-lg font-semibold mb-4">Where you’ll be</h3>
 						<div className="mb-4 inline-flex items-center gap-2 text-gray-600 text-sm">
 							<svg className="w-4 h-4 text-gray-500" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
 								<path d="M12 2C8.134 2 5 5.134 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.866-3.134-7-7-7zm0 9.5a2.5 2.5 0 110-5 2.5 2.5 0 010 5z"/>

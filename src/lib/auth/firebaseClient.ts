@@ -22,7 +22,6 @@ export function getFirebaseApp() {
 	// Simple guard to surface missing env during dev
 	if (!firebaseConfig.apiKey) {
 		if (process.env.NODE_ENV !== "production") {
-			// eslint-disable-next-line no-console
 			console.warn("Firebase is missing NEXT_PUBLIC_FIREBASE_API_KEY. Did you set .env.local and restart?");
 		}
 	}

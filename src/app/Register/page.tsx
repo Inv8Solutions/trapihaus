@@ -36,8 +36,9 @@ export default function RegisterPage() {
 					await registerEmailPassword(fullName, email, password);
 					// Option: go straight to login so user signs in; alternatively, push to homescreen.
 					router.push("/login");
-			} catch (err: any) {
-				setError(err?.message || "Failed to create account");
+			} catch (err: unknown) {
+				const e = err as { message?: string };
+				setError(e?.message || "Failed to create account");
 			} finally {
 				setLoading(false);
 			}

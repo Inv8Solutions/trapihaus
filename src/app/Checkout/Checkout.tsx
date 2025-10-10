@@ -175,7 +175,7 @@ export default function Checkout() {
 		<main className="max-w-full mx-auto px-6 py-10 bg-[#F5F5F5]">
 			<header className="mb-6">
 				<h1 className="text-3xl font-extrabold font-lexend">Complete your Booking</h1>
-				<p className="text-gray-500 mt-1">You're just a few steps away from your perfect stay</p>
+				<p className="text-gray-500 mt-1">You’re just a few steps away from your perfect stay</p>
 			</header>
 
 			<div className="grid grid-cols-1 lg:grid-cols-[1fr_420px] gap-8">
