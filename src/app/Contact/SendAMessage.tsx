@@ -187,7 +187,7 @@ export default function SendAMessage({ title = "Send us a Message" }: SendAMessa
 									<path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z" />
 									<path d="M9 12l2 2 4-4" />
 								</svg>
-								Your info is protected. We'll never share your data without consent.
+								Your info is protected. We&apos;ll never share your data without consent.
 							</p>
 						</div>
 					</form>

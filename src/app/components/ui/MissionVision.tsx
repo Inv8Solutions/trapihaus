@@ -24,7 +24,7 @@ export default function MissionVision({
               Our <span className="text-[#1078CF]">Mission</span>
             </h2>
             <p className="text-gray-600 text-lg font-lexend leading-relaxed">
-              <span className="text-[#83C12C] font-semibold">To connect travelers with safe and affordable accommodations</span> while supporting compliant local hosts. We strive to create a marketplace where trust, transparency, and community values are at the forefront of every interaction.
+              <span className="text-[#83C12C] font-semibold">{missionText || 'To connect travelers with safe and affordable accommodations'}</span> {missionText ? null : 'while supporting compliant local hosts. We strive to create a marketplace where trust, transparency, and community values are at the forefront of every interaction.'}
             </p>
           </div>
           
@@ -52,7 +52,7 @@ export default function MissionVision({
               Our <span className="text-[#1078CF]">Vision</span>
             </h2>
             <p className="text-gray-600 text-lg font-lexend leading-relaxed">
-              <span className="text-[#F68109] font-semibold">To become the most trusted local accommodation marketplace across the Philippines.</span> We envision a future where every Filipino city has access to our platform, connecting quality accommodations with travelers while fostering economic growth in local communities.
+              <span className="text-[#F68109] font-semibold">{visionText || 'To become the most trusted local accommodation marketplace across the Philippines.'}</span> {visionText ? null : 'We envision a future where every Filipino city has access to our platform, connecting quality accommodations with travelers while fostering economic growth in local communities.'}
             </p>
           </div>
         </div>

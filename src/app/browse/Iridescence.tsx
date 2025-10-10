@@ -154,7 +154,7 @@ export default function Iridescence({
         if (ctn.style && ctn.style.position === 'relative') {
           ctn.style.position = '';
         }
-      } catch (e) {
+      } catch {
         // ignore
       }
       gl.getExtension('WEBGL_lose_context')?.loseContext();

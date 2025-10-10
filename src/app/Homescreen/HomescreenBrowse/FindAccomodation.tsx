@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from 'react';
+import AppImage from '../../components/ui/AppImage';
 
 interface AccommodationCardProps {
   id: string;
@@ -15,12 +16,8 @@ interface AccommodationCardProps {
 const AccommodationCard = ({ name, location, price, rating, image, verified }: AccommodationCardProps) => {
   return (
     <div className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300">
-      <div className="relative">
-        <img 
-          src={image} 
-          alt={name}
-          className="w-full h-48 object-cover"
-        />
+      <div className="relative w-full h-48">
+        <AppImage src={image} alt={name} fillParent className="object-cover" />
         {verified && (
           <div className="absolute top-3 left-3 bg-green-500 text-white px-3 py-1 rounded-full text-sm font-medium">
             ✓ Verified

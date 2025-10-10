@@ -238,7 +238,6 @@ export default function Listing() {
 
 	const handleFinish = () => {
 		// Placeholder finish handler. In real implementation we'd submit to backend.
-		// eslint-disable-next-line no-console
 		console.log("Listing data submitted", data);
 	};
 
@@ -733,7 +732,7 @@ export default function Listing() {
 					</div>
 				</div>
 				<div className="rounded-md bg-gray-100 p-4 text-[11px] leading-relaxed text-gray-600">
-					By submitting, you agree to Trapihaus Terms of Service and Privacy Policy. We'll review your listing within 24 hours and notify you via email.
+					By submitting, you agree to Trapihaus Terms of Service and Privacy Policy. We&apos;ll review your listing within 24 hours and notify you via email.
 				</div>
 			</div>
 		);
