@@ -17,8 +17,60 @@ export default function Listing() {
 		"https://images.unsplash.com/photo-1505693314120-6e2b274e82ab?auto=format&fit=crop&w=800&q=80",
 	];
 
+	// Mock details beneath About section
+	const offers = [
+		{ label: "Wi‑Fi", icon: (
+			<svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+				<path d="M5 12a10 10 0 0114 0" />
+				<path d="M8.5 15.5a6 6 0 016 0" />
+				<path d="M12 19h.01" />
+			</svg>
+		)},
+		{ label: "Air Conditioning", icon: (
+			<svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+				<path d="M12 2v20M2 12h20" />
+				<path d="M4 4l4 4M20 4l-4 4M4 20l4-4M20 20l-4-4" />
+			</svg>
+		)},
+		{ label: "Heating", icon: (
+			<svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+				<path d="M12 3v8a4 4 0 104 4" />
+			</svg>
+		)},
+		{ label: "Pet Friendly", icon: (
+			<svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+				<circle cx="9" cy="8" r="2" />
+				<circle cx="15" cy="8" r="2" />
+				<circle cx="7" cy="12" r="2" />
+				<circle cx="17" cy="12" r="2" />
+				<path d="M12 13c2.5 0 4.5 1.5 4.5 3.5S14.5 20 12 20s-4.5-1-4.5-3.5S9.5 13 12 13z" />
+			</svg>
+		)},
+		{ label: "TV", icon: (
+			<svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+				<rect x="2" y="6" width="20" height="14" rx="2" />
+				<path d="M12 2l4 4M12 2L8 6" />
+			</svg>
+		)},
+		{ label: "Breakfast", icon: (
+			<svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+				<path d="M3 10h14a4 4 0 010 8H3z" />
+				<path d="M17 10V6a3 3 0 013-3h1v7" />
+			</svg>
+		)},
+	];
+
+	const reviews = Array.from({ length: 3 }, () => ({
+		name: "Reynold Galvin",
+		initials: "RG",
+		date: "September 2025",
+		rating: 5,
+		text:
+			"Loakan Heights Residences felt like home. The place was clean, safe, and very affordable. Perfect for my semester stay in Baguio, and the host was super accommodating. I'll definitely book again through Trapihauss!",
+	}));
+
 	return (
-		<main className="max-w-7xl mx-auto px-6 py-10">
+		<main className="max-w-full mx-auto px-6 py-10 bg-[#F5F5F5]">
 			{/* Page header */}
 			<header className="mb-6 flex items-start justify-between gap-4">
 				<div>
@@ -60,7 +112,11 @@ export default function Listing() {
 			<div className="grid grid-cols-1 lg:grid-cols-[440px_1fr] gap-10 items-start">
 				{/* Left Sidebar (Booking Card) */}
 				<aside className="space-y-6">
-					<div className="bg-white rounded-[28px] p-6 shadow-md border border-[#F3F4F6] sticky top-8">
+					<div className="bg-white rounded-[28px] p-6 shadow-md border border-[#F3F4F6] top-8 transition-transform duration-300 will-change-transform"
+						style={{
+							transition: "transform 0.3s cubic-bezier(0.4,0,0.2,1)",
+						}}
+					>
 						<div className="flex items-center justify-between bg-[#F9FAFB] p-5 rounded-[20px] mb-5">
 							<div>
 								<div className="text-2xl font-bold font-lexend">{String.fromCharCode(0x20b1)}2,500</div>
@@ -158,45 +214,104 @@ export default function Listing() {
 							<li>• Budget-friendly rates with flexible options</li>
 						</ul>
 					</div>
+
+					{/* What this place offers */}
+					<div className="bg-white rounded-[28px] p-6 shadow-md border border-[#F3F4F6]">
+						<h3 className="text-lg font-semibold mb-4">What this place offers</h3>
+						<div className="flex flex-wrap gap-2">
+							{offers.map((o) => (
+								<span key={o.label} className="inline-flex items-center gap-2 rounded-full bg-[#F9FAFB] text-gray-700 text-xs px-3 py-2 border border-gray-100">
+									{o.icon}
+									{o.label}
+								</span>
+							))}
+						</div>
+					</div>
+
+					{/* Where you'll be section */}
+					<div className="bg-white rounded-[28px] p-6 shadow-md border border-[#F3F4F6]">
+						<h3 className="text-lg font-semibold mb-4">Where you'll be</h3>
+						<div className="mb-4 inline-flex items-center gap-2 text-gray-600 text-sm">
+							<svg className="w-4 h-4 text-gray-500" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+								<path d="M12 2C8.134 2 5 5.134 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.866-3.134-7-7-7zm0 9.5a2.5 2.5 0 110-5 2.5 2.5 0 010 5z"/>
+							</svg>
+							Near Camp John Hay
+						</div>
+						<div className="h-48 rounded-2xl border border-gray-200 bg-[#F3F4F6] flex items-center justify-center text-gray-400 text-sm">
+							Google Maps
+						</div>
+					</div>
+
+					{/* Reviews */}
+					<div className="bg-white rounded-[28px] p-6 shadow-md border border-[#F3F4F6]">
+						<div className="flex items-center justify-between">
+							<h3 className="text-lg font-semibold">Reviews</h3>
+							<div className="flex items-center gap-2 text-sm text-gray-600">
+								<svg className="w-4 h-4 text-yellow-500" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+									<path d="M12 .587l3.668 7.431L23.4 9.748l-5.7 5.556L18.82 24 12 19.897 5.18 24l1.12-8.696L.6 9.748l7.732-1.73z" />
+								</svg>
+								<span className="font-medium">4.6</span>
+								<span className="text-gray-400 text-xs">(17 Reviews)</span>
+							</div>
+						</div>
+						<div className="mt-4 divide-y divide-gray-100">
+							{reviews.map((r, idx) => (
+								<div key={idx} className="py-5">
+									<div className="flex items-start gap-3 mb-2">
+										<div className="w-10 h-10 rounded-full bg-gray-100 text-gray-600 flex items-center justify-center text-sm font-semibold">{r.initials}</div>
+										<div className="flex-1">
+											<div className="flex items-center justify-between">
+												<p className="text-sm font-medium">{r.name}</p>
+												<p className="text-xs text-gray-500">{r.date}</p>
+											</div>
+											<div className="flex items-center gap-1 text-yellow-500 my-1">
+												{Array.from({ length: r.rating }).map((_, i) => (
+													<svg key={i} className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+														<path d="M12 .587l3.668 7.431L23.4 9.748l-5.7 5.556L18.82 24 12 19.897 5.18 24l1.12-8.696L.6 9.748l7.732-1.73z" />
+													</svg>
+												))}
+											</div>
+											<p className="text-sm text-gray-600 leading-relaxed">“{r.text}”</p>
+										</div>
+									</div>
+								</div>
+							))}
+						</div>
+					</div>
 				</aside>
 
 				{/* Right: Gallery */}
 				<section>
 					<div className="bg-white rounded-[28px] p-6 shadow-lg border border-[#F3F4F6]">
-						<div className="grid grid-cols-1 md:grid-cols-[1fr_320px] gap-8 items-start">
-							<div className="rounded-[28px] overflow-hidden shadow-sm">
-								<div className="relative w-full h-[480px] rounded-[28px] overflow-hidden">
-									<AppImage
-										src={mainImage}
-										alt="Cozy bedroom with single bed, warm lighting, and window view"
-										fillParent
-										priority
-										sizes="(max-width: 768px) 100vw, 60vw"
-										className="object-cover rounded-[28px]"
-									/>
-								</div>
+						<div className="flex flex-col gap-6">
+							{/* Big image on top */}
+							<div className="relative w-full h-[480px] rounded-[28px] overflow-hidden shadow-sm">
+								<AppImage
+									src={mainImage}
+									alt="Cozy bedroom with single bed, warm lighting, and window view"
+									fillParent
+									priority
+									sizes="(max-width: 768px) 100vw, 60vw"
+									className="object-cover rounded-[28px]"
+								/>
 							</div>
 
-							<div className="flex flex-col gap-4">
-								<div className="grid grid-cols-3 gap-4">
-									{thumbs.map((t, i) => (
-										<div key={t} className="relative overflow-hidden rounded-[18px] h-24">
-											<AppImage src={t} alt={`Bedroom thumbnail ${i + 1}`} fillParent className="object-cover rounded-[18px]" />
-											{i === thumbs.length - 1 && (
-												<div className="absolute inset-0 bg-black/40 flex items-center justify-center text-white text-sm font-medium rounded-[18px]">View all Photos</div>
-											)}
-										</div>
-									))}
-								</div>
-								<div className="mt-3">
-									<p className="text-sm text-gray-600">See all photos and details of the accommodation. Large gallery on the right lets guests preview the space before booking.</p>
-								</div>
-							</div>
+							{/* Thumbnails below (square, dynamic) */}
+							<div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-4">
+								{thumbs.map((t, i) => (
+									<div key={t} className="relative overflow-hidden rounded-[18px] aspect-square">
+										<AppImage src={t} alt={`Bedroom thumbnail ${i + 1}`} fillParent className="object-cover rounded-[18px]" />
+										{i === thumbs.length - 1 && (
+											<div className="absolute inset-0 bg-black/40 flex items-center justify-center text-white text-sm font-medium rounded-[18px]">View all Photos</div>
+										)}
+									</div>
+								))}
 							</div>
 						</div>
+					</div>
 				</section>
 			</div>
-						</main>
+		</main>
 	);
 }
 
