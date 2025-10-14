@@ -1,15 +1,20 @@
-// Placeholder session utilities.
-// Later you can integrate NextAuth or Firebase Admin. Keep server-only secrets off the client.
+import { getServerSession as nextAuthGetServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth/authOptions";
 
-export type Session = {
-  userId: string;
-  email: string;
-  name?: string;
-} | null;
+export type Session =
+  | {
+      userId: string;
+      email: string;
+      name?: string;
+    }
+  | null;
 
-// Example: read a session from cookies or headers on the server.
 export async function getServerSession(): Promise<Session> {
-  // TODO: integrate with NextAuth, Firebase Admin, or your auth of choice.
-  // For now, always return null (unauthenticated).
-  return null;
+  const session = await nextAuthGetServerSession(authOptions);
+  if (!session || !session.user?.email) return null;
+  return {
+    userId: (session as any).userId || "",
+    email: session.user.email,
+    name: session.user.name || undefined,
+  };
 }
