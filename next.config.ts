@@ -19,7 +19,8 @@ const cspDev = [
 
 const cspProd = [
   "default-src 'self'",
-  "script-src 'self'",
+  // Allow minimal inline scripts required by Next.js runtime. For stricter security, migrate to a nonce-based CSP.
+  "script-src 'self' 'unsafe-inline'",
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' https://images.unsplash.com https://github.com data:",
   "font-src 'self' data:",
