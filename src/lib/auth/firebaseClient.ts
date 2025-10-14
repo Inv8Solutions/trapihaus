@@ -18,13 +18,28 @@ const firebaseConfig = {
 	appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
 } as const;
 
-export function getFirebaseApp() {
-	// Simple guard to surface missing env during dev
-	if (!firebaseConfig.apiKey) {
-		if (process.env.NODE_ENV !== "production") {
-			console.warn("Firebase is missing NEXT_PUBLIC_FIREBASE_API_KEY. Did you set .env.local and restart?");
+function ensureFirebaseEnv() {
+	const missing: string[] = [];
+	if (!firebaseConfig.apiKey) missing.push("NEXT_PUBLIC_FIREBASE_API_KEY");
+	if (!firebaseConfig.authDomain) missing.push("NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN");
+	if (!firebaseConfig.projectId) missing.push("NEXT_PUBLIC_FIREBASE_PROJECT_ID");
+	if (!firebaseConfig.storageBucket) missing.push("NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET");
+	if (!firebaseConfig.messagingSenderId) missing.push("NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID");
+	if (!firebaseConfig.appId) missing.push("NEXT_PUBLIC_FIREBASE_APP_ID");
+	if (missing.length) {
+		const msg = `Firebase config missing keys: ${missing.join(", ")}. Add them to .env.local and restart dev server.`;
+		if (typeof window !== "undefined") {
+			// Throw on client to surface immediately during auth calls
+			throw new Error(msg);
+		} else if (process.env.NODE_ENV !== "production") {
+			console.warn(msg);
 		}
 	}
+}
+
+export function getFirebaseApp() {
+	// Validate configuration early
+	ensureFirebaseEnv();
 	return getApps().length ? getApp() : initializeApp(firebaseConfig);
 }
 
