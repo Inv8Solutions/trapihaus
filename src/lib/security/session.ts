@@ -12,8 +12,9 @@ export type Session =
 export async function getServerSession(): Promise<Session> {
   const session = await nextAuthGetServerSession(authOptions);
   if (!session || !session.user?.email) return null;
+  const s = session as typeof session & { userId?: string };
   return {
-    userId: (session as any).userId || "",
+    userId: s.userId || "",
     email: session.user.email,
     name: session.user.name || undefined,
   };

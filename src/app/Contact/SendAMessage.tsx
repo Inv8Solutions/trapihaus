@@ -59,7 +59,7 @@ export default function SendAMessage({ title = "Send us a Message" }: SendAMessa
 								} else {
 									setStatus({ ok: false, message: "Something went wrong. Please try again later." });
 								}
-							} catch (err) {
+							} catch {
 								setStatus({ ok: false, message: "Network error. Please try again." });
 							} finally {
 								setSubmitting(false);

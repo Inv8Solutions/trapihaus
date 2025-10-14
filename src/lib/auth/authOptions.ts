@@ -1,4 +1,5 @@
-import type { NextAuthOptions } from "next-auth";
+import type { NextAuthOptions, User } from "next-auth";
+import type { JWT } from "next-auth/jwt";
 import CredentialsProvider from "next-auth/providers/credentials";
 
 // Prefer a server-only key; fallback to NEXT_PUBLIC_* for convenience in dev
@@ -57,18 +58,25 @@ export const authOptions: NextAuthOptions = {
   ],
   callbacks: {
     async jwt({ token, user }) {
+      type AppToken = JWT & { uid?: string };
+      const t = token as AppToken;
       if (user) {
-        token.uid = (user as any).id;
-        token.name = user.name;
-        token.email = user.email;
+        const u = user as Pick<User, "id" | "name" | "email">;
+        t.uid = (u as { id?: string }).id;
+        t.name = u.name ?? t.name;
+        t.email = u.email ?? t.email;
       }
-      return token;
+      return t;
     },
     async session({ session, token }) {
+      type AppToken = JWT & { uid?: string };
+      const t = token as AppToken;
       if (session.user) {
-        session.user.name = (token as any).name as string | undefined;
-        session.user.email = (token as any).email as string | undefined;
-        (session as any).userId = (token as any).uid as string | undefined;
+        // Narrow and set fields in-place without using any
+        const su = session.user as { id?: string; name?: string | null; email?: string | null };
+        su.name = (t.name as string | undefined) ?? su.name ?? undefined;
+        su.email = (t.email as string | undefined) ?? su.email ?? undefined;
+        su.id = t.uid ?? su.id;
       }
       return session;
     },
