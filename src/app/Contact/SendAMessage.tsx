@@ -1,6 +1,6 @@
 "use client";
 
-import { useId } from "react";
+import { useId, useState } from "react";
 import Image from "next/image";
 
 interface SendAMessageProps {
@@ -17,6 +17,8 @@ const categories = [
 
 export default function SendAMessage({ title = "Send us a Message" }: SendAMessageProps) {
 	const formId = useId();
+  const [submitting, setSubmitting] = useState(false);
+  const [status, setStatus] = useState<null | { ok: boolean; message: string }>(null);
 
 	return (
 		<section className="px-8 mt-10">
@@ -26,8 +28,42 @@ export default function SendAMessage({ title = "Send us a Message" }: SendAMessa
 					<h2 className="text-2xl md:text-[26px] font-bold font-lexend mb-6 tracking-tight text-[#111827]">{title}</h2>
 
 					<form
-						onSubmit={(e) => {
+						onSubmit={async (e) => {
 							e.preventDefault();
+							if (submitting) return;
+							setStatus(null);
+							setSubmitting(true);
+							try {
+								const form = e.currentTarget as HTMLFormElement;
+								const fd = new FormData(form);
+								const payload = {
+									name: String(fd.get("fullName") || "").trim(),
+									email: String(fd.get("email") || "").trim(),
+									subject: String(fd.get("subject") || "").trim(),
+									message: String(fd.get("message") || "").trim(),
+								};
+
+								const res = await fetch("/api/contact", {
+									method: "POST",
+									headers: { "Content-Type": "application/json" },
+									body: JSON.stringify(payload),
+								});
+
+								if (res.ok) {
+									form.reset();
+									setStatus({ ok: true, message: "Message sent. We will get back to you shortly." });
+								} else if (res.status === 429) {
+									setStatus({ ok: false, message: "Too many requests. Please wait a moment and try again." });
+								} else if (res.status === 400) {
+									setStatus({ ok: false, message: "Please check your inputs and try again." });
+								} else {
+									setStatus({ ok: false, message: "Something went wrong. Please try again later." });
+								}
+							} catch (err) {
+								setStatus({ ok: false, message: "Network error. Please try again." });
+							} finally {
+								setSubmitting(false);
+							}
 						}}
 						className="flex flex-col gap-6"
 						aria-labelledby={`${formId}-title`}
@@ -117,6 +153,7 @@ export default function SendAMessage({ title = "Send us a Message" }: SendAMessa
 									id={`${formId}-subject`}
 									name="subject"
 									placeholder='e.g., "Change check-in time"'
+									required
 									className="h-11 w-full rounded-lg border border-[#E5E7EB] bg-white px-4 text-sm font-lexend placeholder:text-[#9CA3AF] focus:outline-none focus:ring-2 focus:ring-[#1078CF]/60 focus:border-[#1078CF]"
 								/>
 							</div>
@@ -131,6 +168,7 @@ export default function SendAMessage({ title = "Send us a Message" }: SendAMessa
 									name="message"
 									placeholder="Share Details"
 									rows={5}
+									required
 									className="w-full rounded-lg border border-[#E5E7EB] bg-white p-4 text-sm font-lexend placeholder:text-[#9CA3AF] resize-none focus:outline-none focus:ring-2 focus:ring-[#1078CF]/60 focus:border-[#1078CF]"
 								/>
 							</div>
@@ -138,6 +176,15 @@ export default function SendAMessage({ title = "Send us a Message" }: SendAMessa
 
 						{/* Actions */}
 						<div className="flex flex-col gap-4">
+							{status && (
+								<p
+									role="status"
+									aria-live="polite"
+									className={`text-sm font-lexend ${status.ok ? "text-green-600" : "text-red-600"}`}
+								>
+									{status.message}
+								</p>
+							)}
 							<div className="flex flex-col md:flex-row md:items-center gap-4 justify-between">
 								<div className="flex items-center gap-3">
 									<label
@@ -161,16 +208,22 @@ export default function SendAMessage({ title = "Send us a Message" }: SendAMessa
 									</label>
 									<button
 										type="submit"
-										className="md:hidden inline-flex items-center justify-center h-11 px-6 rounded-xl bg-[#1078CF] hover:bg-[#0D68B5] active:bg-[#0B5A9C] text-white text-sm font-semibold font-lexend shadow-sm transition-colors"
+										disabled={submitting}
+										className={`md:hidden inline-flex items-center justify-center h-11 px-6 rounded-xl text-white text-sm font-semibold font-lexend shadow-sm transition-colors ${
+											submitting ? "bg-[#1078CF]/60 cursor-not-allowed" : "bg-[#1078CF] hover:bg-[#0D68B5] active:bg-[#0B5A9C]"
+										}`}
 									>
-										Send Message
+										{submitting ? "Sending..." : "Send Message"}
 									</button>
 								</div>
 								<button
 									type="submit"
-									className="hidden md:inline-flex items-center justify-center h-11 px-8 rounded-xl bg-[#1078CF] hover:bg-[#0D68B5] active:bg-[#0B5A9C] text-white text-sm font-semibold font-lexend shadow-sm transition-colors"
+									disabled={submitting}
+									className={`hidden md:inline-flex items-center justify-center h-11 px-8 rounded-xl text-white text-sm font-semibold font-lexend shadow-sm transition-colors ${
+										submitting ? "bg-[#1078CF]/60 cursor-not-allowed" : "bg-[#1078CF] hover:bg-[#0D68B5] active:bg-[#0B5A9C]"
+									}`}
 								>
-									Send Message
+									{submitting ? "Sending..." : "Send Message"}
 								</button>
 							</div>
 							<p className="flex items-start gap-2 text-[11px] md:text-xs text-[#4B5563] font-lexend">
@@ -195,14 +248,14 @@ export default function SendAMessage({ title = "Send us a Message" }: SendAMessa
 
 				{/* Image Card */}
 				<div className="relative rounded-[40px] overflow-hidden border border-[#E9E9E9] bg-white min-h-[520px] flex items-center justify-center p-4">
-					<Image
-						src="/woman.png"
-						alt="Support representative using phone"
-						fill
-						className="object-cover"
-						sizes="(max-width: 768px) 100vw, 40vw"
-						priority
-					/>
+						<Image
+							src="/whoweare.jpg"
+							alt="Support representative using phone"
+							fill
+							className="object-cover"
+							sizes="(max-width: 768px) 100vw, 40vw"
+							priority
+						/>
 				</div>
 			</div>
 		</section>

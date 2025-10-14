@@ -238,7 +238,8 @@ export default function Listing() {
 
 	const handleFinish = () => {
 		// Placeholder finish handler. In real implementation we'd submit to backend.
-		console.log("Listing data submitted", data);
+		// Avoid logging sensitive data to the console.
+		// e.g., show a success toast or redirect to a confirmation page here.
 	};
 
 	const renderBasic = () => {

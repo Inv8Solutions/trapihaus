@@ -94,8 +94,9 @@ If adding async data later, co-locate fetch logic in `src/app/lib/` with a thin 
 - To automatically fix common issues, use:
   ```bash
   npm run lint -- --fix
+  ```
 
-14. Security & Data Protection Guidelines
+## 14. Security & Data Protection Guidelines
 
 Follow these practices for all code touching user data, authentication, or payment logic:
 
@@ -144,6 +145,71 @@ If adding cookies or sessions, configure them as:
 
 
 Provide visible privacy disclaimers for all user-facing data inputs.
+
+### HTTP Security Headers (Recommended)
+We ship with strict-but-practical defaults using `headers()` in `next.config.ts`. CSP may require tuning as features are added.
+
+Set the following headers for all routes:
+- Strict-Transport-Security: `max-age=31536000; includeSubDomains; preload`
+- X-Content-Type-Options: `nosniff`
+- X-Frame-Options: `DENY`
+- Referrer-Policy: `no-referrer`
+- Permissions-Policy: `geolocation=(), camera=(), microphone=()`
+- Content-Security-Policy (baseline):
+  - `default-src 'self'`
+  - `script-src 'self' 'unsafe-eval' 'wasm-unsafe-eval'` (dev only; remove `unsafe-eval` in prod)
+  - `style-src 'self' 'unsafe-inline'`
+  - `img-src 'self' https://images.unsplash.com https://github.com data:`
+  - `font-src 'self' data:`
+  - `connect-src 'self'` (relax for Firebase/analytics if needed)
+  - `frame-ancestors 'none'`
+
+Note: If Firebase, analytics, or third-party APIs are added, extend `connect-src` (and potentially `script-src`/`img-src`) to include their domains explicitly.
+
+### Client vs Server Secrets
+- Put all server-only secrets (DB URLs, JWT secrets, admin tokens) in `.env.local` without `NEXT_PUBLIC_` and access them only in:
+  - Route Handlers (`app/api/**/route.ts`),
+  - Server Components, or
+  - Middleware/Edge functions.
+- Only expose values with the `NEXT_PUBLIC_` prefix if they are truly safe for the client.
+- Never log secrets; rotate compromised keys immediately.
+
+### Input Handling for APIs
+- Validate every request server-side. Use a schema validator (e.g., `zod`) with:
+  - Required fields, max lengths, allowed enums,
+  - Numeric ranges, and
+  - Whitelists for content types on uploads.
+- Sanitize/escape all user strings you render. Prefer not to use `dangerouslySetInnerHTML`. If necessary, sanitize with DOMPurify server-side.
+- Enforce request size limits for JSON and uploads; reject oversized payloads.
+- For file uploads: check MIME type and extension, limit count/size, store outside web root, and generate new filenames.
+
+### Authentication Hardening
+- If using Firebase or NextAuth:
+  - Enforce server-side session verification on API routes and protected pages.
+  - Prefer HTTP-only, `SameSite=strict`, `Secure` cookies for sessions.
+  - On logout, invalidate/clear sessions server-side.
+- For JWTs (if used): set short expirations, rotate/refresh, and verify audience/issuer.
+
+### CORS & CSRF
+- Default to same-origin. If you must allow cross-origin, use a strict allowlist of origins and methods.
+- For cookie-based auth, implement CSRF protection (framework-provided where possible) and verify CSRF tokens on state-changing requests.
+
+### Logging & PII
+- Do not log passwords, tokens, or personal data. Redact sensitive keys if logging structured payloads.
+- Use conditional logging in dev only: `if (process.env.NODE_ENV !== 'production') console.log(...)`.
+- Return generic error messages to clients; avoid leaking stack traces in production.
+
+### Rate Limiting & Bot Protection
+- Add IP-based rate limiting on write endpoints (auth, contact forms, listing creation). For Edge deployments, consider a KV-backed or token-bucket limiter.
+- Add CAPTCHA or similar bot checks on public forms as needed.
+
+### Dependency Hygiene
+- Keep dependencies up to date. Enable Dependabot/GitHub alerts.
+- Run `npm audit` and address critical/high findings promptly.
+
+### Data Retention & Privacy
+- Store only what you need and for as short as possible.
+- Clearly disclose what’s collected and why. Obtain consent for analytics/cookies where required.
 
 15. Copilot & AI Integration Notes
 
