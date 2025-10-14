@@ -55,6 +55,12 @@ const nextConfig: NextConfig = {
       },
     ];
   },
+  async rewrites() {
+    return [
+      // Serve an existing asset as favicon to avoid 404s
+      { source: "/favicon.ico", destination: "/logo.png" },
+    ];
+  },
 };
 
 export default nextConfig;
