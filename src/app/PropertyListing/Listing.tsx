@@ -80,7 +80,7 @@ export default function Listing() {
 	return (
 		<main className="max-w-full mx-auto px-6 py-10 bg-[#F5F5F5]">
 			{/* Page header */}
-			<header className="mb-6 flex items-start justify-between gap-4">
+			<header className="mb-6 flex items-start justify-between gap-4 bg-white px-7 py-5 rounded-[40]">
 				<div>
 					<h1 className="text-3xl md:text-[32px] leading-tight font-extrabold font-lexend">Loakan Heights Residences</h1>
 					<div className="mt-2 flex items-center gap-3 text-sm text-gray-600">
@@ -274,7 +274,7 @@ export default function Listing() {
 										</button>
 										<p className="mt-2 text-center text-xs text-gray-400">You won’t be charged yet</p>
 										<div className="mt-2 w-full flex justify-center">
-											<span className="inline-flex items-center rounded-full bg-gray-100 text-gray-600 text-xs px-3 py-1">Free cancellation for 24 hours</span>
+											<span className="inline-flex items-center rounded-full bg-gray-100 text-gray-600 text-xs px-5 py-1">Free cancellation for 24 hours</span>
 										</div>
 									</div>
 								</div>
@@ -282,7 +282,7 @@ export default function Listing() {
 						</div>
 						<div className="border-t border-gray-100 pt-4">
 							<div className="flex items-center gap-3">
-								<AppImage src="/woman.png" alt="Photo of host, Mika De Guzman" width={48} height={48} className="rounded-full object-cover" />
+								<AppImage src="/woman.png" alt="Photo of host, Mika De Guzman" width={48} height={48} className="rounded-full object-contain" />
 								<div>
 									<div className="text-sm font-semibold">Hosted by Mika De Guzman</div>
 									<div className="text-xs text-gray-500">Verified Host</div>
