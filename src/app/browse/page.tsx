@@ -3,16 +3,20 @@
 import Navbar from "../components/layout/Navbar";
 import Search from "./Search";
 import Accomodation from "./Accomodation";
+import Footerr from "../components/layout/Footerr";
 
 export default function About() {
   return (
-    <main className="min-h-screen bg-white max-w-full overflow-hidden">
+    <>
+      <main className="min-h-screen bg-white max-w-full overflow-hidden">
         <Navbar />
       
         <Search />
 
         <Accomodation />
 
-    </main>
+      </main>
+      <Footerr />
+    </>
   );
 }

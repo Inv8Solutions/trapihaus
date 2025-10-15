@@ -327,7 +327,7 @@ export default function Accommodation() {
               </div>
 
               {/* Booking Options */}
-              <div className="mb-6">
+              <div className="mb-96">
                 <h3 className="font-semibold mb-4 font-lexend">Booking Options</h3>
                 <div className="grid grid-cols-1 gap-2">
                   {bookingOptionsList.map(option => (
