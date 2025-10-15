@@ -78,7 +78,7 @@ export default function Listing() {
 	}));
 
 	return (
-		<main className="max-w-full mx-auto px-6 py-10 bg-[#F5F5F5]">
+		<main className="max-w-full mx-auto px-6 py-10 bg-[#F5F5F5] mb-[80px]">
 			{/* Page header */}
 			<header className="mb-6 flex items-start justify-between gap-4 bg-white px-7 py-5 rounded-[40]">
 				<div>

@@ -2,6 +2,7 @@
 
 import NavBar from "../components/layout/Navbar";
 import Listing from "./Listing";
+import Footerr from "../components/layout/Footerr";
 
 export default function PropertyListingPage() {
     return (
@@ -10,6 +11,7 @@ export default function PropertyListingPage() {
         <main>
             <Listing />
         </main>
+        <Footerr />
         </>        
     );
 }
