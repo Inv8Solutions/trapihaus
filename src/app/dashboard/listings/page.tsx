@@ -29,7 +29,7 @@ function StatCard({ label, value }: { label: string; value: number }) {
 
 function Rating({ value }: { value: number }) {
   return (
-    <div className="flex items-center gap-1 text-[#111827]">
+    <div className="flex items-center gap-1 text-white">
       <svg className="w-4 h-4 text-yellow-400 fill-current" viewBox="0 0 20 20" aria-hidden>
         <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
       </svg>
@@ -49,7 +49,7 @@ function SmallStat({ icon, label }: { icon: React.ReactNode; label: string }) {
 
 function ListingCard({ item }: { item: ListingItem }) {
   return (
-    <div className="bg-white rounded-3xl overflow-hidden border border-[#E5E7EB] shadow-sm">
+    <div className="bg-white rounded-2xl overflow-hidden border border-[#E5E7EB] shadow-sm">
       <div className="relative h-52">
         <Image
           src={item.image}
@@ -68,53 +68,72 @@ function ListingCard({ item }: { item: ListingItem }) {
       </div>
 
       <div className="p-4">
-        <div className="flex items-start justify-between mb-1">
-          <h3 className="font-lexend font-semibold text-[#111827] text-[15px] leading-tight">{item.title}</h3>
-          <Rating value={item.rating} />
+        <div className="mb-1">
+          <h3 className="font-lexend font-bold text-[#111827] text-[18px] leading-tight">{item.title}</h3>
         </div>
-        <div className="flex items-center gap-2 text-[#6B7280] text-sm font-lexend mb-4">
+        <div className="flex items-center gap-2 text-[#6B7280] text-sm font-lexend mt-1">
           <svg className="w-4 h-4 text-[#1078CF]" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
           </svg>
-          <span>{item.location}</span>
+          <span className="truncate">{item.location}</span>
         </div>
 
+        <hr className="border-t border-gray-100 my-4" />
+
         <div className="grid grid-cols-3 gap-3 mb-4">
-          <SmallStat
-            icon={<svg className="w-4 h-4 text-yellow-500 fill-current" viewBox="0 0 20 20" aria-hidden><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>}
-            label={`${item.reviews} Reviews`}
-          />
-          <SmallStat
-            icon={<svg className="w-4 h-4 text-[#111827]" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2v-7H3v7a2 2 0 002 2z"/></svg>}
-            label={`${item.bookings} bookings`}
-          />
-          <SmallStat
-            icon={<svg className="w-4 h-4 text-[#111827]" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5V8l-7-5-7 5v12h5v-6h4v6z"/></svg>}
-            label={`${item.guests} guests`}
-          />
+          <div className="flex flex-col items-center">
+            <div className="flex items-center gap-2">
+              <svg className="w-5 h-5 text-yellow-400" viewBox="0 0 20 20" aria-hidden>
+                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+              </svg>
+              <span className="text-lg font-lexend font-semibold text-[#F5A623]">{item.rating.toFixed(1)}</span>
+            </div>
+            <div className="text-sm text-[#6B7280] mt-1">{item.reviews} Reviews</div>
+          </div>
+
+          <div className="flex flex-col items-center border-l border-gray-100 pl-4">
+            <div className="text-xl font-lexend font-bold text-[#111827]">{item.bookings}</div>
+            <div className="text-sm text-[#6B7280]">bookings</div>
+          </div>
+
+          <div className="flex flex-col items-center border-l border-gray-100 pl-4">
+            <div className="text-xl font-lexend font-bold text-[#111827]">{item.guests}</div>
+            <div className="text-sm text-[#6B7280]">guests</div>
+          </div>
         </div>
+
+        <hr className="border-t border-gray-100 mb-4" />
 
         <div className="flex items-center justify-between">
           <div>
-            <div className="text-xs text-[#6B7280] font-lexend">Profit This Month</div>
-            <div className="text-[#111827] text-lg font-lexend font-semibold">₱{item.profitThisMonth.toLocaleString()}</div>
+            <div className="text-sm text-[#9CA3AF] font-lexend">Profit This Month</div>
+            <div className="text-[#83C12C] text-2xl font-lexend font-bold">₱{item.profitThisMonth.toLocaleString()}</div>
           </div>
           <div className="text-right">
-            <div className="text-xs text-[#6B7280] font-lexend">Price per Night</div>
-            <div className="text-[#111827] text-lg font-lexend font-semibold">₱{item.pricePerNight.toLocaleString()}</div>
+            <div className="text-sm text-[#9CA3AF] font-lexend">Price per Night</div>
+            <div className="text-[#F68109] text-2xl font-lexend font-bold">₱{item.pricePerNight.toLocaleString()}</div>
           </div>
         </div>
 
-        <div className="mt-3 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <span className={`inline-flex h-2 w-2 rounded-full ${item.status === "active" ? "bg-[#22C55E]" : "bg-[#9CA3AF]"}`} aria-hidden />
-            <span className="text-sm font-lexend text-[#111827] capitalize">{item.status}</span>
+        <div className="mt-4 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <button
+              role="switch"
+              aria-checked={item.status === "active"}
+              className={`relative inline-flex items-center h-6 w-11 rounded-full transition-colors focus:outline-none ${
+                item.status === "active" ? "bg-[#22C55E]" : "bg-gray-200"
+              }`}
+            >
+              <span className={`block w-4 h-4 bg-white rounded-full shadow transform transition-transform ${item.status === "active" ? "translate-x-6" : "translate-x-1"}`} />
+            </button>
+            <span className="text-sm font-lexend text-[#111827]">Active</span>
           </div>
-          <div className="flex items-center gap-2">
-            <button className="inline-flex items-center gap-2 px-3 h-9 rounded-xl border border-[#E5E7EB] text-[#111827] bg-white hover:bg-[#F9FAFB] text-sm font-lexend">
-              <svg className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor" aria-hidden>
-                <path d="M4 13.5V16h2.5l7.356-7.356-2.5-2.5L4 13.5z" /><path d="M14.207 3.793l2 2a1 1 0 010 1.414l-1 1-3.414-3.414 1-1a1 1 0 011.414 0z" />
+          <div>
+            <button className="inline-flex items-center gap-2 px-3 h-9 rounded-lg border border-[#BEE0FF] text-[#1078CF] bg-white hover:bg-[#F1FAFF] text-sm font-lexend">
+              <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} aria-hidden>
+                <path d="M12 20h9" strokeLinecap="round" strokeLinejoin="round" />
+                <path d="M16.5 3.5a2.121 2.121 0 113 3L8 18l-4 1 1-4L16.5 3.5z" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
               Edit
             </button>
