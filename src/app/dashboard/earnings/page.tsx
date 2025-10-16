@@ -9,6 +9,7 @@ import {
   faUserGroup,
   faDownload,
   faChevronDown,
+  faCreditCard,
 } from "@fortawesome/free-solid-svg-icons";
 
 type TabKey = "overview" | "transactions" | "settings";
@@ -138,16 +139,192 @@ export default function EarningsPage() {
       )}
 
       {tab === "transactions" && (
-        <div className="bg-white border border-[#E5E7EB] rounded-2xl p-6 shadow-sm text-sm text-[#6B7280] font-lexend">
-          Transactions tab placeholder
-        </div>
+        <section className="bg-white border border-[#E5E7EB] rounded-2xl p-0 shadow-sm overflow-hidden">
+          <div className="px-6 pt-6 pb-4">
+            <h3 className="font-lexend font-semibold text-[#111827]">Earnings Trend</h3>
+            <a className="text-xs text-[#1078CF] underline font-lexend cursor-pointer">Your earnings over the past 8 months</a>
+          </div>
+
+          {/* Table header */}
+          <div className="px-6">
+            <div className="grid grid-cols-12 text-xs text-[#6B7280] font-lexend py-2">
+              <div className="col-span-3">Transaction ID</div>
+              <div className="col-span-2">Date</div>
+              <div className="col-span-3">Property</div>
+              <div className="col-span-1">Guest</div>
+              <div className="col-span-1">Method</div>
+              <div className="col-span-1">Status</div>
+              <div className="col-span-1 text-right">Amount</div>
+            </div>
+          </div>
+
+          <div className="divide-y divide-[#E5E7EB]">
+            {[
+              {
+                id: "TXN-2024-001",
+                date: "Oct 14, 2024",
+                property: "Loakan Heights Residences",
+                guest: "Maria D.",
+                method: "GCash",
+                status: "Completed" as const,
+                amount: 3600,
+              },
+              {
+                id: "TXN-2024-002",
+                date: "Oct 12, 2024",
+                property: "Burnham View Hotel",
+                guest: "Carlos M.",
+                method: "Bank Transfer",
+                status: "Completed" as const,
+                amount: 2500,
+              },
+              {
+                id: "TXN-2024-003",
+                date: "Oct 10, 2024",
+                property: "Pinecrest Transient",
+                guest: "John R.",
+                method: "GCash",
+                status: "Pending" as const,
+                amount: 1200,
+              },
+              {
+                id: "TXN-2024-004",
+                date: "Oct 8, 2024",
+                property: "Loakan Heights Residences",
+                guest: "Sarah L.",
+                method: "PayMaya",
+                status: "Completed" as const,
+                amount: 3600,
+              },
+              {
+                id: "TXN-2024-005",
+                date: "Oct 5, 2024",
+                property: "Burnham View Hotel",
+                guest: "Miguel T.",
+                method: "Bank Transfer",
+                status: "Completed" as const,
+                amount: 2500,
+              },
+            ].map((t) => (
+              <div key={t.id} className="px-6 py-3">
+                <div className="grid grid-cols-12 items-center text-sm">
+                  <div className="col-span-3">
+                    <a href="#" className="text-[#1078CF] hover:underline font-lexend">{t.id}</a>
+                  </div>
+                  <div className="col-span-2 text-[#111827] font-lexend">{t.date}</div>
+                  <div className="col-span-3 text-[#111827] font-lexend">{t.property}</div>
+                  <div className="col-span-1 text-[#111827] font-lexend">{t.guest}</div>
+                  <div className="col-span-1 text-[#111827] font-lexend flex items-center gap-2">
+                    {/* method indicator */}
+                    <span className="inline-flex h-4 w-4 rounded-[4px] bg-[#E5E7EB] items-center justify-center" aria-hidden>
+                      <svg viewBox="0 0 20 20" className="w-3 h-3 text-[#111827]" fill="currentColor">
+                        <path d="M16.707 5.293a1 1 0 00-1.414 0L8 12.586 4.707 9.293A1 1 0 003.293 10.707l4 4a1 1 0 001.414 0l8-8a1 1 0 000-1.414z" />
+                      </svg>
+                    </span>
+                    {t.method}
+                  </div>
+                  <div className="col-span-1">
+                    {t.status === "Completed" ? (
+                      <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-lexend font-semibold bg-[#EAF7EE] text-[#166534]">
+                        <span className="h-2 w-2 rounded-full bg-[#22C55E]" aria-hidden />
+                        Completed
+                      </span>
+                    ) : (
+                      <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-lexend font-semibold bg-[#FFF3D6] text-[#A16207]">
+                        <span className="h-2 w-2 rounded-full bg-[#F59E0B]" aria-hidden />
+                        Pending
+                      </span>
+                    )}
+                  </div>
+                  <div className="col-span-1 text-right text-[#111827] font-lexend">₱{t.amount.toLocaleString()}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="flex items-center justify-between px-6 py-4">
+            <div className="text-sm text-[#6B7280] font-lexend">Showing 5 of 127 transactions</div>
+            <button className="h-10 px-4 rounded-xl bg-white border border-[#E5E7EB] text-sm font-lexend">View All</button>
+          </div>
+        </section>
       )}
 
       {tab === "settings" && (
-        <div className="bg-white border border-[#E5E7EB] rounded-2xl p-6 shadow-sm text-sm text-[#6B7280] font-lexend">
-          Settings tab placeholder
-        </div>
+        <section className="bg-white border border-[#E5E7EB] rounded-2xl p-6 shadow-sm">
+          <div className="mb-4">
+            <h3 className="font-lexend font-semibold text-[#111827]">Payment Methods</h3>
+            <p className="text-sm text-[#6B7280] font-lexend">Manage how you receive your earnings</p>
+          </div>
+
+          <PaymentMethods />
+        </section>
       )}
+    </div>
+  );
+}
+
+type PayoutMethod = {
+  id: string;
+  type: "GCash" | "Bank Transfer";
+  details: string; // masked details
+};
+
+function PaymentMethods() {
+  const [primaryId, setPrimaryId] = useState<string>("gcash");
+  const [methods, setMethods] = useState<PayoutMethod[]>([
+    { id: "gcash", type: "GCash", details: "0917*****34" },
+    { id: "bank", type: "Bank Transfer", details: "BDO - ****5678" },
+  ]);
+
+  const setAsPrimary = (id: string) => setPrimaryId(id);
+
+  return (
+    <div className="space-y-3">
+      {methods.map((m) => {
+        const isPrimary = m.id === primaryId;
+        return (
+          <div
+            key={m.id}
+            className={`flex items-center justify-between rounded-xl border px-4 py-4 ${
+              isPrimary ? "bg-[#F5FAFF] border-[#3B82F6] ring-1 ring-[#93C5FD]" : "bg-white border-[#E5E7EB]"
+            }`}
+          >
+            <div className="flex items-center gap-3">
+              <span className={`h-10 w-10 rounded-lg flex items-center justify-center ${isPrimary ? "bg-white text-[#1078CF] border border-[#BFDBFE]" : "bg-[#F3F4F6] text-[#6B7280]"}`}>
+                <FontAwesomeIcon icon={faCreditCard} />
+              </span>
+              <div>
+                <div className="flex items-center gap-2">
+                  <div className="text-[#111827] font-lexend font-medium">{m.type}</div>
+                </div>
+                <div className="text-sm text-[#6B7280] font-lexend">{m.details}</div>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2">
+              {isPrimary && (
+                <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs bg-[#EAF7EE] text-[#166534] font-lexend">Primary</span>
+              )}
+              {!isPrimary ? (
+                <button
+                  onClick={() => setAsPrimary(m.id)}
+                  className="h-9 px-3 rounded-xl bg-white border border-[#E5E7EB] text-sm font-lexend"
+                >
+                  Set as Primary
+                </button>
+              ) : null}
+              <button className="h-9 px-3 rounded-xl bg-white border border-[#E5E7EB] text-sm font-lexend">
+                Edit
+              </button>
+            </div>
+          </div>
+        );
+      })}
+
+      <button className="w-full h-11 rounded-xl border border-[#E5E7EB] text-[#6B7280] bg-white hover:bg-[#F9FAFB] inline-flex items-center justify-center gap-2 text-sm font-lexend mt-2">
+        <FontAwesomeIcon icon={faCreditCard} />
+        Add Payment Method
+      </button>
     </div>
   );
 }
