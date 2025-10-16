@@ -87,8 +87,10 @@ To provide a trusted platform where students and tourists can find safe, complia
 
 ### Prerequisites
 
-- Node.js 18+ 
-- npm or yarn package manager
+- Node.js 20+ (recommended: 20.17.0 LTS or 22.9+)
+- npm (ships with Node; updating to latest optional)
+
+Note: This repository includes an `.nvmrc` set to `20.17.0`. If you use nvm/nvm-windows, running `nvm use` will select the correct version.
 
 ### Installation
 

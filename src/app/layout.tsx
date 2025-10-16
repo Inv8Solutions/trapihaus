@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Lexend } from "next/font/google";
 import "./globals.css";
+import "@fortawesome/fontawesome-svg-core/styles.css";
+import { config as faConfig } from "@fortawesome/fontawesome-svg-core";
+faConfig.autoAddCss = false;
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
