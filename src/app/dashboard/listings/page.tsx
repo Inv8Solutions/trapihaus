@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 interface ListingItem {
   id: string;
@@ -47,7 +47,7 @@ function SmallStat({ icon, label }: { icon: React.ReactNode; label: string }) {
   );
 }
 
-function ListingCard({ item }: { item: ListingItem }) {
+function ListingCard({ item, onEdit }: { item: ListingItem; onEdit: (id: string) => void }) {
   return (
     <div className="bg-white rounded-2xl overflow-hidden border border-[#E5E7EB] shadow-sm">
       <div className="relative h-52">
@@ -130,7 +130,10 @@ function ListingCard({ item }: { item: ListingItem }) {
             <span className="text-sm font-lexend text-[#111827]">Active</span>
           </div>
           <div>
-            <button className="inline-flex items-center gap-2 px-3 h-9 rounded-lg border border-[#BEE0FF] text-[#1078CF] bg-white hover:bg-[#F1FAFF] text-sm font-lexend">
+            <button
+              onClick={() => onEdit(item.id)}
+              className="inline-flex items-center gap-2 px-3 h-9 rounded-lg border border-[#BEE0FF] text-[#1078CF] bg-white hover:bg-[#F1FAFF] text-sm font-lexend"
+            >
               <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} aria-hidden>
                 <path d="M12 20h9" strokeLinecap="round" strokeLinejoin="round" />
                 <path d="M16.5 3.5a2.121 2.121 0 113 3L8 18l-4 1 1-4L16.5 3.5z" strokeLinecap="round" strokeLinejoin="round" />
@@ -149,7 +152,8 @@ export default function MyListingsPage() {
   const [typeFilter, setTypeFilter] = useState("All Types");
   const [statusFilter, setStatusFilter] = useState("All Status");
 
-  const listings: ListingItem[] = [
+  // Listings need to be stateful so edits can update the card
+  const [listings, setListings] = useState<ListingItem[]>([
     {
       id: "1",
       title: "Loakan Heights Residences",
@@ -192,7 +196,58 @@ export default function MyListingsPage() {
       status: "inactive",
       verified: true,
     },
-  ];
+  ]);
+
+  // Modal state
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [pastedImage, setPastedImage] = useState<string | null>(null); // data URL
+  const pasteAreaRef = useRef<HTMLDivElement | null>(null);
+
+  const openEdit = (id: string) => {
+    setSelectedId(id);
+    setPastedImage(null);
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setPastedImage(null);
+    setSelectedId(null);
+  };
+
+  const onPaste = (e: React.ClipboardEvent) => {
+    const items = e.clipboardData?.items;
+    if (!items) return;
+    for (let i = 0; i < items.length; i++) {
+      const item = items[i];
+      if (item.type.startsWith("image/")) {
+        const file = item.getAsFile();
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = () => {
+            const result = reader.result as string;
+            setPastedImage(result);
+          };
+          reader.readAsDataURL(file);
+          break;
+        }
+      }
+    }
+  };
+
+  const saveChanges = () => {
+    if (!selectedId || !pastedImage) return;
+    setListings((prev) => prev.map((l) => (l.id === selectedId ? { ...l, image: pastedImage } : l)));
+    closeModal();
+  };
+
+  // Focus the paste area when modal opens for quick Ctrl+V
+  useEffect(() => {
+    if (isModalOpen && pasteAreaRef.current) {
+      pasteAreaRef.current.focus();
+    }
+  }, [isModalOpen]);
 
   const filtered = useMemo(() => {
     return listings.filter((l) => {
@@ -267,7 +322,7 @@ export default function MyListingsPage() {
       {/* Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {filtered.map((item) => (
-          <ListingCard key={item.id} item={item} />
+          <ListingCard key={item.id} item={item} onEdit={openEdit} />
         ))}
       </div>
 
@@ -275,6 +330,80 @@ export default function MyListingsPage() {
       <div className="text-center text-sm text-[#9CA3AF] font-lexend pt-6">
         Trapihaus - Safe, Affordable, Trusted Stays in Baguio.
       </div>
+
+      {/* Edit Modal: paste an image to update listing */}
+      {isModalOpen && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          className="fixed inset-0 z-50 flex items-center justify-center"
+          onKeyDown={(e) => {
+            if (e.key === "Escape") closeModal();
+          }}
+        >
+          <div className="absolute inset-0 bg-black/50" onClick={closeModal} />
+          <div className="relative bg-white w-[92vw] max-w-xl rounded-2xl shadow-xl border border-[#E5E7EB] p-4 md:p-6">
+            <div className="flex items-start justify-between mb-4">
+              <div>
+                <h2 className="text-lg md:text-xl font-lexend font-semibold text-[#111827]">Edit Listing</h2>
+                <p className="text-xs md:text-sm text-[#6B7280] mt-0.5">Paste an image (Ctrl+V) to replace the cover photo.</p>
+              </div>
+              <button
+                onClick={closeModal}
+                className="p-2 rounded-lg hover:bg-gray-100 text-[#6B7280]"
+                aria-label="Close"
+              >
+                <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+                  <path d="M6 18L18 6M6 6l12 12" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </button>
+            </div>
+
+            <div className="space-y-4">
+              {/* Paste area */}
+              <div
+                ref={pasteAreaRef}
+                onPaste={onPaste}
+                tabIndex={0}
+                className="border-2 border-dashed border-[#E5E7EB] rounded-xl p-4 flex flex-col items-center justify-center text-center min-h-40 outline-none focus:border-[#BEE0FF]"
+              >
+                {!pastedImage ? (
+                  <div className="flex flex-col items-center gap-2 text-[#6B7280]">
+                    <svg className="w-10 h-10 text-[#BEC7D0]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}>
+                      <path d="M3 7a4 4 0 014-4h4l2 2h4a4 4 0 014 4v10a4 4 0 01-4 4H7a4 4 0 01-4-4V7z" />
+                      <path d="M8 13l2.5-2.5a1 1 0 011.5 0L16 12l3-3" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                    <p className="text-sm font-lexend">Press Ctrl+V to paste an image from your clipboard</p>
+                    <p className="text-xs text-[#9CA3AF]">PNG/JPG recommended. First pasted image will be used.</p>
+                  </div>
+                ) : (
+                  <div className="relative w-full h-60 md:h-72 rounded-lg overflow-hidden">
+                    <Image src={pastedImage} alt="Pasted preview" fill className="object-cover" sizes="100vw" />
+                  </div>
+                )}
+              </div>
+
+              <div className="flex items-center justify-between gap-3 pt-2">
+                <button
+                  onClick={closeModal}
+                  className="h-10 px-4 rounded-lg border border-[#E5E7EB] bg-white text-[#374151] text-sm font-lexend"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={saveChanges}
+                  disabled={!pastedImage || !selectedId}
+                  className={`h-10 px-4 rounded-lg text-white text-sm font-lexend ${
+                    pastedImage && selectedId ? "bg-[#1078CF] hover:bg-[#0e6dbb]" : "bg-[#9CA3AF] cursor-not-allowed"
+                  }`}
+                >
+                  Save Changes
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

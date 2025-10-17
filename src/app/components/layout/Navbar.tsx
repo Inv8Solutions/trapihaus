@@ -62,7 +62,7 @@ export default function Navbar() {
                         <Link href="/" className={pathname === "/" ? "font-black" : "font-medium"}>Home</Link>
                         <Link href="/browse" className={pathname === "/browse" ? "font-black" : "font-medium"}>Browse Accommodations</Link>
                         <Link href="/trips" className={pathname === "/trips" ? "font-black" : "font-medium"}>My Trips</Link>
-                        <Link href="/List" className={pathname === "/List" ? "font-black" : "font-medium"}>List Property</Link>
+                        <Link href="/dashboard" className={pathname === "/dashboard" ? "font-black" : "font-medium"}>Dashboard</Link>
                 </div>
 
                 {user ? (
@@ -88,6 +88,7 @@ export default function Navbar() {
                             <div role="menu" className="absolute right-0 mt-2 w-44 rounded-xl bg-white shadow-lg ring-1 ring-black/5 overflow-hidden z-[9999]">
                                 <Link href="/Homescreen/MyTrips" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">My Trips</Link>
                                 <Link href="/List" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">List Property</Link>
+                                <Link href="/dashboard" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">Dashboard</Link>
                                 <div className="h-px bg-gray-100" />
                                 <button
                                     onClick={async () => {
