@@ -203,10 +203,31 @@ export default function MyListingsPage() {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [pastedImage, setPastedImage] = useState<string | null>(null); // data URL
   const pasteAreaRef = useRef<HTMLDivElement | null>(null);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+
+  // Multi-page (tabs) state
+  const [activeTab, setActiveTab] = useState<"basic" | "details" | "amenities" | "rules">("basic");
+
+  // Basic Info form state (prefilled when opening modal)
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const [propertyType, setPropertyType] = useState("Apartment");
+  const [price, setPrice] = useState<number | "">("");
+  const [address, setAddress] = useState("");
 
   const openEdit = (id: string) => {
     setSelectedId(id);
     setPastedImage(null);
+    // Prefill form based on selected listing
+    const l = listings.find((x) => x.id === id);
+    if (l) {
+      setTitle(l.title);
+      setDescription("");
+      setPropertyType("Apartment");
+      setPrice(l.pricePerNight);
+      setAddress(l.location);
+    }
+    setActiveTab("basic");
     setIsModalOpen(true);
   };
 
@@ -237,8 +258,20 @@ export default function MyListingsPage() {
   };
 
   const saveChanges = () => {
-    if (!selectedId || !pastedImage) return;
-    setListings((prev) => prev.map((l) => (l.id === selectedId ? { ...l, image: pastedImage } : l)));
+    if (!selectedId) return;
+    setListings((prev) =>
+      prev.map((l) =>
+        l.id === selectedId
+          ? {
+              ...l,
+              image: pastedImage ? pastedImage : l.image,
+              title: title || l.title,
+              location: address || l.location,
+              pricePerNight: typeof price === "number" ? price : l.pricePerNight,
+            }
+          : l
+      )
+    );
     closeModal();
   };
 
@@ -331,7 +364,7 @@ export default function MyListingsPage() {
         Trapihaus - Safe, Affordable, Trusted Stays in Baguio.
       </div>
 
-      {/* Edit Modal: paste an image to update listing */}
+      {/* Edit Modal: Multi-page UI with paste/upload image support */}
       {isModalOpen && (
         <div
           role="dialog"
@@ -342,59 +375,197 @@ export default function MyListingsPage() {
           }}
         >
           <div className="absolute inset-0 bg-black/50" onClick={closeModal} />
-          <div className="relative bg-white w-[92vw] max-w-xl rounded-2xl shadow-xl border border-[#E5E7EB] p-4 md:p-6">
-            <div className="flex items-start justify-between mb-4">
-              <div>
-                <h2 className="text-lg md:text-xl font-lexend font-semibold text-[#111827]">Edit Listing</h2>
-                <p className="text-xs md:text-sm text-[#6B7280] mt-0.5">Paste an image (Ctrl+V) to replace the cover photo.</p>
+          <div className="relative bg-white w-[96vw] max-w-3xl rounded-2xl shadow-xl border border-[#E5E7EB] overflow-hidden">
+            {/* Header */}
+            <div className="px-5 md:px-6 pt-5">
+              <h2 className="text-lg md:text-xl font-lexend font-semibold text-[#111827]">Edit Listing</h2>
+              <p className="text-xs md:text-sm text-[#6B7280] mt-0.5">Update your property details and settings</p>
+
+              {/* Tabs */}
+              <div className="mt-4 inline-flex items-center gap-2 bg-[#F3F4F6] rounded-full p-1">
+                {([
+                  { key: "basic", label: "Basic Info" },
+                  { key: "details", label: "Details" },
+                  { key: "amenities", label: "Amenities" },
+                  { key: "rules", label: "Rules & Policies" },
+                ] as const).map((t) => (
+                  <button
+                    key={t.key}
+                    onClick={() => setActiveTab(t.key)}
+                    className={`h-9 px-3 md:px-4 rounded-full text-sm font-lexend transition-colors ${
+                      activeTab === t.key ? "bg-white text-[#111827] shadow" : "text-[#6B7280] hover:text-[#374151]"
+                    }`}
+                    aria-pressed={activeTab === t.key}
+                  >
+                    {t.label}
+                  </button>
+                ))}
               </div>
-              <button
-                onClick={closeModal}
-                className="p-2 rounded-lg hover:bg-gray-100 text-[#6B7280]"
-                aria-label="Close"
-              >
-                <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
-                  <path d="M6 18L18 6M6 6l12 12" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
-              </button>
             </div>
 
-            <div className="space-y-4">
-              {/* Paste area */}
-              <div
-                ref={pasteAreaRef}
-                onPaste={onPaste}
-                tabIndex={0}
-                className="border-2 border-dashed border-[#E5E7EB] rounded-xl p-4 flex flex-col items-center justify-center text-center min-h-40 outline-none focus:border-[#BEE0FF]"
-              >
-                {!pastedImage ? (
-                  <div className="flex flex-col items-center gap-2 text-[#6B7280]">
-                    <svg className="w-10 h-10 text-[#BEC7D0]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}>
-                      <path d="M3 7a4 4 0 014-4h4l2 2h4a4 4 0 014 4v10a4 4 0 01-4 4H7a4 4 0 01-4-4V7z" />
-                      <path d="M8 13l2.5-2.5a1 1 0 011.5 0L16 12l3-3" strokeLinecap="round" strokeLinejoin="round" />
-                    </svg>
-                    <p className="text-sm font-lexend">Press Ctrl+V to paste an image from your clipboard</p>
-                    <p className="text-xs text-[#9CA3AF]">PNG/JPG recommended. First pasted image will be used.</p>
+            {/* Body */}
+            <div className="px-5 md:px-6 py-5 max-h-[70vh] overflow-y-auto" onPaste={onPaste}>
+              {activeTab === "basic" && (
+                <div className="space-y-4">
+                  {/* Title */}
+                  <div className="space-y-1.5">
+                    <label className="block text-sm text-[#111827] font-lexend">Property Title <span className="text-red-500">*</span></label>
+                    <input
+                      value={title}
+                      onChange={(e) => setTitle(e.target.value)}
+                      placeholder="e.g., Cozy 2BR Apartment near Burnham Park"
+                      className="w-full h-11 bg-[#F9FAFB] border border-[#E5E7EB] rounded-lg px-3 text-sm font-lexend outline-none focus:border-[#BEE0FF]"
+                    />
                   </div>
-                ) : (
-                  <div className="relative w-full h-60 md:h-72 rounded-lg overflow-hidden">
-                    <Image src={pastedImage} alt="Pasted preview" fill className="object-cover" sizes="100vw" />
-                  </div>
-                )}
-              </div>
 
-              <div className="flex items-center justify-between gap-3 pt-2">
+                  {/* Description */}
+                  <div className="space-y-1.5">
+                    <label className="block text-sm text-[#111827] font-lexend">Description <span className="text-red-500">*</span></label>
+                    <textarea
+                      value={description}
+                      onChange={(e) => setDescription(e.target.value)}
+                      placeholder="Describe your property..."
+                      className="w-full min-h-28 bg-[#F9FAFB] border border-[#E5E7EB] rounded-lg px-3 py-2 text-sm font-lexend outline-none focus:border-[#BEE0FF]"
+                    />
+                  </div>
+
+                  {/* Type & Price */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <div className="space-y-1.5">
+                      <label className="block text-sm text-[#111827] font-lexend">Property Type <span className="text-red-500">*</span></label>
+                      <select
+                        value={propertyType}
+                        onChange={(e) => setPropertyType(e.target.value)}
+                        className="w-full h-11 bg-[#F9FAFB] border border-[#E5E7EB] rounded-lg px-3 text-sm font-lexend outline-none focus:border-[#BEE0FF]"
+                      >
+                        <option>Apartment</option>
+                        <option>Transient</option>
+                        <option>Hotel</option>
+                      </select>
+                    </div>
+                    <div className="space-y-1.5">
+                      <label className="block text-sm text-[#111827] font-lexend">Price per Night (₱) <span className="text-red-500">*</span></label>
+                      <input
+                        inputMode="numeric"
+                        value={price}
+                        onChange={(e) => {
+                          const v = e.target.value;
+                          if (v === "") setPrice("");
+                          else {
+                            const n = Number(v.replace(/[^0-9]/g, ""));
+                            setPrice(Number.isNaN(n) ? "" : n);
+                          }
+                        }}
+                        placeholder="1200"
+                        className="w-full h-11 bg-[#F9FAFB] border border-[#E5E7EB] rounded-lg px-3 text-sm font-lexend outline-none focus:border-[#BEE0FF]"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Address */}
+                  <div className="space-y-1.5">
+                    <label className="block text-sm text-[#111827] font-lexend">Address / Location <span className="text-red-500">*</span></label>
+                    <div className="relative">
+                      <div className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-[#9CA3AF]">
+                        <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+                          <path d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                          <path d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                        </svg>
+                      </div>
+                      <input
+                        value={address}
+                        onChange={(e) => setAddress(e.target.value)}
+                        placeholder="Street, Barangay, Baguio City"
+                        className="w-full h-11 bg-[#F9FAFB] border border-[#E5E7EB] rounded-lg pl-9 pr-3 text-sm font-lexend outline-none focus:border-[#BEE0FF]"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Images */}
+                  <div className="space-y-2">
+                    <div className="text-sm text-[#111827] font-lexend">Property Images</div>
+                    <div className="grid grid-cols-2 gap-3">
+                      {/* Cover preview */}
+                      <div className="relative h-36 md:h-40 rounded-lg overflow-hidden bg-[#F3F4F6] border border-[#E5E7EB]">
+                        {(pastedImage || listings.find((l) => l.id === selectedId)?.image) ? (
+                          <Image
+                            src={pastedImage || (listings.find((l) => l.id === selectedId)?.image as string)}
+                            alt="Cover preview"
+                            fill
+                            sizes="(max-width:768px) 50vw, 300px"
+                            className="object-cover"
+                          />
+                        ) : null}
+                      </div>
+
+                      {/* Upload tile (also supports paste) */}
+                      <div
+                        ref={pasteAreaRef}
+                        tabIndex={0}
+                        onPaste={onPaste}
+                        className="flex flex-col items-center justify-center gap-2 h-36 md:h-40 rounded-lg border border-[#D1D5DB] bg-white hover:bg-[#F9FAFB] cursor-pointer"
+                        onClick={() => fileInputRef.current?.click()}
+                        aria-label="Upload image"
+                      >
+                        <svg className="w-6 h-6 text-[#6B7280]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+                          <path d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2" strokeLinecap="round" strokeLinejoin="round" />
+                          <path d="M7 9l5-5 5 5" strokeLinecap="round" strokeLinejoin="round" />
+                          <path d="M12 4v12" strokeLinecap="round" strokeLinejoin="round" />
+                        </svg>
+                        <span className="text-sm text-[#111827] font-lexend">Upload</span>
+                        <input
+                          ref={fileInputRef}
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          onChange={(e) => {
+                            const f = e.target.files?.[0];
+                            if (!f) return;
+                            const reader = new FileReader();
+                            reader.onload = () => setPastedImage(reader.result as string);
+                            reader.readAsDataURL(f);
+                            // reset input so same file can be chosen again later
+                            e.currentTarget.value = "";
+                          }}
+                        />
+                      </div>
+                    </div>
+                    <p className="text-xs text-[#6B7280] font-lexend">Upload up to 10 high-quality photos. First image will be the cover.</p>
+                  </div>
+                </div>
+              )}
+
+              {activeTab === "details" && (
+                <div className="text-sm text-[#6B7280] font-lexend">Details coming soon.</div>
+              )}
+              {activeTab === "amenities" && (
+                <div className="text-sm text-[#6B7280] font-lexend">Amenities coming soon.</div>
+              )}
+              {activeTab === "rules" && (
+                <div className="text-sm text-[#6B7280] font-lexend">Rules & Policies coming soon.</div>
+              )}
+            </div>
+
+            {/* Footer */}
+            <div className="border-t border-[#E5E7EB] px-5 md:px-6 py-4 flex items-center justify-between bg-white">
+              <button
+                onClick={closeModal}
+                className="h-10 px-4 rounded-lg border border-[#E5E7EB] bg-white text-[#374151] text-sm font-lexend"
+              >
+                Cancel
+              </button>
+              <div className="flex items-center gap-2">
                 <button
-                  onClick={closeModal}
+                  onClick={() => {/* future draft handling */}}
                   className="h-10 px-4 rounded-lg border border-[#E5E7EB] bg-white text-[#374151] text-sm font-lexend"
                 >
-                  Cancel
+                  Save as Draft
                 </button>
                 <button
                   onClick={saveChanges}
-                  disabled={!pastedImage || !selectedId}
+                  disabled={!selectedId}
                   className={`h-10 px-4 rounded-lg text-white text-sm font-lexend ${
-                    pastedImage && selectedId ? "bg-[#1078CF] hover:bg-[#0e6dbb]" : "bg-[#9CA3AF] cursor-not-allowed"
+                    selectedId ? "bg-[#1078CF] hover:bg-[#0e6dbb]" : "bg-[#9CA3AF] cursor-not-allowed"
                   }`}
                 >
                   Save Changes
