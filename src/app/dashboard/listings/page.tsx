@@ -2,6 +2,16 @@
 
 import Image from "next/image";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faWifi,
+  faSquareParking,
+  faUtensils,
+  faTv,
+  faSnowflake,
+  faFire,
+  faShower,
+} from "@fortawesome/free-solid-svg-icons";
 
 interface ListingItem {
   id: string;
@@ -16,6 +26,9 @@ interface ListingItem {
   profitThisMonth: number;
   status: "active" | "inactive";
   verified: boolean;
+  amenities?: string[]; // optional for now
+  houseRules?: string[];
+  cancellationPolicy?: "Flexible" | "Moderate" | "Strict";
 }
 
 function StatCard({ label, value }: { label: string; value: number }) {
@@ -223,6 +236,30 @@ export default function MyListingsPage() {
   const [checkInTime, setCheckInTime] = useState<string>("2:00 PM");
   const [checkOutTime, setCheckOutTime] = useState<string>("12:00 PM");
 
+  // Amenities tab state
+  const AMENITY_LIST = [
+    { key: "wifi", label: "WiFi", icon: <FontAwesomeIcon icon={faWifi} className="w-5 h-5" /> },
+    { key: "parking", label: "Parking", icon: <FontAwesomeIcon icon={faSquareParking} className="w-5 h-5" /> },
+    { key: "kitchen", label: "Kitchen", icon: <FontAwesomeIcon icon={faUtensils} className="w-5 h-5" /> },
+    { key: "tv", label: "TV", icon: <FontAwesomeIcon icon={faTv} className="w-5 h-5" /> },
+    { key: "aircon", label: "Air Conditioning", icon: <FontAwesomeIcon icon={faSnowflake} className="w-5 h-5" /> },
+    { key: "heating", label: "Heating", icon: <FontAwesomeIcon icon={faFire} className="w-5 h-5" /> },
+    { key: "hotwater", label: "Hot Water", icon: <FontAwesomeIcon icon={faShower} className="w-5 h-5" /> },
+  ] as const;
+  const [amenities, setAmenities] = useState<string[]>([]);
+  const toggleAmenity = (key: string) => {
+    setAmenities((prev) => (prev.includes(key) ? prev.filter((a) => a !== key) : [...prev, key]));
+  };
+
+  // Rules & Policies state
+  const [houseRulesText, setHouseRulesText] = useState("");
+  const [cancellationPolicy, setCancellationPolicy] = useState<"Flexible" | "Moderate" | "Strict">("Moderate");
+  const policyDescriptions: Record<typeof cancellationPolicy, string> = {
+    Flexible: "Full refund up to 1 day before check-in",
+    Moderate: "Full refund up to 5 days before check-in",
+    Strict: "50% refund up to 7 days before check-in",
+  };
+
   const openEdit = (id: string) => {
     setSelectedId(id);
     setPastedImage(null);
@@ -240,6 +277,9 @@ export default function MyListingsPage() {
       setBathrooms(2);
       setCheckInTime("2:00 PM");
       setCheckOutTime("12:00 PM");
+      setAmenities(l.amenities ?? ["wifi", "parking", "kitchen", "tv", "aircon"]);
+      setHouseRulesText((l.houseRules ?? []).join("\n"));
+      setCancellationPolicy(l.cancellationPolicy ?? "Moderate");
     }
     setActiveTab("basic");
     setIsModalOpen(true);
@@ -283,6 +323,12 @@ export default function MyListingsPage() {
               location: address || l.location,
               pricePerNight: typeof price === "number" ? price : l.pricePerNight,
               guests: maxGuests || l.guests,
+              amenities,
+              houseRules: houseRulesText
+                .split("\n")
+                .map((s) => s.trim())
+                .filter(Boolean),
+              cancellationPolicy,
             }
           : l
       )
@@ -642,10 +688,77 @@ export default function MyListingsPage() {
                 </div>
               )}
               {activeTab === "amenities" && (
-                <div className="text-sm text-[#6B7280] font-lexend">Amenities coming soon.</div>
+                <div className="space-y-3">
+                  <div className="text-sm text-[#111827] font-lexend">Available Amenities</div>
+                  <div className="text-xs text-[#6B7280] font-lexend -mt-1">Select all amenities available at your property</div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    {AMENITY_LIST.map((a) => {
+                      const selected = amenities.includes(a.key);
+                      return (
+                        <button
+                          key={a.key}
+                          type="button"
+                          onClick={() => toggleAmenity(a.key)}
+                          className={`flex items-center gap-3 w-full h-12 rounded-xl border px-3 md:px-4 text-sm font-lexend text-left ${
+                            selected
+                              ? "border-[#60A5FA] bg-[#EFF6FF] text-[#111827]"
+                              : "border-[#E5E7EB] bg-white text-[#6B7280]"
+                          }`}
+                          aria-pressed={selected}
+                        >
+                          {/* Left check/icon group */}
+                          <span
+                            className={`inline-flex items-center justify-center w-5 h-5 rounded ${
+                              selected ? "bg-[#3B82F6] text-white" : "bg-white border border-[#D1D5DB]"
+                            }`}
+                          >
+                            {/* checkmark when selected */}
+                            {selected ? (
+                              <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={3}>
+                                <path d="M5 13l4 4L19 7" strokeLinecap="round" strokeLinejoin="round" />
+                              </svg>
+                            ) : null}
+                          </span>
+                          {/* Amenity icon and label */}
+                          <span className="flex items-center gap-2">
+                            <span className={`text-[#6B7280] ${selected ? "text-[#2563EB]" : ""}`}>{a.icon}</span>
+                            <span className="text-[#111827]">{a.label}</span>
+                          </span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
               )}
               {activeTab === "rules" && (
-                <div className="text-sm text-[#6B7280] font-lexend">Rules & Policies coming soon.</div>
+                <div className="space-y-4">
+                  {/* House Rules */}
+                  <div className="space-y-1.5">
+                    <div className="text-sm text-[#111827] font-lexend">House Rules</div>
+                    <textarea
+                      value={houseRulesText}
+                      onChange={(e) => setHouseRulesText(e.target.value)}
+                      placeholder="Enter house rules, one per line..."
+                      className="w-full min-h-32 bg-[#F9FAFB] border border-[#E5E7EB] rounded-lg px-3 py-2 text-sm font-lexend outline-none focus:border-[#BEE0FF]"
+                    />
+                    <div className="text-xs text-[#9CA3AF] font-lexend">One rule per line for better readability</div>
+                  </div>
+
+                  {/* Cancellation Policy */}
+                  <div className="space-y-1.5">
+                    <div className="text-sm text-[#111827] font-lexend">Cancellation Policy</div>
+                    <select
+                      value={cancellationPolicy}
+                      onChange={(e) => setCancellationPolicy(e.target.value as typeof cancellationPolicy)}
+                      className="w-full h-11 bg-[#F9FAFB] border border-[#E5E7EB] rounded-lg px-3 text-sm font-lexend outline-none focus:border-[#BEE0FF]"
+                    >
+                      <option value="Flexible">Flexible</option>
+                      <option value="Moderate">Moderate</option>
+                      <option value="Strict">Strict</option>
+                    </select>
+                    <div className="text-xs text-[#9CA3AF] font-lexend">{policyDescriptions[cancellationPolicy]}</div>
+                  </div>
+                </div>
               )}
             </div>
 
