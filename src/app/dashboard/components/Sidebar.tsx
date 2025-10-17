@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import Image from "next/image";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import type { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 import {
   faHouse,
   faListUl,
@@ -16,7 +17,7 @@ import {
   faPlus,
 } from "@fortawesome/free-solid-svg-icons";
 
-const nav = [
+const nav: { href: string; label: string; icon: IconDefinition }[] = [
   { href: "/dashboard", label: "Dashboard", icon: faHouse },
   { href: "/dashboard/listings", label: "My Listings", icon: faListUl },
   { href: "/dashboard/reservations", label: "Reservations", icon: faCalendarDays },

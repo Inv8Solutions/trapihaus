@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import type { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 import {
   faCalendarCheck,
   faCircleCheck,
@@ -11,8 +12,6 @@ import {
   faFilter,
   faEye,
   faEllipsisVertical,
-  faUserGroup,
-  faPesoSign,
 } from "@fortawesome/free-solid-svg-icons";
 
 type Status = "Confirmed" | "Pending" | "Checked-in" | "Completed" | "Cancelled";
@@ -28,7 +27,7 @@ interface ReservationItem {
   amount: number;
 }
 
-function Stat({ icon, label, value, tint }: { icon: any; label: string; value: number; tint: string }) {
+function Stat({ icon, label, value, tint }: { icon: IconDefinition; label: string; value: number; tint: string }) {
   return (
     <div className="flex items-center gap-3 rounded-2xl bg-white border border-[#E5E7EB] h-[92px] px-5">
       <div className={`h-10 w-10 rounded-full flex items-center justify-center ${tint}`}
@@ -116,7 +115,8 @@ export default function ReservationsPage() {
   const [statusFilter, setStatusFilter] = useState("All Status");
   const [propertyFilter, setPropertyFilter] = useState("All Properties");
 
-  const reservations: ReservationItem[] = [
+  const reservations: ReservationItem[] = useMemo(
+    () => [
     {
       id: "1",
       guestName: "Maria Dela Cruz",
@@ -167,7 +167,9 @@ export default function ReservationsPage() {
       guests: 4,
       amount: 3600,
     },
-  ];
+    ],
+    []
+  );
 
   const filtered = useMemo(() => {
     return reservations.filter((r) => {

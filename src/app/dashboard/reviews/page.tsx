@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import type { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 import {
   faStar,
   faMagnifyingGlass,
@@ -9,7 +10,7 @@ import {
   faThumbsUp,
 } from "@fortawesome/free-solid-svg-icons";
 
-function Stat({ icon, label, value, tint, valueColor }: { icon: any; label: string; value: string; tint: string; valueColor: string }) {
+function Stat({ icon, label, value, tint, valueColor }: { icon: IconDefinition; label: string; value: string; tint: string; valueColor: string }) {
   return (
     <div className="flex items-center gap-3 rounded-2xl bg-white border border-[#E5E7EB] h-[92px] px-5">
       <div className={`h-10 w-10 rounded-full flex items-center justify-center ${tint}`} aria-hidden>

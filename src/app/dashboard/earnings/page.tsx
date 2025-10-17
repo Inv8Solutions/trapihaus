@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import type { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 import {
   faPesoSign,
   faWallet,
@@ -14,7 +15,7 @@ import {
 
 type TabKey = "overview" | "transactions" | "settings";
 
-function Stat({ icon, label, value, tint, valueColor }: { icon: any; label: string; value: string; tint: string; valueColor: string }) {
+function Stat({ icon, label, value, tint, valueColor }: { icon: IconDefinition; label: string; value: string; tint: string; valueColor: string }) {
   return (
     <div className="flex items-center gap-3 rounded-2xl bg-white border border-[#E5E7EB] h-[92px] px-5">
       <div className={`h-10 w-10 rounded-full flex items-center justify-center ${tint}`} aria-hidden>
@@ -62,7 +63,7 @@ function LineChart({ points }: { points: number[] }) {
 
 export default function EarningsPage() {
   const [tab, setTab] = useState<TabKey>("overview");
-  const [period, setPeriod] = useState("This Year");
+  const [period] = useState("This Year");
 
   const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug"];
   const points = [9000, 9500, 12000, 9800, 14000, 15000, 18000, 18500];
@@ -271,7 +272,7 @@ type PayoutMethod = {
 
 function PaymentMethods() {
   const [primaryId, setPrimaryId] = useState<string>("gcash");
-  const [methods, setMethods] = useState<PayoutMethod[]>([
+  const [methods] = useState<PayoutMethod[]>([
     { id: "gcash", type: "GCash", details: "0917*****34" },
     { id: "bank", type: "Bank Transfer", details: "BDO - ****5678" },
   ]);
