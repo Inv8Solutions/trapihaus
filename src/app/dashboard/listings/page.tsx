@@ -215,6 +215,14 @@ export default function MyListingsPage() {
   const [price, setPrice] = useState<number | "">("");
   const [address, setAddress] = useState("");
 
+  // Details tab state
+  const [maxGuests, setMaxGuests] = useState<number>(2);
+  const [bedrooms, setBedrooms] = useState<number>(1);
+  const [beds, setBeds] = useState<number>(1);
+  const [bathrooms, setBathrooms] = useState<number>(1);
+  const [checkInTime, setCheckInTime] = useState<string>("2:00 PM");
+  const [checkOutTime, setCheckOutTime] = useState<string>("12:00 PM");
+
   const openEdit = (id: string) => {
     setSelectedId(id);
     setPastedImage(null);
@@ -226,6 +234,12 @@ export default function MyListingsPage() {
       setPropertyType("Apartment");
       setPrice(l.pricePerNight);
       setAddress(l.location);
+      setMaxGuests(l.guests);
+      setBedrooms(2);
+      setBeds(3);
+      setBathrooms(2);
+      setCheckInTime("2:00 PM");
+      setCheckOutTime("12:00 PM");
     }
     setActiveTab("basic");
     setIsModalOpen(true);
@@ -268,6 +282,7 @@ export default function MyListingsPage() {
               title: title || l.title,
               location: address || l.location,
               pricePerNight: typeof price === "number" ? price : l.pricePerNight,
+              guests: maxGuests || l.guests,
             }
           : l
       )
@@ -536,7 +551,95 @@ export default function MyListingsPage() {
               )}
 
               {activeTab === "details" && (
-                <div className="text-sm text-[#6B7280] font-lexend">Details coming soon.</div>
+                <div className="space-y-4">
+                  {/* Capacity & Rooms */}
+                  <div>
+                    <div className="text-sm text-[#111827] font-lexend mb-2">Capacity & Rooms</div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                      <div className="space-y-1.5">
+                        <div className="text-sm text-[#6B7280] font-lexend">Max Guests</div>
+                        <select
+                          value={maxGuests}
+                          onChange={(e) => setMaxGuests(Number(e.target.value))}
+                          className="w-full h-11 bg-[#F9FAFB] border border-[#E5E7EB] rounded-lg px-3 text-sm font-lexend outline-none focus:border-[#BEE0FF]"
+                        >
+                          {Array.from({ length: 16 }, (_, i) => i + 1).map((n) => (
+                            <option key={n} value={n}>{n} {n === 1 ? "guest" : "guests"}</option>
+                          ))}
+                        </select>
+                      </div>
+                      <div className="space-y-1.5">
+                        <div className="text-sm text-[#6B7280] font-lexend">Bedrooms</div>
+                        <select
+                          value={bedrooms}
+                          onChange={(e) => setBedrooms(Number(e.target.value))}
+                          className="w-full h-11 bg-[#F9FAFB] border border-[#E5E7EB] rounded-lg px-3 text-sm font-lexend outline-none focus:border-[#BEE0FF]"
+                        >
+                          {Array.from({ length: 8 }, (_, i) => i + 0).map((n) => (
+                            <option key={n} value={n}>{n} {n === 1 ? "bedroom" : "bedrooms"}</option>
+                          ))}
+                        </select>
+                      </div>
+                      <div className="space-y-1.5">
+                        <div className="text-sm text-[#6B7280] font-lexend">Beds</div>
+                        <select
+                          value={beds}
+                          onChange={(e) => setBeds(Number(e.target.value))}
+                          className="w-full h-11 bg-[#F9FAFB] border border-[#E5E7EB] rounded-lg px-3 text-sm font-lexend outline-none focus:border-[#BEE0FF]"
+                        >
+                          {Array.from({ length: 10 }, (_, i) => i + 1).map((n) => (
+                            <option key={n} value={n}>{n} {n === 1 ? "bed" : "beds"}</option>
+                          ))}
+                        </select>
+                      </div>
+                      <div className="space-y-1.5">
+                        <div className="text-sm text-[#6B7280] font-lexend">Bathrooms</div>
+                        <select
+                          value={bathrooms}
+                          onChange={(e) => setBathrooms(Number(e.target.value))}
+                          className="w-full h-11 bg-[#F9FAFB] border border-[#E5E7EB] rounded-lg px-3 text-sm font-lexend outline-none focus:border-[#BEE0FF]"
+                        >
+                          {Array.from({ length: 8 }, (_, i) => i + 1).map((n) => (
+                            <option key={n} value={n}>{n} {n === 1 ? "bathroom" : "bathrooms"}</option>
+                          ))}
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+
+                  <hr className="border-t border-[#E5E7EB]" />
+
+                  {/* Check-in & Check-out Times */}
+                  <div>
+                    <div className="text-sm text-[#111827] font-lexend mb-2">Check-in & Check-out Times</div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                      <div className="space-y-1.5">
+                        <div className="text-sm text-[#6B7280] font-lexend">Check-in Time</div>
+                        <select
+                          value={checkInTime}
+                          onChange={(e) => setCheckInTime(e.target.value)}
+                          className="w-full h-11 bg-[#F9FAFB] border border-[#E5E7EB] rounded-lg px-3 text-sm font-lexend outline-none focus:border-[#BEE0FF]"
+                        >
+                          {["12:00 PM", "1:00 PM", "2:00 PM", "3:00 PM", "4:00 PM"].map((t) => (
+                            <option key={t} value={t}>{t}</option>
+                          ))}
+                        </select>
+                      </div>
+                      <div className="space-y-1.5">
+                        <div className="text-sm text-[#6B7280] font-lexend">Check-out Time</div>
+                        <select
+                          value={checkOutTime}
+                          onChange={(e) => setCheckOutTime(e.target.value)}
+                          className="w-full h-11 bg-[#F9FAFB] border border-[#E5E7EB] rounded-lg px-3 text-sm font-lexend outline-none focus:border-[#BEE0FF]"
+                        >
+                          {["10:00 AM", "11:00 AM", "12:00 PM"].map((t) => (
+                            <option key={t} value={t}>{t}</option>
+                          ))}
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               )}
               {activeTab === "amenities" && (
                 <div className="text-sm text-[#6B7280] font-lexend">Amenities coming soon.</div>
