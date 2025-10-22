@@ -42,7 +42,7 @@ export default function TermsOfService() {
           <section>
             <h2 className="text-xl font-semibold text-[#1F2937] mb-3">1. Acceptance of Terms</h2>
             <p className="mb-3">
-              Welcome to Trapihaus ("we," "us," or "our"). By accessing and using the Trapihaus platform as a property host, you agree to comply with and be bound by these Terms of Service ("Terms"). If you do not agree with any part of these Terms, you may not use our platform.
+              Welcome to Trapihaus (&quot;we,&quot; &quot;us,&quot; or &quot;our&quot;). By accessing and using the Trapihaus platform as a property host, you agree to comply with and be bound by these Terms of Service (&quot;Terms&quot;). If you do not agree with any part of these Terms, you may not use our platform.
             </p>
             <p>
               If you use our agree to these Terms, you also use our service as our our terms by creating an account and listing your property. Trapihaus provides a marketplace for short-term rental properties in Baguio, Philippines, and takes compliance with local laws seriously.
@@ -55,19 +55,19 @@ export default function TermsOfService() {
           <section>
             <h2 className="text-xl font-semibold text-[#1F2937] mb-3">2. Definitions</h2>
             <div className="space-y-2">
-              <p><strong>"Platform":</strong></p>
+              <p><strong>&quot;Platform&quot;:</strong></p>
               <p className="ml-4">Means the Trapihaus website, mobile application, and all related services.</p>
               
-              <p className="mt-3"><strong>"Host":</strong></p>
+              <p className="mt-3"><strong>&quot;Host&quot;:</strong></p>
               <p className="ml-4">Refers to any person or entity creating a listing, offering a property for booking through the Platform.</p>
               
-              <p className="mt-3"><strong>"Guest":</strong></p>
+              <p className="mt-3"><strong>&quot;Guest&quot;:</strong></p>
               <p className="ml-4">Means any individual who books or intent for a Listing.</p>
               
-              <p className="mt-3"><strong>"Booking":</strong></p>
+              <p className="mt-3"><strong>&quot;Booking&quot;:</strong></p>
               <p className="ml-4">Means the confirmed reservation made through the Platform.</p>
               
-              <p className="mt-3"><strong>"Service Fee":</strong></p>
+              <p className="mt-3"><strong>&quot;Service Fee&quot;:</strong></p>
               <p className="ml-4">Refers to the fee charged by Trapihaus for use of the Platform, currently set at 15% of the booking subtotal.</p>
             </div>
           </section>
@@ -308,7 +308,7 @@ export default function TermsOfService() {
           {/* Acknowledgment */}
           <section className="bg-[#F9FAFB] p-6 rounded-lg mt-8">
             <h3 className="font-semibold text-[#1F2937] mb-3">Acknowledgment</h3>
-            <p>By clicking "I Agree" or by listing a property on Trapihaus, you acknowledge that you have read, understood, and agreed to be bound by these Terms of Service. You also acknowledge that you have reviewed our Privacy Policy and agree to its terms.</p>
+            <p>By clicking &quot;I Agree&quot; or by listing a property on Trapihaus, you acknowledge that you have read, understood, and agreed to be bound by these Terms of Service. You also acknowledge that you have reviewed our Privacy Policy and agree to its terms.</p>
           </section>
         </div>
           </div>

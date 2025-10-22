@@ -185,7 +185,7 @@ export default function PrivacyPolicy() {
                 <p>You can request to delete your account by contacting us at <a href="mailto:privacy@trapihaus.com" className="text-[#1078CF] hover:underline">privacy@trapihaus.com</a>. Please note that some information may be retained for legal or legitimate business purposes.</p>
 
                 <h3 className="font-semibold text-[#1F2937] mt-4 mb-2">6.3 Opt-Out of Marketing</h3>
-                <p>You can unsubscribe from promotional emails by clicking the "unsubscribe" link in any email or by adjusting your notification settings.</p>
+                <p>You can unsubscribe from promotional emails by clicking the &quot;unsubscribe&quot; link in any email or by adjusting your notification settings.</p>
 
                 <h3 className="font-semibold text-[#1F2937] mt-4 mb-2">6.4 Cookie Management</h3>
                 <p>You can manage or disable cookies through your browser settings. Note that disabling cookies may affect the functionality of the Platform.</p>
@@ -253,7 +253,7 @@ export default function PrivacyPolicy() {
                 </p>
                 <ul className="list-disc ml-6 space-y-1">
                   <li>Post the updated policy on this page.</li>
-                  <li>Update the "Last Updated" date at the top.</li>
+                  <li>Update the &quot;Last Updated&quot; date at the top.</li>
                   <li>Notify you via email or through a notice on the Platform (for significant changes).</li>
                 </ul>
                 <p className="mt-3">
