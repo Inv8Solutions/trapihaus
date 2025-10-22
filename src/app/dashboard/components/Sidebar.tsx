@@ -25,7 +25,7 @@ const nav: { href: string; label: string; icon: IconDefinition }[] = [
   { href: "/dashboard/messages", label: "Messages", icon: faComments },
   { href: "/dashboard/reviews", label: "Reviews", icon: faStar },
   { href: "/dashboard/settings", label: "Settings", icon: faGear },
-  { href: "/dashboard/help", label: "Help Center", icon: faCircleQuestion },
+  { href: "/dashboard/helpCenter", label: "Help Center", icon: faCircleQuestion },
 ];
 
 export default function Sidebar() {
