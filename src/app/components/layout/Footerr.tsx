@@ -74,9 +74,9 @@ export default function Footerr() {
           </Link>
               </li>
               <li>
-          <a href="#" className="text-blue-100 hover:text-white transition-colors font-lexend">
+          <Link href="/privacy" className="text-blue-100 hover:text-white transition-colors font-lexend">
             Privacy Policy
-          </a>
+          </Link>
               </li>
             </ul>
           </div>
