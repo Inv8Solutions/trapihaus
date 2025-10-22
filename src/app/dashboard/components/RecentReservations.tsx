@@ -6,13 +6,9 @@ type Reservation = {
   amount: string;
 };
 
-const items: Reservation[] = [
-  { guest: "Maria D.", property: "Laokan Heights", checkIn: "Oct 5", status: "Confirmed", amount: "₱3,600" },
-  { guest: "John R.", property: "Pinecrest Transient", checkIn: "Oct 10", status: "Pending", amount: "₱1,200" },
-  { guest: "Lara M.", property: "Burnham View Hotel", checkIn: "Oct 12", status: "Cancelled", amount: "₱0" },
-];
+interface RecentReservationsProps { items?: Reservation[] }
 
-export default function RecentReservations() {
+export default function RecentReservations({ items }: RecentReservationsProps) {
   const badge = (s: Reservation["status"]) => {
     const map = {
       Confirmed: "bg-[#EAF6EE] text-[#22C55E]",
@@ -39,15 +35,21 @@ export default function RecentReservations() {
             </tr>
           </thead>
           <tbody>
-            {items.map((r) => (
-              <tr key={`${r.guest}-${r.checkIn}`} className="border-t border-[#F3F4F6]">
-                <td className="py-3 pr-4 font-medium text-[#111827]">{r.guest}</td>
-                <td className="py-3 pr-4">{r.property}</td>
-                <td className="py-3 pr-4">{r.checkIn}</td>
-                <td className="py-3 pr-4">{badge(r.status)}</td>
-                <td className="py-3 pr-4 text-right">{r.amount}</td>
+            {!items || items.length === 0 ? (
+              <tr className="border-t border-[#F3F4F6]">
+                <td colSpan={5} className="py-6 text-center text-[#9CA3AF]">No reservations yet</td>
               </tr>
-            ))}
+            ) : (
+              items.map((r) => (
+                <tr key={`${r.guest}-${r.checkIn}`} className="border-t border-[#F3F4F6]">
+                  <td className="py-3 pr-4 font-medium text-[#111827]">{r.guest}</td>
+                  <td className="py-3 pr-4">{r.property}</td>
+                  <td className="py-3 pr-4">{r.checkIn}</td>
+                  <td className="py-3 pr-4">{badge(r.status)}</td>
+                  <td className="py-3 pr-4 text-right">{r.amount}</td>
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
       </div>

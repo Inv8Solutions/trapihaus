@@ -5,11 +5,6 @@ type Review = {
   room?: string;
 };
 
-const items: Review[] = [
-  { name: "Maria D.", rating: 5, quote: "Super clean and near town!!", room: "#Room 214" },
-  { name: "Paolo S.", rating: 4, quote: "Affordable and easy to book.", room: "#Room 204" },
-];
-
 function Stars({ rating }: { rating: number }) {
   return (
     <div className="flex items-center gap-1" aria-label={`${rating} out of 5`}>
@@ -22,23 +17,43 @@ function Stars({ rating }: { rating: number }) {
   );
 }
 
-export default function LatestReviews() {
+interface LatestReviewsProps { reviews?: Review[] }
+
+export default function LatestReviews({ reviews }: LatestReviewsProps) {
+  const hasData = Array.isArray(reviews) && reviews.length > 0;
+  const skeletons = new Array(2).fill(0);
+
   return (
     <section className="bg-white border border-[#E5E7EB] rounded-2xl p-6 shadow-sm">
       <h3 className="font-lexend font-semibold">Latest Reviews</h3>
       <p className="text-sm text-[#6B7280]">Recent Guest Feedback</p>
 
       <div className="mt-4 space-y-4">
-        {items.map((r) => (
-          <div key={r.name} className="rounded-xl border border-[#F3F4F6] p-4">
-            <div className="flex items-center justify-between">
-              <p className="font-medium text-[#111827]">{r.name}</p>
-              <Stars rating={r.rating} />
-            </div>
-            <p className="text-sm text-[#374151] mt-2">“{r.quote}”</p>
-            {r.room ? <p className="text-xs text-[#9CA3AF] mt-1">{r.room}</p> : null}
-          </div>
-        ))}
+        {hasData
+          ? reviews!.map((r) => (
+              <div key={`${r.name}-${r.quote.slice(0, 8)}`} className="rounded-xl border border-[#F3F4F6] p-4">
+                <div className="flex items-center justify-between">
+                  <p className="font-medium text-[#111827]">{r.name}</p>
+                  <Stars rating={r.rating} />
+                </div>
+                <p className="text-sm text-[#374151] mt-2">“{r.quote}”</p>
+                {r.room ? <p className="text-xs text-[#9CA3AF] mt-1">{r.room}</p> : null}
+              </div>
+            ))
+          : skeletons.map((_, i) => (
+              <div key={i} className="rounded-xl border border-[#F3F4F6] p-4">
+                <div className="flex items-center justify-between">
+                  <div className="h-4 w-28 bg-[#F3F4F6] rounded animate-pulse" />
+                  <div className="flex gap-1">
+                    {new Array(5).fill(0).map((_, s) => (
+                      <div key={s} className="w-4 h-4 rounded bg-[#F3F4F6] animate-pulse" />
+                    ))}
+                  </div>
+                </div>
+                <div className="h-4 w-3/4 bg-[#F3F4F6] rounded mt-3 animate-pulse" />
+                <div className="h-3 w-24 bg-[#F3F4F6] rounded mt-2 animate-pulse" />
+              </div>
+            ))}
       </div>
     </section>
   );

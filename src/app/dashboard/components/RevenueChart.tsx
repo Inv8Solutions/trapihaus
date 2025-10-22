@@ -1,11 +1,11 @@
-export default function RevenueChart() {
-  const data = [
-    { month: "August", value: 40 },
-    { month: "September", value: 50 },
-    { month: "October", value: 35 },
-  ];
+interface RevenueChartProps {
+  data?: Array<{ label: string; value: number }>;
+}
 
-  const max = Math.max(...data.map((d) => d.value));
+export default function RevenueChart({ data }: RevenueChartProps) {
+  const hasData = Array.isArray(data) && data.length > 0;
+  const safeData = hasData ? data! : [{ label: "Aug", value: 0 }, { label: "Sep", value: 0 }, { label: "Oct", value: 0 }];
+  const max = Math.max(1, ...safeData.map((d) => d.value));
 
   return (
     <section className="bg-white border border-[#E5E7EB] rounded-2xl p-6 shadow-sm">
@@ -18,14 +18,14 @@ export default function RevenueChart() {
       </div>
 
       <div className="mt-6 grid grid-cols-3 gap-6 items-end h-56">
-        {data.map((d) => (
-          <div key={d.month} className="flex flex-col items-center gap-3">
+        {safeData.map((d) => (
+          <div key={d.label} className="flex flex-col items-center gap-3 w-full">
             <div
-              className="w-14 rounded-xl bg-[#1078CF]"
-              style={{ height: `${(d.value / max) * 100}%` }}
-              aria-label={`${d.month} revenue`}
+              className={`w-14 rounded-xl ${hasData ? "bg-[#1078CF]" : "bg-[#E5E7EB] animate-pulse"}`}
+              style={{ height: `${hasData ? (d.value / max) * 100 : 60}%` }}
+              aria-label={`${d.label} revenue`}
             />
-            <p className="text-sm text-[#6B7280]">{d.month}</p>
+            <p className="text-sm text-[#6B7280]">{d.label}</p>
           </div>
         ))}
       </div>
