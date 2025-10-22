@@ -31,31 +31,87 @@ interface ListingItem {
   cancellationPolicy?: "Flexible" | "Moderate" | "Strict";
 }
 
+// Mock data with a data URL image to emulate a pasted cover
+const MOCK_PASTED_IMAGE = `data:image/svg+xml;utf8,
+<svg xmlns='http://www.w3.org/2000/svg' width='800' height='500'>
+  <defs>
+    <linearGradient id='g' x1='0' y1='0' x2='1' y2='1'>
+      <stop offset='0%' stop-color='#E5E7EB'/>
+      <stop offset='100%' stop-color='#C7D2FE'/>
+    </linearGradient>
+  </defs>
+  <rect width='800' height='500' fill='url(#g)'/>
+  <text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle'
+        fill='#111827' font-size='32' font-family='Segoe UI, Arial, sans-serif'>
+    Pasted Preview
+  </text>
+  <rect x='24' y='24' width='752' height='452' fill='none' stroke='#9CA3AF' stroke-dasharray='8 8' rx='16'/>
+  <circle cx='64' cy='64' r='10' fill='#10B981'/>
+  <circle cx='92' cy='64' r='10' fill='#F59E0B'/>
+  <circle cx='120' cy='64' r='10' fill='#EF4444'/>
+</svg>`.replace(/\n/g, "");
+
+const mockListings: ListingItem[] = [
+  {
+    id: "mock1",
+    title: "Mock Pasted Preview",
+    location: "Sample Address, Baguio City",
+    image: MOCK_PASTED_IMAGE,
+    rating: 4.7,
+    reviews: 42,
+    bookings: 21,
+    guests: 4,
+    pricePerNight: 3800,
+    profitThisMonth: 14500,
+    status: "active",
+    verified: true,
+    amenities: ["wifi", "parking", "kitchen", "tv", "aircon"],
+    houseRules: ["No smoking", "No pets", "Quiet hours after 10 PM"],
+    cancellationPolicy: "Moderate",
+  },
+  {
+    id: "mock2",
+    title: "Sunrise Pines Lodge",
+    location: "Near Saint Louis University",
+    image:
+      "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?w=820&h=560&fit=crop&crop=center&auto=format",
+    rating: 4.8,
+    reviews: 30,
+    bookings: 22,
+    guests: 5,
+    pricePerNight: 4500,
+    profitThisMonth: 9000,
+    status: "active",
+    verified: true,
+    amenities: ["wifi", "tv", "parking"],
+    houseRules: ["No parties", "Government ID required at check-in"],
+    cancellationPolicy: "Flexible",
+  },
+  {
+    id: "mock3",
+    title: "Session View Apartments",
+    location: "Near Session Road",
+    image:
+      "https://images.unsplash.com/photo-1505691723518-36a5ac3b2d55?w=820&h=560&fit=crop&crop=center&auto=format",
+    rating: 4.5,
+    reviews: 12,
+    bookings: 10,
+    guests: 3,
+    pricePerNight: 3800,
+    profitThisMonth: 6000,
+    status: "inactive",
+    verified: true,
+    amenities: ["wifi"],
+    houseRules: ["No shoes indoors"],
+    cancellationPolicy: "Strict",
+  },
+];
+
 function StatCard({ label, value }: { label: string; value: number }) {
   return (
     <div className="flex flex-col justify-center rounded-2xl bg-white border border-[#E5E7EB] h-[92px] px-6">
       <div className="text-3xl font-bold text-[#111827] font-lexend">{value}</div>
       <div className="text-sm text-[#6B7280] font-lexend">{label}</div>
-    </div>
-  );
-}
-
-function Rating({ value }: { value: number }) {
-  return (
-    <div className="flex items-center gap-1 text-white">
-      <svg className="w-4 h-4 text-yellow-400 fill-current" viewBox="0 0 20 20" aria-hidden>
-        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-      </svg>
-      <span className="text-sm font-lexend font-semibold">{value.toFixed(1)}</span>
-    </div>
-  );
-}
-
-function SmallStat({ icon, label }: { icon: React.ReactNode; label: string }) {
-  return (
-    <div className="flex items-center gap-1 text-[#111827] text-sm font-lexend">
-      {icon}
-      <span>{label}</span>
     </div>
   );
 }
@@ -166,50 +222,7 @@ export default function MyListingsPage() {
   const [statusFilter, setStatusFilter] = useState("All Status");
 
   // Listings need to be stateful so edits can update the card
-  const [listings, setListings] = useState<ListingItem[]>([
-    {
-      id: "1",
-      title: "Loakan Heights Residences",
-      location: "Near Camp John Hay",
-      image: "https://images.unsplash.com/photo-1560066984-138dadb4c035?w=820&h=560&fit=crop&crop=center&auto=format",
-      rating: 4.6,
-      reviews: 24,
-      bookings: 18,
-      guests: 4,
-      pricePerNight: 4200,
-      profitThisMonth: 12000,
-      status: "active",
-      verified: true,
-    },
-    {
-      id: "2",
-      title: "Sunrise Pines Lodge",
-      location: "Near Saint Louis University",
-      image: "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?w=820&h=560&fit=crop&crop=center&auto=format",
-      rating: 4.8,
-      reviews: 30,
-      bookings: 22,
-      guests: 5,
-      pricePerNight: 4500,
-      profitThisMonth: 9000,
-      status: "active",
-      verified: true,
-    },
-    {
-      id: "3",
-      title: "Session View Apartments",
-      location: "Near Session Road",
-      image: "https://images.unsplash.com/photo-1505691723518-36a5ac3b2d55?w=820&h=560&fit=crop&crop=center&auto=format",
-      rating: 4.5,
-      reviews: 12,
-      bookings: 10,
-      guests: 3,
-      pricePerNight: 3800,
-      profitThisMonth: 6000,
-      status: "inactive",
-      verified: true,
-    },
-  ]);
+  const [listings, setListings] = useState<ListingItem[]>(mockListings);
 
   // Modal state
   const [isModalOpen, setIsModalOpen] = useState(false);
