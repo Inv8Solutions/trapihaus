@@ -69,9 +69,9 @@ export default function Footerr() {
           </a>
               </li>
               <li>
-          <a href="#" className="text-blue-100 hover:text-white transition-colors font-lexend">
+          <Link href="/terms" className="text-blue-100 hover:text-white transition-colors font-lexend">
             Terms Of Service
-          </a>
+          </Link>
               </li>
               <li>
           <a href="#" className="text-blue-100 hover:text-white transition-colors font-lexend">
