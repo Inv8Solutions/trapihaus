@@ -26,7 +26,7 @@ const PropertyTypeTab = ({
 }) => (
   <button
     onClick={onClick}
-    className={`flex items-center gap-2 px-4 py-3 rounded-full text-[18px] font-medium transition-all duration-200 ${
+    className={`flex items-center gap-1.5 md:gap-2 px-3 md:px-4 py-2 md:py-3 rounded-full text-[14px] md:text-[18px] font-medium transition-all duration-200 ${
       isActive
         ? 'bg-blue-100 text-[#1078CF]'
         : 'bg-gray-100 text-black hover:bg-gray-200'
@@ -307,21 +307,21 @@ export default function TopPicks() {
   const filteredListings = listings.filter(listing => listing.type === activeTab);
 
   return (
-    <section className="py-20 bg-[#FBFBFB] px-6">
+    <section className="py-12 md:py-20 bg-[#FBFBFB] px-4 md:px-6">
       <div className="w-full mx-auto">
         {/* Header */}
-        <div className="flex items-center justify-between mb-8">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6 md:mb-8 gap-4 md:gap-0">
           <div>
-            <h2 className="text-4xl font-bold text-black mb-2 font-lexend">
+            <h2 className="text-2xl md:text-4xl font-bold text-black mb-1 md:mb-2 font-lexend">
               Top Picks for
             </h2>
-            <h3 className="text-4xl font-bold text-blue-600 font-lexend">
+            <h3 className="text-2xl md:text-4xl font-bold text-blue-600 font-lexend">
               Students & Travelers
             </h3>
           </div>
 
           {/* Property Type Tabs */}
-          <div className="flex items-center gap-3">
+          <div className="flex flex-wrap md:flex-nowrap items-center gap-2 md:gap-3">
             <PropertyTypeTab
               label="Apartment"
               icon={
@@ -354,17 +354,17 @@ export default function TopPicks() {
             />
             
             {/* Navigation Arrows */}
-            <div className="flex items-center gap-2 ml-4">
+            <div className="flex items-center gap-2 ml-auto md:ml-4">
               <button 
                 onClick={handlePrevious}
-                className={`w-10 h-10 rounded-full flex items-center justify-center transition-colors ${
+                className={`w-9 h-9 md:w-10 md:h-10 rounded-full flex items-center justify-center transition-colors ${
                   lastPressed === 'prev' 
                     ? 'bg-green-500 hover:bg-green-600' 
                     : 'bg-gray-100 hover:bg-gray-200'
                 }`}
               >
                 <svg 
-                  className={`w-5 h-5 ${lastPressed === 'prev' ? 'text-white' : 'text-gray-600'}`} 
+                  className={`w-4 h-4 md:w-5 md:h-5 ${lastPressed === 'prev' ? 'text-white' : 'text-gray-600'}`} 
                   fill="none" 
                   stroke="currentColor" 
                   viewBox="0 0 24 24"
@@ -374,14 +374,14 @@ export default function TopPicks() {
               </button>
               <button 
                 onClick={handleNext}
-                className={`w-10 h-10 rounded-full flex items-center justify-center transition-colors ${
+                className={`w-9 h-9 md:w-10 md:h-10 rounded-full flex items-center justify-center transition-colors ${
                   lastPressed === 'next' 
                     ? 'bg-green-500 hover:bg-green-600' 
                     : 'bg-gray-100 hover:bg-gray-200'
                 }`}
               >
                 <svg 
-                  className={`w-5 h-5 ${lastPressed === 'next' ? 'text-white' : 'text-gray-600'}`} 
+                  className={`w-4 h-4 md:w-5 md:h-5 ${lastPressed === 'next' ? 'text-white' : 'text-gray-600'}`} 
                   fill="none" 
                   stroke="currentColor" 
                   viewBox="0 0 24 24"
@@ -394,7 +394,7 @@ export default function TopPicks() {
         </div>
 
         {/* Property Grid */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 mb-6 md:mb-8">
           {filteredListings.map((listing) => (
             <PropertyCard key={listing.id} listing={listing} />
           ))}
@@ -402,9 +402,9 @@ export default function TopPicks() {
 
         {/* View All Link */}
         <div className="text-center">
-          <a href="#" className="text-blue-600 hover:text-blue-700 font-medium inline-flex items-center gap-2 text-lg">
+          <a href="#" className="text-blue-600 hover:text-blue-700 font-medium inline-flex items-center gap-2 text-base md:text-lg">
             View All Listings
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
             </svg>
           </a>
