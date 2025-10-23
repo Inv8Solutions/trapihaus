@@ -62,7 +62,7 @@ export default function HowItWorks() {
 
           {/* Content Section */}
           <div>
-            <h2 className="text-4xl md:text-5xl font-bold mb-2 font-lexend">
+            <h2 className="text-4xl md:text-5xl font-bold mb-2 font-lexend mt-18 md:mt-0">
               How it <span className="text-blue-600">Works</span>
             </h2>
             <p className="text-gray-600 text-lg mb-8 font-lexend">
