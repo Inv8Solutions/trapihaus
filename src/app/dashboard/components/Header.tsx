@@ -2,10 +2,10 @@
 
 import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
-
-interface HeaderProps {
-  userName: string;
-}
+import { getFirebaseAuth } from "@/lib/auth/firebaseClient";
+import { onAuthStateChanged, signOut as firebaseSignOut } from "firebase/auth";
+import { getUserProfile } from "@/lib/services/userProfile";
+import Image from "next/image";
 
 interface Notification {
   id: string;
@@ -16,8 +16,10 @@ interface Notification {
   isRead: boolean;
 }
 
-export default function Header({ userName }: HeaderProps) {
+export default function Header() {
   const router = useRouter();
+  const [userName, setUserName] = useState("");
+  const [userAvatar, setUserAvatar] = useState("/woman.png");
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const [notifications, setNotifications] = useState<Notification[]>([
@@ -51,6 +53,41 @@ export default function Header({ userName }: HeaderProps) {
   const userMenuRef = useRef<HTMLDivElement | null>(null);
 
   const unreadCount = notifications.filter((n) => !n.isRead).length;
+
+  // Load user data
+  useEffect(() => {
+    const auth = getFirebaseAuth();
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        try {
+          const profile = await getUserProfile(user.uid);
+          if (profile) {
+            setUserName(profile.displayName || profile.firstName || user.email || "Guest");
+            setUserAvatar(profile.photoURL || "/woman.png");
+          } else {
+            setUserName(user.displayName || user.email || "Guest");
+            setUserAvatar(user.photoURL || "/woman.png");
+          }
+        } catch (error) {
+          console.error("Failed to load profile:", error);
+          setUserName(user.displayName || user.email || "Guest");
+          setUserAvatar(user.photoURL || "/woman.png");
+        }
+      }
+    });
+    
+    return () => unsubscribe();
+  }, []);
+
+  const handleLogout = async () => {
+    try {
+      const auth = getFirebaseAuth();
+      await firebaseSignOut(auth);
+      router.push("/");
+    } catch (error) {
+      console.error("Logout failed:", error);
+    }
+  };
 
   const markAllAsRead = () => {
     setNotifications((prev) => prev.map((n) => ({ ...n, isRead: true })));
@@ -192,7 +229,14 @@ export default function Header({ userName }: HeaderProps) {
               onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
               className="h-9 px-3 rounded-full bg-[#1078CF] text-white flex items-center gap-2 font-lexend text-sm hover:bg-[#0e6dbb] transition-colors"
             >
-              {userName}
+              <Image
+                src={userAvatar}
+                alt={userName}
+                width={24}
+                height={24}
+                className="w-6 h-6 rounded-full object-cover border border-white/20"
+              />
+              <span className="hidden md:inline">{userName}</span>
               <svg
                 className={`w-4 h-4 transition-transform ${isUserMenuOpen ? "rotate-180" : ""}`}
                 viewBox="0 0 24 24"
@@ -208,8 +252,18 @@ export default function Header({ userName }: HeaderProps) {
             {isUserMenuOpen && (
               <div className="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-xl border border-[#E5E7EB] overflow-hidden z-50">
                 {/* User Info */}
-                <div className="px-4 py-3 border-b border-[#E5E7EB] bg-[#F9FAFB]">
-                  <p className="font-lexend font-semibold text-[15px] text-[#1F2937]">{userName}</p>
+                <div className="px-4 py-3 border-b border-[#E5E7EB] bg-[#F9FAFB] flex items-center gap-3">
+                  <Image
+                    src={userAvatar}
+                    alt={userName}
+                    width={40}
+                    height={40}
+                    className="w-10 h-10 rounded-full object-cover border-2 border-white"
+                  />
+                  <div>
+                    <p className="font-lexend font-semibold text-[15px] text-[#1F2937]">{userName}</p>
+                    <p className="text-xs text-[#6B7280] font-lexend">View Profile</p>
+                  </div>
                 </div>
 
                 {/* Menu Items */}
@@ -244,11 +298,7 @@ export default function Header({ userName }: HeaderProps) {
                 {/* Logout */}
                 <div className="border-t border-[#E5E7EB]">
                   <button
-                    onClick={() => {
-                      // Add logout logic here
-                      console.log("Logging out...");
-                      setIsUserMenuOpen(false);
-                    }}
+                    onClick={handleLogout}
                     className="w-full px-4 py-2.5 text-left text-sm font-lexend text-[#EF4444] hover:bg-[#FEF2F2] transition-colors flex items-center gap-3"
                   >
                     <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>

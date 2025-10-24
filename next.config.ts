@@ -6,12 +6,13 @@ const isDev = process.env.NODE_ENV !== "production";
 const cspDev = [
   "default-src 'self'",
   // Allow inline scripts in dev for Next.js HMR/dev overlays. Remove in prod.
-  "script-src 'self' 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval'",
+  "script-src 'self' 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval' https://apis.google.com",
   "style-src 'self' 'unsafe-inline'",
-  "img-src 'self' https://images.unsplash.com https://github.com data:",
+  "img-src 'self' https://images.unsplash.com https://github.com https://firebasestorage.googleapis.com data: blob:",
   "font-src 'self' data:",
-  // Allow websockets for HMR in dev, and Firebase endpoints for client SDK
-  "connect-src 'self' ws: wss: https://auth.googleapis.com https://securetoken.googleapis.com https://identitytoolkit.googleapis.com https://firestore.googleapis.com https://firebase.googleapis.com https://www.googleapis.com",
+  // Allow websockets for HMR in dev, Firebase endpoints, and Google APIs
+  "connect-src 'self' ws: wss: https://auth.googleapis.com https://securetoken.googleapis.com https://identitytoolkit.googleapis.com https://firestore.googleapis.com https://firebase.googleapis.com https://www.googleapis.com https://firebasestorage.googleapis.com https://storage.googleapis.com",
+  "frame-src 'self' https://accounts.google.com https://apis.google.com https://content-firebaseappcheck.googleapis.com https://trapihaus.firebaseapp.com",
   "frame-ancestors 'none'",
   "base-uri 'self'",
   "form-action 'self'",
@@ -19,13 +20,14 @@ const cspDev = [
 
 const cspProd = [
   "default-src 'self'",
-  // Allow minimal inline scripts required by Next.js runtime. For stricter security, migrate to a nonce-based CSP.
-  "script-src 'self' 'unsafe-inline'",
+  // Allow minimal inline scripts required by Next.js runtime and Google APIs for Firebase Auth
+  "script-src 'self' 'unsafe-inline' https://apis.google.com",
   "style-src 'self' 'unsafe-inline'",
-  "img-src 'self' https://images.unsplash.com https://github.com data:",
+  "img-src 'self' https://images.unsplash.com https://github.com https://firebasestorage.googleapis.com data: blob:",
   "font-src 'self' data:",
-  // Allow Firebase endpoints for client SDK (Auth, token refresh, Firestore)
-  "connect-src 'self' https://auth.googleapis.com https://securetoken.googleapis.com https://identitytoolkit.googleapis.com https://firestore.googleapis.com https://firebase.googleapis.com https://www.googleapis.com",
+  // Allow Firebase endpoints, Google APIs, and Firebase Storage
+  "connect-src 'self' https://auth.googleapis.com https://securetoken.googleapis.com https://identitytoolkit.googleapis.com https://firestore.googleapis.com https://firebase.googleapis.com https://www.googleapis.com https://firebasestorage.googleapis.com https://storage.googleapis.com",
+  "frame-src 'self' https://accounts.google.com https://apis.google.com https://content-firebaseappcheck.googleapis.com https://trapihaus.firebaseapp.com",
   "frame-ancestors 'none'",
   "base-uri 'self'",
   "form-action 'self'",
@@ -45,6 +47,7 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       { protocol: "https", hostname: "images.unsplash.com" },
       { protocol: "https", hostname: "github.com" },
+      { protocol: "https", hostname: "firebasestorage.googleapis.com" },
     ],
   },
   async headers() {

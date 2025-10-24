@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { signInEmailPassword } from "@/lib/auth/firebaseClient";
+import { ensureUserProfile } from "@/lib/services/userProfile";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -21,7 +22,16 @@ export default function LoginPage() {
     const email = String(fd.get("email") || "").trim();
     const password = String(fd.get("password") || "");
     try {
-      await signInEmailPassword(email, password);
+      const userCred = await signInEmailPassword(email, password);
+      
+      // Ensure user profile exists in Firestore
+      await ensureUserProfile(
+        userCred.user.uid,
+        userCred.user.email || email,
+        userCred.user.displayName || email.split("@")[0],
+        userCred.user.photoURL || undefined
+      );
+      
       router.push("/Homescreen/home");
     } catch (err: unknown) {
       const e = err as { code?: string; message?: string };

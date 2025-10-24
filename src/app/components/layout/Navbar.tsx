@@ -8,6 +8,7 @@ import { getFirebaseAuth } from "@/lib/auth/firebaseClient";
 import { onAuthStateChanged } from "firebase/auth";
 import { signOut } from "firebase/auth";
 import { useRouter } from "next/navigation";
+import { getUserProfile } from "@/lib/services/userProfile";
 
 interface User { name: string; avatar: string }
 
@@ -26,14 +27,33 @@ export default function Navbar() {
 
     useEffect(() => {
         const auth = getFirebaseAuth();
-        const unsub = onAuthStateChanged(auth, (fbUser) => {
+        const unsub = onAuthStateChanged(auth, async (fbUser) => {
             if (!fbUser) {
                 setUser(null);
                 return;
             }
-            const name = fbUser.displayName || fbUser.email || "Guest";
-            const avatar = fbUser.photoURL || "/woman.png";
-            setUser({ name, avatar });
+            
+            // Load profile from Firestore for real-time updates
+            try {
+                const profile = await getUserProfile(fbUser.uid);
+                if (profile) {
+                    setUser({
+                        name: profile.displayName || profile.firstName || fbUser.email || "Guest",
+                        avatar: profile.photoURL || "/woman.png",
+                    });
+                } else {
+                    // Fallback to Firebase Auth data
+                    const name = fbUser.displayName || fbUser.email || "Guest";
+                    const avatar = fbUser.photoURL || "/woman.png";
+                    setUser({ name, avatar });
+                }
+            } catch (error) {
+                console.error("Failed to load profile:", error);
+                // Fallback to Firebase Auth data
+                const name = fbUser.displayName || fbUser.email || "Guest";
+                const avatar = fbUser.photoURL || "/woman.png";
+                setUser({ name, avatar });
+            }
         });
         return () => unsub();
     }, []);

@@ -1,0 +1,26 @@
+rules_version = '2';
+
+service firebase.storage {
+  match /b/{bucket}/o {
+    
+    // User profile photos
+    match /users/{userId}/profile/{allPaths=**} {
+      // Anyone can read profile photos (for public profiles)
+      allow read: if true;
+      
+      // Allow writes for authenticated users OR server-side uploads
+      // Server uploads won't have request.auth, so we allow all writes with proper validation
+      allow write: if request.resource.size < 2 * 1024 * 1024  // Max 2MB
+                   && request.resource.contentType.matches('image/.*');  // Images only
+      
+      // Only the owner can delete their profile photos
+      allow delete: if request.auth != null 
+                    && request.auth.uid == userId;
+    }
+    
+    // Deny all other access by default
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

@@ -1,15 +1,27 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { getFirebaseAuth } from "@/lib/auth/firebaseClient";
+import { onAuthStateChanged } from "firebase/auth";
+import { getUserProfile, updateUserProfile, updateProfilePhoto, createUserProfile } from "@/lib/services/userProfile";
+import Image from "next/image";
 
 export default function SettingsPage() {
   const [activeTab, setActiveTab] = useState<"profile" | "notifications" | "security" | "preferences">("profile");
-  const [firstName, setFirstName] = useState("Juan");
-  const [lastName, setLastName] = useState("Dela Cruz");
-  const [email, setEmail] = useState("juan.delacruz@email.com");
-  const [phone, setPhone] = useState("+63 917 123 4567");
-  const [address, setAddress] = useState("Baguio City, Benguet");
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [userId, setUserId] = useState<string | null>(null);
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  const [address, setAddress] = useState("");
   const [bio, setBio] = useState("");
+  const [photoURL, setPhotoURL] = useState("");
+  const [photoFile, setPhotoFile] = useState<File | null>(null);
+  const [photoPreview, setPhotoPreview] = useState<string | null>(null);
+  const [uploadError, setUploadError] = useState<string | null>(null);
+  const [saveMessage, setSaveMessage] = useState<string | null>(null);
 
   // Notification settings state
   const [bookingConfirmations, setBookingConfirmations] = useState(true);
@@ -35,6 +47,122 @@ export default function SettingsPage() {
   const [defaultCheckOut, setDefaultCheckOut] = useState("12:00 PM");
   const [defaultCancellationPolicy, setDefaultCancellationPolicy] = useState("Moderate");
 
+  // Load user data on mount
+  useEffect(() => {
+    const auth = getFirebaseAuth();
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        setUserId(user.uid);
+        setEmail(user.email || "");
+        
+        // Load profile from Firestore
+        try {
+          let profile = await getUserProfile(user.uid);
+          
+          // Create profile if it doesn't exist
+          if (!profile) {
+            const displayName = user.displayName || "";
+            
+            await createUserProfile(
+              user.uid,
+              user.email || "",
+              displayName,
+              user.photoURL || undefined
+            );
+            
+            profile = await getUserProfile(user.uid);
+          }
+          
+          if (profile) {
+            setFirstName(profile.firstName);
+            setLastName(profile.lastName);
+            setPhone(profile.phoneNumber);
+            setAddress(profile.address);
+            setBio(profile.bio);
+            setPhotoURL(profile.photoURL);
+          }
+        } catch (error) {
+          console.error("Failed to load profile:", error);
+        } finally {
+          setLoading(false);
+        }
+      } else {
+        setLoading(false);
+      }
+    });
+    
+    return () => unsubscribe();
+  }, []);
+
+  // Handle photo file selection
+  const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    
+    // Validate file type
+    if (!file.type.startsWith("image/")) {
+      setUploadError("Please select an image file (JPG, PNG, or GIF)");
+      return;
+    }
+    
+    // Validate file size (2MB)
+    const maxSize = 2 * 1024 * 1024;
+    if (file.size > maxSize) {
+      setUploadError("Image must be less than 2MB");
+      return;
+    }
+    
+    setUploadError(null);
+    setPhotoFile(file);
+    
+    // Create preview
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setPhotoPreview(reader.result as string);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  // Save profile changes
+  const handleSaveProfile = async () => {
+    if (!userId) return;
+    
+    setSaving(true);
+    setSaveMessage(null);
+    
+    try {
+      let newPhotoURL = photoURL;
+      
+      // Upload new photo if selected
+      if (photoFile) {
+        newPhotoURL = await updateProfilePhoto(userId, photoFile, photoURL);
+        setPhotoURL(newPhotoURL);
+        setPhotoPreview(null);
+        setPhotoFile(null);
+      }
+      
+      // Update profile data
+      await updateUserProfile(userId, {
+        firstName,
+        lastName,
+        phoneNumber: phone,
+        address,
+        bio,
+        photoURL: newPhotoURL,
+      });
+      
+      setSaveMessage("Profile updated successfully!");
+      
+      // Clear message after 3 seconds
+      setTimeout(() => setSaveMessage(null), 3000);
+    } catch (error) {
+      console.error("Failed to save profile:", error);
+      setSaveMessage("Failed to save profile. Please try again.");
+    } finally {
+      setSaving(false);
+    }
+  };
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -42,6 +170,17 @@ export default function SettingsPage() {
         <h1 className="text-2xl font-lexend font-semibold text-[#1F2937]">Settings</h1>
         <p className="text-sm text-[#6B7280] font-lexend mt-1">Manage your account and preferences</p>
       </div>
+
+      {/* Loading State */}
+      {loading && (
+        <div className="flex items-center justify-center py-12">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#1078CF]"></div>
+        </div>
+      )}
+
+      {/* Content - only show when not loading */}
+      {!loading && (
+        <>
 
       {/* Tabs */}
       <div className="flex items-center gap-6 border-b border-[#E5E7EB]">
@@ -116,19 +255,58 @@ export default function SettingsPage() {
             <p className="text-sm text-[#6B7280] font-lexend mb-4">Update your profile picture</p>
             
             <div className="flex items-center gap-4">
-              <div className="w-20 h-20 rounded-full bg-[#E5E7EB] flex items-center justify-center">
-                <svg className="w-10 h-10 text-[#9CA3AF]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
-                  <path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
+              <div className="w-20 h-20 rounded-full bg-[#E5E7EB] flex items-center justify-center overflow-hidden relative">
+                {photoPreview || photoURL ? (
+                  <Image 
+                    src={photoPreview || photoURL} 
+                    alt="Profile" 
+                    fill
+                    className="object-cover"
+                  />
+                ) : (
+                  <svg className="w-10 h-10 text-[#9CA3AF]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+                    <path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                )}
               </div>
-              <button className="h-10 px-4 rounded-lg border border-[#E5E7EB] bg-white text-[#374151] text-sm font-lexend hover:bg-[#F9FAFB] transition-colors flex items-center gap-2">
-                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
-                  <path d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5-5m0 0l5 5m-5-5v12" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
-                Upload Photo
-              </button>
+              <div>
+                <input
+                  type="file"
+                  id="photo-upload"
+                  accept="image/jpeg,image/png,image/gif"
+                  onChange={handlePhotoChange}
+                  className="hidden"
+                />
+                <label
+                  htmlFor="photo-upload"
+                  className="h-10 px-4 rounded-lg border border-[#E5E7EB] bg-white text-[#374151] text-sm font-lexend hover:bg-[#F9FAFB] transition-colors inline-flex items-center gap-2 cursor-pointer"
+                >
+                  <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+                    <path d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5-5m0 0l5 5m-5-5v12" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                  Upload Photo
+                </label>
+                {photoFile && (
+                  <button
+                    onClick={() => {
+                      setPhotoFile(null);
+                      setPhotoPreview(null);
+                      setUploadError(null);
+                    }}
+                    className="ml-2 text-sm text-[#EF4444] hover:text-[#DC2626] font-lexend"
+                  >
+                    Remove
+                  </button>
+                )}
+              </div>
             </div>
             <p className="text-xs text-[#9CA3AF] font-lexend mt-3">JPG, PNG or GIF. Max size 2MB.</p>
+            {uploadError && (
+              <p className="text-xs text-[#EF4444] font-lexend mt-2">{uploadError}</p>
+            )}
+            {photoFile && (
+              <p className="text-xs text-[#10B981] font-lexend mt-2">New photo selected: {photoFile.name}</p>
+            )}
           </div>
 
           {/* Personal Information */}
@@ -230,12 +408,33 @@ export default function SettingsPage() {
 
             {/* Save Button */}
             <div className="mt-6">
-              <button className="h-10 px-6 rounded-lg bg-[#1078CF] text-white text-sm font-lexend font-medium hover:bg-[#0e6dbb] transition-colors flex items-center gap-2">
-                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
-                  <path d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
-                Save Changes
+              <button 
+                onClick={handleSaveProfile}
+                disabled={saving}
+                className="h-10 px-6 rounded-lg bg-[#1078CF] text-white text-sm font-lexend font-medium hover:bg-[#0e6dbb] transition-colors flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {saving ? (
+                  <>
+                    <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                    </svg>
+                    Saving...
+                  </>
+                ) : (
+                  <>
+                    <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+                      <path d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                    Save Changes
+                  </>
+                )}
               </button>
+              {saveMessage && (
+                <p className={`text-sm font-lexend mt-2 ${saveMessage.includes("success") ? "text-[#10B981]" : "text-[#EF4444]"}`}>
+                  {saveMessage}
+                </p>
+              )}
             </div>
           </div>
 
@@ -839,6 +1038,8 @@ export default function SettingsPage() {
             </div>
           </div>
         </div>
+      )}
+      </>
       )}
     </div>
   );

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { registerEmailPassword } from "@/lib/auth/firebaseClient";
+import { createUserProfile } from "@/lib/services/userProfile";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
@@ -32,19 +33,26 @@ export default function RegisterPage() {
 				setLoading(false);
 				return;
 			}
-				try {
-					await registerEmailPassword(fullName, email, password);
-					// Option: go straight to login so user signs in; alternatively, push to homescreen.
-					router.push("/login");
-			} catch (err: unknown) {
-				const e = err as { message?: string };
-				setError(e?.message || "Failed to create account");
-			} finally {
-				setLoading(false);
-			}
-		};
-
-	return (
+			try {
+				const userCred = await registerEmailPassword(fullName, email, password);
+				
+				// Create user profile in Firestore
+				await createUserProfile(
+					userCred.user.uid,
+					userCred.user.email || email,
+					fullName,
+					userCred.user.photoURL || undefined
+				);
+				
+				// Option: go straight to login so user signs in; alternatively, push to homescreen.
+				router.push("/login");
+		} catch (err: unknown) {
+			const e = err as { message?: string };
+			setError(e?.message || "Failed to create account");
+		} finally {
+			setLoading(false);
+		}
+	};	return (
 		<main className="h-screen w-full flex flex-col lg:flex-row p-0 overflow-hidden">
 			{/* Left: Form */}
 			<div className="relative flex w-full lg:w-1/2 items-center justify-center px-6 md:px-14 lg:px-20 py-10 lg:py-0 lg:h-screen">
