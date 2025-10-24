@@ -18,6 +18,7 @@ export default function Navbar() {
     const [user, setUser] = useState<User | null>(null);
     const [menuOpen, setMenuOpen] = useState(false);
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+    const [showLoginModal, setShowLoginModal] = useState(false);
     const menuRef = useRef<HTMLDivElement | null>(null);
     const mobileMenuRef = useRef<HTMLDivElement | null>(null);
     const mobileButtonRef = useRef<HTMLButtonElement | null>(null);
@@ -85,7 +86,16 @@ export default function Navbar() {
                         <Link href="/" className={pathname === "/" ? "font-black" : "font-medium"}>Home</Link>
                         <Link href="/browse" className={pathname === "/browse" ? "font-black" : "font-medium"}>Browse Accommodations</Link>
                         <Link href="/trips" className={pathname === "/trips" ? "font-black" : "font-medium"}>My Trips</Link>
-                        <Link href="/dashboard" className={pathname === "/dashboard" ? "font-black" : "font-medium"}>Dashboard</Link>
+                        {user ? (
+                            <Link href="/dashboard" className={pathname === "/dashboard" ? "font-black" : "font-medium"}>Dashboard</Link>
+                        ) : (
+                            <button 
+                                onClick={() => setShowLoginModal(true)}
+                                className={pathname === "/dashboard" ? "font-black" : "font-medium"}
+                            >
+                                Dashboard
+                            </button>
+                        )}
                 </div>
 
                 {/* Mobile Hamburger Button */}
@@ -198,13 +208,25 @@ export default function Navbar() {
                         >
                             My Trips
                         </Link>
-                        <Link 
-                            href="/dashboard" 
-                            onClick={() => setMobileMenuOpen(false)}
-                            className={`block px-6 py-3 text-sm ${pathname === "/dashboard" ? "font-bold text-[#1078CF] bg-blue-50" : "text-gray-700"} hover:bg-gray-50`}
-                        >
-                            Dashboard
-                        </Link>
+                        {user ? (
+                            <Link 
+                                href="/dashboard" 
+                                onClick={() => setMobileMenuOpen(false)}
+                                className={`block px-6 py-3 text-sm ${pathname === "/dashboard" ? "font-bold text-[#1078CF] bg-blue-50" : "text-gray-700"} hover:bg-gray-50`}
+                            >
+                                Dashboard
+                            </Link>
+                        ) : (
+                            <button 
+                                onClick={() => {
+                                    setMobileMenuOpen(false);
+                                    setShowLoginModal(true);
+                                }}
+                                className={`block w-full text-left px-6 py-3 text-sm ${pathname === "/dashboard" ? "font-bold text-[#1078CF] bg-blue-50" : "text-gray-700"} hover:bg-gray-50`}
+                            >
+                                Dashboard
+                            </button>
+                        )}
 
                         {user && (
                             <>
@@ -262,6 +284,65 @@ export default function Navbar() {
                                 </div>
                             </>
                         )}
+                    </div>
+                </div>
+            )}
+
+            {/* Login Required Modal */}
+            {showLoginModal && (
+                <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[10000] px-4">
+                    <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 relative animate-in fade-in zoom-in duration-200">
+                        {/* Close button */}
+                        <button
+                            onClick={() => setShowLoginModal(false)}
+                            className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors"
+                            aria-label="Close modal"
+                        >
+                            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+
+                        {/* Icon */}
+                        <div className="flex justify-center mb-4">
+                            <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center">
+                                <svg className="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                                </svg>
+                            </div>
+                        </div>
+
+                        {/* Content */}
+                        <h3 className="text-xl font-bold text-gray-900 text-center mb-2">
+                            Login Required
+                        </h3>
+                        <p className="text-gray-600 text-center mb-6">
+                            You must be logged in to access the dashboard. Please sign in to continue.
+                        </p>
+
+                        {/* Buttons */}
+                        <div className="flex flex-col gap-3">
+                            <Link
+                                href="/login"
+                                onClick={() => setShowLoginModal(false)}
+                                className="w-full text-center px-5 py-3 rounded-full bg-[#1078CF] text-white font-semibold shadow hover:bg-[#0d5fa8] transition-colors"
+                            >
+                                Sign In
+                            </Link>
+                            <Link
+                                href="/Register"
+                                onClick={() => setShowLoginModal(false)}
+                                className="w-full text-center px-5 py-3 rounded-full bg-[#83C12C] text-white font-semibold shadow hover:bg-[#6e9f24] transition-colors"
+                            >
+                                Create Account
+                            </Link>
+                            <button
+                                onClick={() => setShowLoginModal(false)}
+                                className="w-full text-center px-5 py-3 rounded-full border-2 border-gray-300 text-gray-700 font-semibold hover:bg-gray-50 transition-colors"
+                            >
+                                Cancel
+                            </button>
+                        </div>
                     </div>
                 </div>
             )}
