@@ -261,6 +261,7 @@ export default function SettingsPage() {
                     src={photoPreview || photoURL} 
                     alt="Profile" 
                     fill
+                    sizes="80px"
                     className="object-cover"
                   />
                 ) : (

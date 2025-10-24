@@ -18,6 +18,21 @@ service firebase.storage {
                     && request.auth.uid == userId;
     }
     
+    // Property listing photos
+    match /listings/{userId}/{allPaths=**} {
+      // Anyone can read listing photos (for public browsing)
+      allow read: if true;
+      
+      // Allow writes with size and type validation
+      // Server-side uploads won't have request.auth
+      allow write: if request.resource.size < 5 * 1024 * 1024  // Max 5MB
+                   && request.resource.contentType.matches('image/.*');  // Images only
+      
+      // Only the owner can delete their listing photos
+      allow delete: if request.auth != null 
+                    && request.auth.uid == userId;
+    }
+    
     // Deny all other access by default
     match /{allPaths=**} {
       allow read, write: if false;

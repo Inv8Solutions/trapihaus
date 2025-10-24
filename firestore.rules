@@ -32,6 +32,26 @@ service cloud.firestore {
       allow delete: if false;
     }
     
+    // Property listings collection
+    match /listings/{listingId} {
+      // Anyone can read approved listings (for public browsing)
+      allow read: if resource.data.status == "approved" || isOwner(resource.data.userId);
+      
+      // Only authenticated users can create listings
+      allow create: if isSignedIn()
+                    && request.resource.data.userId == request.auth.uid
+                    && request.resource.data.status in ["draft", "pending"]
+                    && request.resource.data.hostEmail is string
+                    && request.resource.data.propertyName is string;
+      
+      // Only the owner can update their listing
+      allow update: if isOwner(resource.data.userId)
+                    && request.resource.data.userId == resource.data.userId; // Cannot transfer ownership
+      
+      // Only the owner can delete their listing
+      allow delete: if isOwner(resource.data.userId);
+    }
+    
     // Deny all other access by default
     match /{document=**} {
       allow read, write: if false;

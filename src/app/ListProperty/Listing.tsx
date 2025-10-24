@@ -1,6 +1,12 @@
 "use client";
 
-import React, { useCallback, useMemo, useState } from "react";
+import React, { useCallback, useMemo, useState, useEffect } from "react";
+import { getFirebaseAuth } from "@/lib/auth/firebaseClient";
+import { onAuthStateChanged } from "firebase/auth";
+import { createListing, submitListingForReview } from "@/lib/services/listings";
+import type { CreateListingData } from "@/types/listing";
+import { useRouter } from "next/navigation";
+import Image from "next/image";
 
 interface BasicInfoData {
 	email: string;
@@ -184,9 +190,43 @@ const passwordRuleChecks = {
 };
 
 export default function Listing() {
+	const router = useRouter();
 	const [data, setData] = useState<ListingState>(initialState);
 	const [current, setCurrent] = useState(0);
 	const [showPassword, setShowPassword] = useState(false);
+	const [userId, setUserId] = useState<string | null>(null);
+	const [isSubmitting, setIsSubmitting] = useState(false);
+	const [submitError, setSubmitError] = useState<string | null>(null);
+	const [submitSuccess, setSubmitSuccess] = useState(false);
+	
+	// Photo upload states
+	const [uploadingPhotos, setUploadingPhotos] = useState(false);
+	const [photoFiles, setPhotoFiles] = useState<File[]>([]);
+	const [photoPreviews, setPhotoPreviews] = useState<string[]>([]);
+	const [uploadError, setUploadError] = useState<string | null>(null);
+
+	// Check authentication status
+	useEffect(() => {
+		const auth = getFirebaseAuth();
+		const unsubscribe = onAuthStateChanged(auth, (user) => {
+			if (user) {
+				setUserId(user.uid);
+				// Pre-fill basic info if user is authenticated
+				setData((prev) => {
+					if (!prev.basic.email && user.email) {
+						return {
+							...prev,
+							basic: { ...prev.basic, email: user.email }
+						};
+					}
+					return prev;
+				});
+			} else {
+				setUserId(null);
+			}
+		});
+		return () => unsubscribe();
+	}, []);
 
 	const step = steps[current];
 
@@ -229,6 +269,96 @@ export default function Listing() {
 		[]
 	);
 
+	// Handle photo file selection
+	const handlePhotoSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+		const files = Array.from(e.target.files || []);
+		
+		if (files.length === 0) return;
+
+		// Validate total photos (max 10)
+		if (photoFiles.length + files.length > 10) {
+			setUploadError("Maximum 10 photos allowed");
+			return;
+		}
+
+		// Validate file types and sizes
+		const validFiles: File[] = [];
+		let hasError = false;
+
+		files.forEach((file) => {
+			if (!file.type.startsWith("image/")) {
+				setUploadError("All files must be images");
+				hasError = true;
+				return;
+			}
+
+			const maxSize = 5 * 1024 * 1024; // 5MB
+			if (file.size > maxSize) {
+				setUploadError("Each image must be less than 5MB");
+				hasError = true;
+				return;
+			}
+
+			validFiles.push(file);
+		});
+
+		if (hasError) return;
+
+		// Add to photo files
+		setPhotoFiles((prev) => [...prev, ...validFiles]);
+
+		// Create previews
+		validFiles.forEach((file) => {
+			const reader = new FileReader();
+			reader.onloadend = () => {
+				setPhotoPreviews((prev) => [...prev, reader.result as string]);
+			};
+			reader.readAsDataURL(file);
+		});
+
+		setUploadError(null);
+	};
+
+	// Remove photo
+	const removePhoto = (index: number) => {
+		setPhotoFiles((prev) => prev.filter((_, i) => i !== index));
+		setPhotoPreviews((prev) => prev.filter((_, i) => i !== index));
+	};
+
+	// Upload photos to Firebase Storage
+	const uploadPhotos = async (): Promise<string[]> => {
+		if (photoFiles.length === 0) return [];
+		if (!userId) throw new Error("User ID is required");
+
+		setUploadingPhotos(true);
+		const uploadedUrls: string[] = [];
+
+		try {
+			for (const file of photoFiles) {
+				const formData = new FormData();
+				formData.append("file", file);
+				formData.append("userId", userId);
+
+				const response = await fetch("/api/upload/listing-photo", {
+					method: "POST",
+					body: formData,
+				});
+
+				if (!response.ok) {
+					const error = await response.json();
+					throw new Error(error.error || "Failed to upload photo");
+				}
+
+				const data = await response.json();
+				uploadedUrls.push(data.url);
+			}
+
+			return uploadedUrls;
+		} finally {
+			setUploadingPhotos(false);
+		}
+	};
+
 	const goNext = () => {
 		setCurrent((c) => Math.min(c + 1, steps.length - 1));
 	};
@@ -236,10 +366,85 @@ export default function Listing() {
 		setCurrent((c) => Math.max(c - 1, 0));
 	};
 
-	const handleFinish = () => {
-		// Placeholder finish handler. In real implementation we'd submit to backend.
-		// Avoid logging sensitive data to the console.
-		// e.g., show a success toast or redirect to a confirmation page here.
+	const handleFinish = async () => {
+		if (!userId) {
+			setSubmitError("You must be logged in to create a listing");
+			return;
+		}
+
+		setIsSubmitting(true);
+		setSubmitError(null);
+
+		try {
+			// Upload photos first if any
+			let photoUrls: string[] = [];
+			if (photoFiles.length > 0) {
+				photoUrls = await uploadPhotos();
+			}
+
+			// Prepare listing data
+			const listingData: CreateListingData = {
+				// Basic Information
+				hostEmail: data.basic.email,
+				hostFirstName: data.basic.firstName,
+				hostLastName: data.basic.lastName,
+				hostPhone: data.basic.phoneNumber,
+				hostPhoneCountry: data.basic.phoneCountry,
+
+				// Property Details
+				propertyType: data.property.propertyType,
+				propertyName: data.property.propertyName,
+				description: data.property.description,
+				city: data.property.city,
+				barangay: data.property.barangay,
+				streetAddress: data.property.streetAddress,
+				landmark: data.property.landmark,
+
+				// Property Specifications
+				bedrooms: data.photos.bedrooms,
+				guests: data.photos.guests,
+				bathrooms: data.photos.bathrooms,
+				size: data.photos.size,
+
+				// Pricing
+				rate: data.photos.rate,
+				ratePeriod: data.photos.ratePeriod,
+
+				// Amenities & Rules
+				amenities: data.photos.amenities,
+				houseRules: data.photos.houseRules,
+
+				// Photos (uploaded URLs)
+				photos: photoUrls,
+
+				// Availability
+				availability: data.contact.availability,
+				minStay: data.contact.minStay,
+				maxStay: data.contact.maxStay,
+			};
+
+			// Create the listing in Firestore
+			const listingId = await createListing(userId, listingData);
+
+			// Submit for review (change status from draft to pending)
+			await submitListingForReview(listingId, userId);
+
+			setSubmitSuccess(true);
+
+			// Redirect to dashboard listings page after 2 seconds
+			setTimeout(() => {
+				router.push("/dashboard/listings");
+			}, 2000);
+		} catch (error) {
+			console.error("Failed to create listing:", error);
+			setSubmitError(
+				error instanceof Error 
+					? error.message 
+					: "Failed to create listing. Please try again."
+			);
+		} finally {
+			setIsSubmitting(false);
+		}
 	};
 
 	const renderBasic = () => {
@@ -664,13 +869,74 @@ export default function Listing() {
 					</div>
 
 					<div>
-						<p className="text-sm font-medium mb-2">Property Photos</p>
-						<div className="border border-dashed rounded-md p-8 text-center text-sm text-gray-500">
-							<svg className="w-6 h-6 mx-auto mb-3 text-gray-400" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V8a2 2 0 00-2-2h-3.172a2 2 0 01-1.414-.586l-1.828-1.828A2 2 0 0010.172 3H6a2 2 0 00-2 2v13a2 2 0 002 2z" /></svg>
-							<p className="mb-2">Drag photos here or click to browse</p>
-							<p className="text-[11px] text-gray-400 mb-4">Upload up to 10 high-quality photos</p>
-							<button type="button" className="px-4 py-2 rounded-full bg-gray-100 hover:bg-gray-200 text-xs font-medium">Choose Files</button>
-						</div>
+						<p className="text-sm font-medium mb-2">Property Photos (Up to 10 photos)</p>
+						
+						{uploadError && (
+							<div className="mb-3 rounded-md bg-red-50 border border-red-200 p-3 flex items-center gap-2 text-xs text-red-600">
+								<svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+									<path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+								</svg>
+								{uploadError}
+							</div>
+						)}
+
+						{/* Photo Previews */}
+						{photoPreviews.length > 0 && (
+							<div className="mb-4 grid grid-cols-2 md:grid-cols-4 gap-3">
+								{photoPreviews.map((preview, idx) => (
+									<div key={idx} className="relative group h-32">
+										<Image 
+											src={preview} 
+											alt={`Preview ${idx + 1}`} 
+											fill
+											sizes="(max-width: 768px) 50vw, 25vw"
+											className="object-cover rounded-md border border-gray-200"
+										/>
+										<button
+											type="button"
+											onClick={() => removePhoto(idx)}
+											className="absolute top-1 right-1 bg-red-600 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity z-10"
+											aria-label="Remove photo"
+										>
+											<svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+												<path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+											</svg>
+										</button>
+										{idx === 0 && (
+											<span className="absolute bottom-1 left-1 bg-blue-600 text-white text-[10px] px-2 py-0.5 rounded z-10">
+												Cover
+											</span>
+										)}
+									</div>
+								))}
+							</div>
+						)}
+
+						{/* Upload Button */}
+						{photoFiles.length < 10 && (
+							<div className="border border-dashed rounded-md p-8 text-center text-sm text-gray-500">
+								<svg className="w-6 h-6 mx-auto mb-3 text-gray-400" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+									<path strokeLinecap="round" strokeLinejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V8a2 2 0 00-2-2h-3.172a2 2 0 01-1.414-.586l-1.828-1.828A2 2 0 0010.172 3H6a2 2 0 00-2 2v13a2 2 0 002 2z" />
+								</svg>
+								<p className="mb-2">Select photos to upload</p>
+								<p className="text-[11px] text-gray-400 mb-4">
+									{photoFiles.length > 0 
+										? `${photoFiles.length} photo${photoFiles.length > 1 ? 's' : ''} selected (${10 - photoFiles.length} remaining)`
+										: 'JPG, PNG or GIF (max 5MB each)'
+									}
+								</p>
+								<label className="inline-block px-4 py-2 rounded-full bg-gray-100 hover:bg-gray-200 text-xs font-medium cursor-pointer">
+									Choose Files
+									<input
+										type="file"
+										multiple
+										accept="image/*"
+										onChange={handlePhotoSelect}
+										className="hidden"
+									/>
+								</label>
+							</div>
+						)}
 					</div>
 
 					<div>
@@ -810,14 +1076,51 @@ export default function Listing() {
 							<h2 className="text-xl md:text-2xl font-bold mb-1">{step.title}</h2>
 							<p className="text-sm text-gray-600 max-w-prose">{step.subtitle}</p>
 						</header>
+
+						{/* Success Message */}
+						{submitSuccess && (
+							<div className="mb-6 rounded-lg bg-emerald-50 border border-emerald-200 p-4 flex items-start gap-3">
+								<svg className="w-5 h-5 text-emerald-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+									<path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+								</svg>
+								<div className="flex-1">
+									<p className="text-sm font-medium text-emerald-800 mb-1">Listing submitted successfully!</p>
+									<p className="text-xs text-emerald-600">Your property listing has been submitted for review. Redirecting to dashboard...</p>
+								</div>
+							</div>
+						)}
+
+						{/* Error Message */}
+						{submitError && (
+							<div className="mb-6 rounded-lg bg-red-50 border border-red-200 p-4 flex items-start gap-3">
+								<svg className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+									<path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+								</svg>
+								<div className="flex-1">
+									<p className="text-sm font-medium text-red-800 mb-1">Error submitting listing</p>
+									<p className="text-xs text-red-600">{submitError}</p>
+								</div>
+								<button 
+									type="button"
+									onClick={() => setSubmitError(null)}
+									className="text-red-400 hover:text-red-600"
+									aria-label="Dismiss error"
+								>
+									<svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+										<path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+									</svg>
+								</button>
+							</div>
+						)}
+
 						<div className="flex-1">{content()}</div>
 						<div className="mt-10 flex items-center justify-between gap-4 pt-6 border-t border-gray-100">
 							<button
 								type="button"
 								onClick={goBack}
-								disabled={current === 0}
+								disabled={current === 0 || isSubmitting}
 								className={`px-8 py-3 rounded-full text-sm font-medium transition focus:outline-none focus:ring-2 focus:ring-offset-2 ${
-									current === 0
+									current === 0 || isSubmitting
 										? "bg-gray-200 text-gray-500 cursor-not-allowed"
 										: "bg-gray-400 hover:bg-gray-500 text-white focus:ring-gray-400"
 								}`}
@@ -828,7 +1131,8 @@ export default function Listing() {
 								<button
 									type="button"
 									onClick={goNext}
-									className="px-10 py-3 rounded-full bg-[#83C12C] text-white text-sm font-medium hover:bg-[#6ba31d] transition focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#83C12C]"
+									disabled={isSubmitting}
+									className="px-10 py-3 rounded-full bg-[#83C12C] text-white text-sm font-medium hover:bg-[#6ba31d] transition focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#83C12C] disabled:bg-gray-300 disabled:cursor-not-allowed"
 								>
 									Next
 								</button>
@@ -836,9 +1140,20 @@ export default function Listing() {
 								<button
 									type="button"
 									onClick={handleFinish}
-									className="px-10 py-3 rounded-full bg-[#83C12C] text-white text-sm font-medium hover:bg-[#6ba31d] transition focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#83C12C]"
+									disabled={isSubmitting || submitSuccess}
+									className="px-10 py-3 rounded-full bg-[#83C12C] text-white text-sm font-medium hover:bg-[#6ba31d] transition focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#83C12C] disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center gap-2"
 								>
-									Finish
+									{isSubmitting ? (
+										<>
+											<svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
+												<circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+												<path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+											</svg>
+											<span>{uploadingPhotos ? `Uploading photos (${photoFiles.length})...` : 'Submitting...'}</span>
+										</>
+									) : (
+										<span>Finish</span>
+									)}
 								</button>
 							)}
 						</div>
@@ -848,5 +1163,3 @@ export default function Listing() {
 		</section>
 	);
 }
-
-// hello
