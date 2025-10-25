@@ -60,10 +60,13 @@ export default function Sidebar() {
           );
         })}
       </nav>
-      <button className="mt-4 inline-flex items-center justify-center h-11 rounded-xl bg-[#F68109] text-white font-lexend text-sm font-semibold shadow px-4 gap-2">
+      <Link 
+        href="/ListProperty"
+        className="mt-4 inline-flex items-center justify-center h-11 rounded-xl bg-[#F68109] text-white font-lexend text-sm font-semibold shadow px-4 gap-2 hover:bg-[#e67508] transition-colors"
+      >
         <FontAwesomeIcon icon={faPlus} aria-hidden />
         <span>Add New Property</span>
-      </button>
+      </Link>
     </aside>
   );
 }
