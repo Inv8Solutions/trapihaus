@@ -14,7 +14,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { onAuthStateChanged } from "firebase/auth";
 import { getFirebaseAuth } from "@/lib/auth/firebaseClient";
-import { getUserListings } from "@/lib/services/listings";
+import { getUserListings, updateListing } from "@/lib/services/listings";
 import type { PropertyListing } from "@/types/listing";
 
 interface ListingItem {
@@ -33,6 +33,7 @@ interface ListingItem {
   amenities?: string[]; // optional for now
   houseRules?: string[];
   cancellationPolicy?: "Flexible" | "Moderate" | "Strict";
+  userId?: string; // For Firestore updates
 }
 
 function StatCard({ label, value }: { label: string; value: number }) {
@@ -234,14 +235,27 @@ export default function MyListingsPage() {
     setSelectedId(null);
   };
 
-  const toggleStatus = (id: string) => {
-    setListings((prev) =>
-      prev.map((l) =>
-        l.id === id
-          ? { ...l, status: l.status === "active" ? "inactive" : "active" }
-          : l
-      )
-    );
+  const toggleStatus = async (id: string) => {
+    const listing = listings.find((l) => l.id === id);
+    if (!listing || !listing.userId) return;
+
+    const newStatus = listing.status === "active" ? "inactive" : "active";
+    const firestoreStatus = newStatus === "active" ? "approved" : "draft";
+
+    try {
+      // Update in Firestore
+      await updateListing(id, listing.userId, { status: firestoreStatus });
+
+      // Update local state
+      setListings((prev) =>
+        prev.map((l) =>
+          l.id === id ? { ...l, status: newStatus, verified: newStatus === "active" } : l
+        )
+      );
+    } catch (error) {
+      console.error("Failed to update listing status:", error);
+      alert("Failed to update listing status. Please try again.");
+    }
   };
 
   const onPaste = (e: React.ClipboardEvent) => {
@@ -315,6 +329,7 @@ export default function MyListingsPage() {
             amenities: listing.amenities || [],
             houseRules: listing.houseRules ? listing.houseRules.split("\n").filter(Boolean) : [],
             cancellationPolicy: "Moderate", // TODO: Add to listing type
+            userId: listing.userId, // Store userId for updates
           }));
           
           setListings(transformed);
