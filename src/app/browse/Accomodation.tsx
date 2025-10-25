@@ -1,9 +1,10 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import AppImage from '../components/ui/AppImage';
 import { getApprovedListings } from '@/lib/services/listings';
 import type { PropertyListing } from '@/types/listing';
+import type { SearchParams } from './page';
 
 interface AccommodationCardProps {
   id: string;
@@ -13,6 +14,8 @@ interface AccommodationCardProps {
   rating: number;
   image: string;
   verified: boolean;
+  guests: number;
+  propertyType: string;
 }
 
 const AccommodationCard = ({ name, location, price, rating, image, verified }: AccommodationCardProps) => {
@@ -52,7 +55,11 @@ const AccommodationCard = ({ name, location, price, rating, image, verified }: A
   );
 };
 
-export default function Accommodation() {
+interface AccommodationProps {
+  searchParams: SearchParams;
+}
+
+export default function Accommodation({ searchParams }: AccommodationProps) {
   const [selectedPropertyType, setSelectedPropertyType] = useState('Hotel');
   const [priceRange, setPriceRange] = useState([0, 10000]);
   const [rooms, setRooms] = useState(0);
@@ -82,6 +89,8 @@ export default function Accommodation() {
           rating: listing.averageRating || 4.5,
           image: listing.coverPhoto || listing.photos?.[0] || '/placeholder-image.jpg',
           verified: listing.status === "approved",
+          guests: listing.guests || 1,
+          propertyType: listing.propertyType || 'hotel',
         }));
         
         setAccommodations(transformed);
@@ -96,6 +105,75 @@ export default function Accommodation() {
 
     fetchListings();
   }, []);
+
+  // Filter accommodations based on search params
+  const filteredAccommodations = useMemo(() => {
+    if (!accommodations.length) return [];
+
+    return accommodations.filter((accommodation) => {
+      // Filter by property type from search
+      if (searchParams.propertyType) {
+        const searchType = searchParams.propertyType.toLowerCase();
+        const accomType = (accommodation.propertyType || 'hotel').toLowerCase();
+        
+        // Map plural search terms to singular property types
+        const typeMapping: Record<string, string[]> = {
+          'hotel': ['hotels', 'hotel'],
+          'apartment': ['apartments', 'apartment'],
+          'transient': ['transients', 'transient']
+        };
+        
+        // Check if accommodation type matches search type
+        let typeMatches = false;
+        for (const [key, values] of Object.entries(typeMapping)) {
+          if (values.includes(searchType) && accomType === key) {
+            typeMatches = true;
+            break;
+          }
+        }
+        
+        if (!typeMatches) return false;
+      }
+
+      // Also filter by sidebar property type selection
+      if (selectedPropertyType !== 'Hotel') {
+        const sidebarType = selectedPropertyType.toLowerCase();
+        const accomType = (accommodation.propertyType || 'hotel').toLowerCase();
+        if (accomType !== sidebarType) return false;
+      }
+
+      // Filter by location (search in location string)
+      if (searchParams.location) {
+        const locationLower = accommodation.location.toLowerCase();
+        const searchLower = searchParams.location.toLowerCase();
+        if (!locationLower.includes(searchLower)) return false;
+      }
+
+      // Filter by number of guests
+      if (searchParams.guests) {
+        const guestCount = parseInt(searchParams.guests) || 0;
+        if (accommodation.guests < guestCount) return false;
+      }
+
+      // Filter by price range
+      if (accommodation.price < priceRange[0] || accommodation.price > priceRange[1]) {
+        return false;
+      }
+
+      // Filter by minimum rating
+      if (minRating > 0 && accommodation.rating < minRating) {
+        return false;
+      }
+
+      // Filter by rooms, beds, bathrooms
+      if (rooms > 0 || beds > 0 || bathrooms > 0) {
+        // These would need to be added to the listing data
+        // For now, we'll skip this filter
+      }
+
+      return true;
+    });
+  }, [accommodations, searchParams, selectedPropertyType, priceRange, minRating, rooms, beds, bathrooms]);
 
   const propertyTypes = ['Hotel', 'Apartment', 'Transient'];
   const amenities = [
@@ -143,7 +221,7 @@ export default function Accommodation() {
             <div className="flex items-center justify-between mb-6">
               <div>
                 <h1 className="text-[40px] font-extrabold text-[#1078CF] font-lexend">
-                  {loading ? "Loading..." : `${accommodations.length} accommodation${accommodations.length !== 1 ? 's' : ''} found`}
+                  {loading ? "Loading..." : `${filteredAccommodations.length} accommodation${filteredAccommodations.length !== 1 ? 's' : ''} found`}
                 </h1>
                 <p className="text-[#9E9E9E] font-lexend text-[24px]">Stays in Baguio City with trusted local hosts</p>
               </div>
@@ -172,20 +250,24 @@ export default function Accommodation() {
             )}
 
             {/* Empty State */}
-            {!loading && !error && accommodations.length === 0 && (
+            {!loading && !error && filteredAccommodations.length === 0 && (
               <div className="flex flex-col items-center justify-center py-12 text-center">
                 <svg className="w-16 h-16 text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                 </svg>
                 <h3 className="text-lg font-lexend font-semibold text-gray-900 mb-2">No accommodations found</h3>
-                <p className="text-sm text-gray-600 font-lexend">Try adjusting your filters or check back later.</p>
+                <p className="text-sm text-gray-600 font-lexend">
+                  {accommodations.length > 0 
+                    ? "Try adjusting your search filters to see more results."
+                    : "No listings available. Check back later."}
+                </p>
               </div>
             )}
 
             {/* Accommodations Grid */}
-            {!loading && !error && accommodations.length > 0 && (
+            {!loading && !error && filteredAccommodations.length > 0 && (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {accommodations.map((accommodation) => (
+                {filteredAccommodations.map((accommodation) => (
                   <AccommodationCard key={accommodation.id} {...accommodation} />
                 ))}
               </div>

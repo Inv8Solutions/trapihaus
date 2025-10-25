@@ -2,8 +2,13 @@
 
 import { useState } from 'react';
 import Iridescence from './Iridescence';
+import type { SearchParams } from './page';
 
-export default function Search() {
+interface SearchProps {
+  onSearch: (params: SearchParams) => void;
+}
+
+export default function Search({ onSearch }: SearchProps) {
   const [activeTab, setActiveTab] = useState('Hotels');
   const [location, setLocation] = useState('');
   const [checkIn, setCheckIn] = useState('');
@@ -13,9 +18,8 @@ export default function Search() {
   const tabs = ['Hotels', 'Apartments', 'Transients'];
 
   const handleSearch = () => {
-    // Handle search logic here
-    console.log({
-      type: activeTab,
+    onSearch({
+      propertyType: activeTab,
       location,
       checkIn,
       checkOut,
