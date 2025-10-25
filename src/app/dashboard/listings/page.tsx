@@ -44,7 +44,7 @@ function StatCard({ label, value }: { label: string; value: number }) {
   );
 }
 
-function ListingCard({ item, onEdit }: { item: ListingItem; onEdit: (id: string) => void }) {
+function ListingCard({ item, onEdit, onToggleStatus }: { item: ListingItem; onEdit: (id: string) => void; onToggleStatus: (id: string) => void }) {
   return (
     <div className="bg-white rounded-2xl overflow-hidden border border-[#E5E7EB] shadow-sm">
       <div className="relative h-52">
@@ -116,6 +116,7 @@ function ListingCard({ item, onEdit }: { item: ListingItem; onEdit: (id: string)
         <div className="mt-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <button
+              onClick={() => onToggleStatus(item.id)}
               role="switch"
               aria-checked={item.status === "active"}
               className={`relative inline-flex items-center h-6 w-11 rounded-full transition-colors focus:outline-none ${
@@ -231,6 +232,16 @@ export default function MyListingsPage() {
     setIsModalOpen(false);
     setPastedImage(null);
     setSelectedId(null);
+  };
+
+  const toggleStatus = (id: string) => {
+    setListings((prev) =>
+      prev.map((l) =>
+        l.id === id
+          ? { ...l, status: l.status === "active" ? "inactive" : "active" }
+          : l
+      )
+    );
   };
 
   const onPaste = (e: React.ClipboardEvent) => {
@@ -429,7 +440,7 @@ export default function MyListingsPage() {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filtered.map((item) => (
-            <ListingCard key={item.id} item={item} onEdit={openEdit} />
+            <ListingCard key={item.id} item={item} onEdit={openEdit} onToggleStatus={toggleStatus} />
           ))}
         </div>
       )}
