@@ -17,7 +17,21 @@ export default function Search({ onSearch }: SearchProps) {
 
   const tabs = ['Hotels', 'Apartments', 'Transients'];
 
+  // Get today's date in YYYY-MM-DD format for min date validation
+  const today = new Date().toISOString().split('T')[0];
+
   const handleSearch = () => {
+    // Validate dates before searching
+    if (checkIn && checkOut) {
+      const checkInDate = new Date(checkIn);
+      const checkOutDate = new Date(checkOut);
+      
+      if (checkOutDate <= checkInDate) {
+        alert('Check-out date must be after check-in date');
+        return;
+      }
+    }
+
     onSearch({
       propertyType: activeTab,
       location,
@@ -114,6 +128,7 @@ export default function Search({ onSearch }: SearchProps) {
                     type="date"
                     value={checkIn}
                     onChange={(e) => setCheckIn(e.target.value)}
+                    min={today}
                     className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#1078CF] focus:border-transparent font-lexend"
                   />
                 </div>
@@ -134,6 +149,7 @@ export default function Search({ onSearch }: SearchProps) {
                     type="date"
                     value={checkOut}
                     onChange={(e) => setCheckOut(e.target.value)}
+                    min={checkIn || today}
                     className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#1078CF] focus:border-transparent font-lexend"
                   />
                 </div>

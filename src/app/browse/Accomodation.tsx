@@ -16,6 +16,8 @@ interface AccommodationCardProps {
   verified: boolean;
   guests: number;
   propertyType: string;
+  minStay?: string;
+  maxStay?: string;
 }
 
 const AccommodationCard = ({ name, location, price, rating, image, verified }: AccommodationCardProps) => {
@@ -91,6 +93,8 @@ export default function Accommodation({ searchParams }: AccommodationProps) {
           verified: listing.status === "approved",
           guests: listing.guests || 1,
           propertyType: listing.propertyType || 'hotel',
+          minStay: listing.minStay,
+          maxStay: listing.maxStay,
         }));
         
         setAccommodations(transformed);
@@ -151,8 +155,56 @@ export default function Accommodation({ searchParams }: AccommodationProps) {
 
       // Filter by number of guests
       if (searchParams.guests) {
-        const guestCount = parseInt(searchParams.guests) || 0;
+        // Handle "5+" guests option
+        let guestCount = 0;
+        if (searchParams.guests === '5+') {
+          guestCount = 5;
+        } else {
+          guestCount = parseInt(searchParams.guests) || 0;
+        }
         if (accommodation.guests < guestCount) return false;
+      }
+
+      // Filter by check-in and check-out dates (validate date range)
+      if (searchParams.checkIn && searchParams.checkOut) {
+        const checkInDate = new Date(searchParams.checkIn);
+        const checkOutDate = new Date(searchParams.checkOut);
+        const today = new Date();
+        today.setHours(0, 0, 0, 0); // Reset time to start of day
+
+        // Validate dates are in the future and check-out is after check-in
+        if (checkInDate < today || checkOutDate <= checkInDate) {
+          return false;
+        }
+
+        // Calculate stay duration in nights
+        const stayDuration = Math.ceil((checkOutDate.getTime() - checkInDate.getTime()) / (1000 * 60 * 60 * 24));
+
+        // Parse minStay and maxStay from accommodation data
+        // Examples: "1 Night", "3 Days", "1 Week", "1 Month"
+        const parseStayDuration = (stayStr: string): number => {
+          const match = stayStr.match(/(\d+)\s*(night|day|week|month)/i);
+          if (!match) return 0;
+          
+          const value = parseInt(match[1]);
+          const unit = match[2].toLowerCase();
+          
+          if (unit === 'night' || unit === 'day') return value;
+          if (unit === 'week') return value * 7;
+          if (unit === 'month') return value * 30;
+          
+          return 0;
+        };
+
+        // Check if the stay duration is within min/max constraints
+        // Note: These fields might not exist on all listings yet
+        // We'll make this check optional
+        const minNights = accommodation.minStay ? parseStayDuration(accommodation.minStay) : 0;
+        const maxNights = accommodation.maxStay ? parseStayDuration(accommodation.maxStay) : 365; // Default to 1 year max
+
+        if (stayDuration < minNights || stayDuration > maxNights) {
+          return false;
+        }
       }
 
       // Filter by price range
@@ -234,6 +286,36 @@ export default function Accommodation({ searchParams }: AccommodationProps) {
                 </button>
               </div>
             </div>
+
+            {/* Active Filters Display */}
+            {/* {(searchParams.location || searchParams.checkIn || searchParams.checkOut || searchParams.guests) && (
+              <div className="mb-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
+                <h3 className="text-sm font-semibold text-blue-900 mb-2 font-lexend">Active Filters:</h3>
+                <div className="flex flex-wrap gap-2">
+                  {searchParams.location && (
+                    <span className="inline-flex items-center px-3 py-1 rounded-full bg-white text-sm font-medium text-gray-700 border border-blue-300 font-lexend">
+                      📍 {searchParams.location}
+                    </span>
+                  )}
+                  {searchParams.checkIn && searchParams.checkOut && (
+                    <span className="inline-flex items-center px-3 py-1 rounded-full bg-white text-sm font-medium text-gray-700 border border-blue-300 font-lexend">
+                      📅 {new Date(searchParams.checkIn).toLocaleDateString()} - {new Date(searchParams.checkOut).toLocaleDateString()}
+                      {(() => {
+                        const checkInDate = new Date(searchParams.checkIn);
+                        const checkOutDate = new Date(searchParams.checkOut);
+                        const nights = Math.ceil((checkOutDate.getTime() - checkInDate.getTime()) / (1000 * 60 * 60 * 24));
+                        return ` (${nights} night${nights !== 1 ? 's' : ''})`;
+                      })()}
+                    </span>
+                  )}
+                  {searchParams.guests && (
+                    <span className="inline-flex items-center px-3 py-1 rounded-full bg-white text-sm font-medium text-gray-700 border border-blue-300 font-lexend">
+                      👥 {searchParams.guests === '5+' ? '5+ guests' : `${searchParams.guests} guest${searchParams.guests !== '1' ? 's' : ''}`}
+                    </span>
+                  )}
+                </div>
+              </div>
+            )} */}
 
             {/* Loading State */}
             {loading && (
