@@ -159,6 +159,7 @@ export default function MyListingsPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [pastedImage, setPastedImage] = useState<string | null>(null); // data URL
+  const [isSaving, setIsSaving] = useState(false);
   const pasteAreaRef = useRef<HTMLDivElement | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
@@ -278,29 +279,74 @@ export default function MyListingsPage() {
     }
   };
 
-  const saveChanges = () => {
+  const saveChanges = async () => {
     if (!selectedId) return;
-    setListings((prev) =>
-      prev.map((l) =>
-        l.id === selectedId
-          ? {
-              ...l,
-              image: pastedImage ? pastedImage : l.image,
-              title: title || l.title,
-              location: address || l.location,
-              pricePerNight: typeof price === "number" ? price : l.pricePerNight,
-              guests: maxGuests || l.guests,
-              amenities,
-              houseRules: houseRulesText
-                .split("\n")
-                .map((s) => s.trim())
-                .filter(Boolean),
-              cancellationPolicy,
-            }
-          : l
-      )
-    );
-    closeModal();
+    
+    const listing = listings.find((l) => l.id === selectedId);
+    if (!listing || !listing.userId) {
+      alert("Unable to save: Missing user information");
+      return;
+    }
+
+    try {
+      setIsSaving(true);
+
+      // Prepare update data
+      const updateData: Record<string, unknown> = {};
+      
+      if (title && title !== listing.title) updateData.propertyName = title;
+      if (address && address !== listing.location) {
+        // Parse address back to components
+        const parts = address.split(",").map(s => s.trim());
+        if (parts.length >= 2) {
+          updateData.streetAddress = parts[0] || "";
+          updateData.barangay = parts[1] || "";
+          updateData.city = parts[2] || "Baguio City";
+        }
+      }
+      if (typeof price === "number" && price !== listing.pricePerNight) {
+        updateData.rate = `₱${price.toLocaleString()}`;
+      }
+      if (maxGuests !== listing.guests) updateData.guests = maxGuests;
+      if (bedrooms) updateData.bedrooms = bedrooms;
+      if (bathrooms) updateData.bathrooms = bathrooms;
+      if (amenities.length > 0) updateData.amenities = amenities;
+      if (houseRulesText) updateData.houseRules = houseRulesText;
+      
+      // Only update if there are changes
+      if (Object.keys(updateData).length > 0) {
+        await updateListing(selectedId, listing.userId, updateData);
+      }
+
+      // Update local state
+      setListings((prev) =>
+        prev.map((l) =>
+          l.id === selectedId
+            ? {
+                ...l,
+                image: pastedImage ? pastedImage : l.image,
+                title: title || l.title,
+                location: address || l.location,
+                pricePerNight: typeof price === "number" ? price : l.pricePerNight,
+                guests: maxGuests || l.guests,
+                amenities,
+                houseRules: houseRulesText
+                  .split("\n")
+                  .map((s) => s.trim())
+                  .filter(Boolean),
+                cancellationPolicy,
+              }
+            : l
+        )
+      );
+
+      closeModal();
+    } catch (error) {
+      console.error("Failed to save changes:", error);
+      alert("Failed to save changes. Please try again.");
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   // Fetch user's listings from Firestore
@@ -819,12 +865,15 @@ export default function MyListingsPage() {
                 </button>
                 <button
                   onClick={saveChanges}
-                  disabled={!selectedId}
-                  className={`h-10 px-4 rounded-lg text-white text-sm font-lexend ${
-                    selectedId ? "bg-[#1078CF] hover:bg-[#0e6dbb]" : "bg-[#9CA3AF] cursor-not-allowed"
+                  disabled={!selectedId || isSaving}
+                  className={`h-10 px-4 rounded-lg text-white text-sm font-lexend flex items-center gap-2 ${
+                    selectedId && !isSaving ? "bg-[#1078CF] hover:bg-[#0e6dbb]" : "bg-[#9CA3AF] cursor-not-allowed"
                   }`}
                 >
-                  Save Changes
+                  {isSaving && (
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                  )}
+                  {isSaving ? "Saving..." : "Save Changes"}
                 </button>
               </div>
             </div>
