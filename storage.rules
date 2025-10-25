@@ -17,7 +17,7 @@ service firebase.storage {
       allow delete: if request.auth != null 
                     && request.auth.uid == userId;
     }
-    
+  
     // Property listing photos
     match /listings/{userId}/{allPaths=**} {
       // Anyone can read listing photos (for public browsing)
