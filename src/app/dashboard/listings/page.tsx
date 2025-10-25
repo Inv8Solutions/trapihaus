@@ -12,6 +12,10 @@ import {
   faFire,
   faShower,
 } from "@fortawesome/free-solid-svg-icons";
+import { onAuthStateChanged } from "firebase/auth";
+import { getFirebaseAuth } from "@/lib/auth/firebaseClient";
+import { getUserListings } from "@/lib/services/listings";
+import type { PropertyListing } from "@/types/listing";
 
 interface ListingItem {
   id: string;
@@ -30,82 +34,6 @@ interface ListingItem {
   houseRules?: string[];
   cancellationPolicy?: "Flexible" | "Moderate" | "Strict";
 }
-
-// Mock data with a data URL image to emulate a pasted cover
-const MOCK_PASTED_IMAGE = `data:image/svg+xml;utf8,
-<svg xmlns='http://www.w3.org/2000/svg' width='800' height='500'>
-  <defs>
-    <linearGradient id='g' x1='0' y1='0' x2='1' y2='1'>
-      <stop offset='0%' stop-color='#E5E7EB'/>
-      <stop offset='100%' stop-color='#C7D2FE'/>
-    </linearGradient>
-  </defs>
-  <rect width='800' height='500' fill='url(#g)'/>
-  <text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle'
-        fill='#111827' font-size='32' font-family='Segoe UI, Arial, sans-serif'>
-    Pasted Preview
-  </text>
-  <rect x='24' y='24' width='752' height='452' fill='none' stroke='#9CA3AF' stroke-dasharray='8 8' rx='16'/>
-  <circle cx='64' cy='64' r='10' fill='#10B981'/>
-  <circle cx='92' cy='64' r='10' fill='#F59E0B'/>
-  <circle cx='120' cy='64' r='10' fill='#EF4444'/>
-</svg>`.replace(/\n/g, "");
-
-const mockListings: ListingItem[] = [
-  {
-    id: "mock1",
-    title: "Mock Pasted Preview",
-    location: "Sample Address, Baguio City",
-    image: MOCK_PASTED_IMAGE,
-    rating: 4.7,
-    reviews: 42,
-    bookings: 21,
-    guests: 4,
-    pricePerNight: 3800,
-    profitThisMonth: 14500,
-    status: "active",
-    verified: true,
-    amenities: ["wifi", "parking", "kitchen", "tv", "aircon"],
-    houseRules: ["No smoking", "No pets", "Quiet hours after 10 PM"],
-    cancellationPolicy: "Moderate",
-  },
-  {
-    id: "mock2",
-    title: "Sunrise Pines Lodge",
-    location: "Near Saint Louis University",
-    image:
-      "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?w=820&h=560&fit=crop&crop=center&auto=format",
-    rating: 4.8,
-    reviews: 30,
-    bookings: 22,
-    guests: 5,
-    pricePerNight: 4500,
-    profitThisMonth: 9000,
-    status: "active",
-    verified: true,
-    amenities: ["wifi", "tv", "parking"],
-    houseRules: ["No parties", "Government ID required at check-in"],
-    cancellationPolicy: "Flexible",
-  },
-  {
-    id: "mock3",
-    title: "Session View Apartments",
-    location: "Near Session Road",
-    image:
-      "https://images.unsplash.com/photo-1505691723518-36a5ac3b2d55?w=820&h=560&fit=crop&crop=center&auto=format",
-    rating: 4.5,
-    reviews: 12,
-    bookings: 10,
-    guests: 3,
-    pricePerNight: 3800,
-    profitThisMonth: 6000,
-    status: "inactive",
-    verified: true,
-    amenities: ["wifi"],
-    houseRules: ["No shoes indoors"],
-    cancellationPolicy: "Strict",
-  },
-];
 
 function StatCard({ label, value }: { label: string; value: number }) {
   return (
@@ -222,7 +150,8 @@ export default function MyListingsPage() {
   const [statusFilter, setStatusFilter] = useState("All Status");
 
   // Listings need to be stateful so edits can update the card
-  const [listings, setListings] = useState<ListingItem[]>(mockListings);
+  const [listings, setListings] = useState<ListingItem[]>([]);
+  const [loading, setLoading] = useState(true);
 
   // Modal state
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -349,6 +278,49 @@ export default function MyListingsPage() {
     closeModal();
   };
 
+  // Fetch user's listings from Firestore
+  useEffect(() => {
+    const firebaseAuth = getFirebaseAuth();
+    const unsubscribe = onAuthStateChanged(firebaseAuth, async (user) => {
+      if (user) {
+        try {
+          setLoading(true);
+          const fetchedListings = await getUserListings(user.uid);
+          
+          // Transform PropertyListing to ListingItem format
+          const transformed: ListingItem[] = fetchedListings.map((listing: PropertyListing) => ({
+            id: listing.id,
+            title: listing.propertyName,
+            location: `${listing.streetAddress}, ${listing.barangay}, ${listing.city}`.trim(),
+            image: listing.coverPhoto || listing.photos?.[0] || "/placeholder-image.jpg",
+            rating: listing.averageRating || 0,
+            reviews: listing.reviewCount || 0,
+            bookings: listing.totalBookings || 0,
+            guests: listing.guests || 1,
+            pricePerNight: parseInt(listing.rate.replace(/[^0-9]/g, "")) || 0,
+            profitThisMonth: 0, // TODO: Calculate from bookings
+            status: listing.status === "approved" ? "active" : "inactive",
+            verified: listing.status === "approved",
+            amenities: listing.amenities || [],
+            houseRules: listing.houseRules ? listing.houseRules.split("\n").filter(Boolean) : [],
+            cancellationPolicy: "Moderate", // TODO: Add to listing type
+          }));
+          
+          setListings(transformed);
+        } catch (error) {
+          console.error("Failed to fetch listings:", error);
+        } finally {
+          setLoading(false);
+        }
+      } else {
+        setListings([]);
+        setLoading(false);
+      }
+    });
+
+    return () => unsubscribe();
+  }, []);
+
   // Focus the paste area when modal opens for quick Ctrl+V
   useEffect(() => {
     if (isModalOpen && pasteAreaRef.current) {
@@ -427,11 +399,40 @@ export default function MyListingsPage() {
       </div>
 
       {/* Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filtered.map((item) => (
-          <ListingCard key={item.id} item={item} onEdit={openEdit} />
-        ))}
-      </div>
+      {loading ? (
+        <div className="flex items-center justify-center py-12">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#1078CF]"></div>
+        </div>
+      ) : filtered.length === 0 ? (
+        <div className="flex flex-col items-center justify-center py-12 text-center">
+          <svg className="w-16 h-16 text-[#D1D5DB] mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+          </svg>
+          <h3 className="text-lg font-lexend font-semibold text-[#111827] mb-2">No listings found</h3>
+          <p className="text-sm text-[#6B7280] font-lexend mb-4">
+            {query || statusFilter !== "All Status" 
+              ? "Try adjusting your filters to see more listings."
+              : "Start by creating your first property listing."}
+          </p>
+          {!query && statusFilter === "All Status" && (
+            <a
+              href="/ListProperty"
+              className="inline-flex items-center gap-2 px-6 h-11 rounded-lg bg-[#1078CF] text-white text-sm font-lexend hover:bg-[#0e6dbb]"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+              </svg>
+              Create Listing
+            </a>
+          )}
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {filtered.map((item) => (
+            <ListingCard key={item.id} item={item} onEdit={openEdit} />
+          ))}
+        </div>
+      )}
 
       {/* Footer helper */}
       <div className="text-center text-sm text-[#9CA3AF] font-lexend pt-6">
