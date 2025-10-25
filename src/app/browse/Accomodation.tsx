@@ -1,7 +1,9 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import AppImage from '../components/ui/AppImage';
+import { getApprovedListings } from '@/lib/services/listings';
+import type { PropertyListing } from '@/types/listing';
 
 interface AccommodationCardProps {
   id: string;
@@ -59,63 +61,41 @@ export default function Accommodation() {
   const [selectedAmenities, setSelectedAmenities] = useState<string[]>([]);
   const [minRating, setMinRating] = useState(0);
   const [bookingOptions, setBookingOptions] = useState<string[]>([]);
+  
+  // Fetch listings from Firestore
+  const [accommodations, setAccommodations] = useState<AccommodationCardProps[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const accommodations = [
-    {
-      id: '1',
-      name: 'Loakan Heights Residences',
-      location: 'Near Police Station',
-      price: 6300,
-      rating: 4.6,
-      image: '/hotel1.jpg',
-      verified: true
-    },
-    {
-      id: '2',
-      name: 'Sunrise Pines Lodge',
-      location: 'Near Saint Louis University',
-      price: 1450,
-      rating: 4.8,
-      image: '/hotel2.jpg',
-      verified: true
-    },
-    {
-      id: '3',
-      name: 'Loakan Heights Residences',
-      location: 'Near Police Station',
-      price: 6300,
-      rating: 4.6,
-      image: '/hotel1.jpg',
-      verified: true
-    },
-    {
-      id: '4',
-      name: 'Sunrise Pines Lodge',
-      location: 'Near Saint Louis University',
-      price: 1450,
-      rating: 4.8,
-      image: '/hotel2.jpg',
-      verified: true
-    },
-    {
-      id: '5',
-      name: 'Loakan Heights Residences',
-      location: 'Near Police Station',
-      price: 6300,
-      rating: 4.6,
-      image: '/hotel1.jpg',
-      verified: true
-    },
-    {
-      id: '6',
-      name: 'Sunrise Pines Lodge',
-      location: 'Near Saint Louis University',
-      price: 1450,
-      rating: 4.8,
-      image: '/hotel2.jpg',
-      verified: true
-    }
-  ];
+  useEffect(() => {
+    const fetchListings = async () => {
+      try {
+        setLoading(true);
+        const listings = await getApprovedListings();
+        
+        // Transform PropertyListing to AccommodationCardProps
+        const transformed: AccommodationCardProps[] = listings.map((listing: PropertyListing) => ({
+          id: listing.id,
+          name: listing.propertyName,
+          location: `${listing.barangay}, ${listing.city}`,
+          price: parseInt(listing.rate.replace(/[^0-9]/g, "")) || 0,
+          rating: listing.averageRating || 4.5,
+          image: listing.coverPhoto || listing.photos?.[0] || '/placeholder-image.jpg',
+          verified: listing.status === "approved",
+        }));
+        
+        setAccommodations(transformed);
+        setError(null);
+      } catch (err) {
+        console.error("Failed to fetch listings:", err);
+        setError("Failed to load accommodations. Please try again later.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchListings();
+  }, []);
 
   const propertyTypes = ['Hotel', 'Apartment', 'Transient'];
   const amenities = [
@@ -162,7 +142,9 @@ export default function Accommodation() {
             {/* Results Header */}
             <div className="flex items-center justify-between mb-6">
               <div>
-                <h1 className="text-[40px] font-extrabold text-[#1078CF] font-lexend">6 accommodations found</h1>
+                <h1 className="text-[40px] font-extrabold text-[#1078CF] font-lexend">
+                  {loading ? "Loading..." : `${accommodations.length} accommodation${accommodations.length !== 1 ? 's' : ''} found`}
+                </h1>
                 <p className="text-[#9E9E9E] font-lexend text-[24px]">Stays in Baguio City with trusted local hosts</p>
               </div>
               <div className="flex gap-2">
@@ -175,12 +157,39 @@ export default function Accommodation() {
               </div>
             </div>
 
+            {/* Loading State */}
+            {loading && (
+              <div className="flex items-center justify-center py-12">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#1078CF]"></div>
+              </div>
+            )}
+
+            {/* Error State */}
+            {error && (
+              <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+                <p className="text-red-600 font-lexend">{error}</p>
+              </div>
+            )}
+
+            {/* Empty State */}
+            {!loading && !error && accommodations.length === 0 && (
+              <div className="flex flex-col items-center justify-center py-12 text-center">
+                <svg className="w-16 h-16 text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                </svg>
+                <h3 className="text-lg font-lexend font-semibold text-gray-900 mb-2">No accommodations found</h3>
+                <p className="text-sm text-gray-600 font-lexend">Try adjusting your filters or check back later.</p>
+              </div>
+            )}
+
             {/* Accommodations Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {accommodations.map((accommodation) => (
-                <AccommodationCard key={accommodation.id} {...accommodation} />
-              ))}
-            </div>
+            {!loading && !error && accommodations.length > 0 && (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {accommodations.map((accommodation) => (
+                  <AccommodationCard key={accommodation.id} {...accommodation} />
+                ))}
+              </div>
+            )}
           </div>
 
           {/* Filters Sidebar */}
