@@ -59,10 +59,24 @@ const AccommodationCard = ({ name, location, price, rating, image, verified }: A
 
 interface AccommodationProps {
   searchParams: SearchParams;
+  initialCategory?: string | null;
 }
 
-export default function Accommodation({ searchParams }: AccommodationProps) {
-  const [selectedPropertyType, setSelectedPropertyType] = useState('Hotel');
+export default function Accommodation({ searchParams, initialCategory }: AccommodationProps) {
+  // Map URL category to display format (capitalize first letter)
+  const getInitialPropertyType = (category: string | null | undefined) => {
+    if (!category) return 'Hotel';
+    
+    const categoryMap: Record<string, string> = {
+      'hotel': 'Hotel',
+      'apartment': 'Apartment',
+      'transient': 'Transient',
+    };
+    
+    return categoryMap[category.toLowerCase()] || 'Hotel';
+  };
+
+  const [selectedPropertyType, setSelectedPropertyType] = useState(() => getInitialPropertyType(initialCategory));
   const [priceRange, setPriceRange] = useState([0, 10000]);
   const [rooms, setRooms] = useState(0);
   const [beds, setBeds] = useState(0);
@@ -70,6 +84,14 @@ export default function Accommodation({ searchParams }: AccommodationProps) {
   const [selectedAmenities, setSelectedAmenities] = useState<string[]>([]);
   const [minRating, setMinRating] = useState(0);
   const [bookingOptions, setBookingOptions] = useState<string[]>([]);
+  
+  // Update selected property type when URL category changes
+  useEffect(() => {
+    if (initialCategory) {
+      const newType = getInitialPropertyType(initialCategory);
+      setSelectedPropertyType(newType);
+    }
+  }, [initialCategory]);
   
   // Fetch listings from Firestore
   const [accommodations, setAccommodations] = useState<AccommodationCardProps[]>([]);
