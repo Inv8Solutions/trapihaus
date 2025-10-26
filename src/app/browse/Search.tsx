@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
+import { useSearchParams } from 'next/navigation';
 import Iridescence from './Iridescence';
 import type { SearchParams } from './page';
 
@@ -9,11 +10,35 @@ interface SearchProps {
 }
 
 export default function Search({ onSearch }: SearchProps) {
+  const searchParams = useSearchParams();
+  const categoryParam = searchParams.get('category');
+  
   const [activeTab, setActiveTab] = useState('Hotels');
   const [location, setLocation] = useState('');
   const [checkIn, setCheckIn] = useState('');
   const [checkOut, setCheckOut] = useState('');
   const [guests, setGuests] = useState('');
+
+  // Map URL category to display format
+  const getTabFromCategory = useCallback((category: string | null) => {
+    if (!category) return 'Hotels';
+    
+    const categoryMap: Record<string, string> = {
+      'hotel': 'Hotels',
+      'apartment': 'Apartments',
+      'transient': 'Transients',
+    };
+    
+    return categoryMap[category.toLowerCase()] || 'Hotels';
+  }, []);
+
+  // Update active tab when URL category changes
+  useEffect(() => {
+    if (categoryParam) {
+      const newTab = getTabFromCategory(categoryParam);
+      setActiveTab(newTab);
+    }
+  }, [categoryParam, getTabFromCategory]);
 
   const tabs = ['Hotels', 'Apartments', 'Transients'];
 

@@ -1,9 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense } from "react";
 import Navbar from "../components/layout/Navbar";
-import Search from "./Search";
-import Accomodation from "./Accomodation";
+import BrowseContent from "./BrowseContent";
 import Footerr from "../components/layout/Footerr";
 
 export interface SearchParams {
@@ -14,23 +13,19 @@ export interface SearchParams {
   guests: string;
 }
 
-export default function About() {
-  const [searchParams, setSearchParams] = useState<SearchParams>({
-    propertyType: 'Hotels',
-    location: '',
-    checkIn: '',
-    checkOut: '',
-    guests: '',
-  });
-
+export default function BrowsePage() {
   return (
     <>
       <main className="min-h-screen bg-white max-w-full overflow-hidden">
         <Navbar />
-      
-        <Search onSearch={setSearchParams} />
-
-        <Accomodation searchParams={searchParams} />
+        
+        <Suspense fallback={
+          <div className="flex items-center justify-center py-20">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#1078CF]"></div>
+          </div>
+        }>
+          <BrowseContent />
+        </Suspense>
 
       </main>
       <Footerr />

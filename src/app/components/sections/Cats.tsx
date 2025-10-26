@@ -1,15 +1,21 @@
 "use client";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
+
 interface CategoryCardProps {
   title: string;
   description: string;
   image: string;
   className?: string;
+  onClick: () => void;
 }
 
-const CategoryCard = ({ title, description, image, className = "" }: CategoryCardProps) => {
+const CategoryCard = ({ title, description, image, className = "", onClick }: CategoryCardProps) => {
   return (
-    <div className={`relative rounded-3xl overflow-hidden group cursor-pointer ${className}`}>
+    <div 
+      onClick={onClick}
+      className={`relative rounded-3xl overflow-hidden group cursor-pointer ${className}`}
+    >
       {/* Background Image */}
       <div className="relative h-64 md:h-80">
         <Image
@@ -34,6 +40,12 @@ const CategoryCard = ({ title, description, image, className = "" }: CategoryCar
 };
 
 export default function Categories() {
+  const router = useRouter();
+
+  const handleCategoryClick = (category: string) => {
+    router.push(`/browse?category=${category.toLowerCase()}`);
+  };
+
   return (
     <section className="py-16 bg-gray-50">
       <div className="max-w-full mx-auto px-6">
@@ -53,12 +65,14 @@ export default function Categories() {
             title="Apartments"
             description="A comfortable space built for longer stays."
             image="https://github.com/Inv8Solutions/trapihaus/blob/master/public/apartments.jpg?raw=true"
+            onClick={() => handleCategoryClick("apartment")}
           />
             
             <CategoryCard
             title="Transients"
             description="Affordable short stays, perfect for quick trips."
             image="https://github.com/Inv8Solutions/trapihaus/blob/master/public/transients.jpg?raw=true"
+            onClick={() => handleCategoryClick("transient")}
             />
           {/* Bottom Row - Hotels spanning full width */}
           <CategoryCard
@@ -66,6 +80,7 @@ export default function Categories() {
             description="Full service comfort with modern convenience."
             image="https://github.com/Inv8Solutions/trapihaus/blob/master/public/hotels.jpg?raw=true"
             className="md:col-span-2"
+            onClick={() => handleCategoryClick("hotel")}
           />
         </div>
       </div>

@@ -1,4 +1,14 @@
+"use client";
+
+import { useRouter } from "next/navigation";
+
 export default function Hero() {
+  const router = useRouter();
+
+  const handleSearchClick = () => {
+    router.push("/browse");
+  };
+
   return (
     <section className="relative bg-white mt-4 md:mt-[24px] mb-16 md:mb-20">
       {/* Background Image */}
@@ -62,8 +72,11 @@ export default function Hero() {
                   <p className="text-gray-500 text-xs md:text-sm">Add guests</p>
                 </div>
               </div>
-              <button className="ml-4 md:ml-6 w-12 h-12 md:w-14 md:h-14 bg-[#83C12C] hover:bg-green-600 text-white rounded-full font-semibold shadow-lg transition-colors duration-200 flex items-center justify-center flex-shrink-0">
-                <svg className="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <button 
+                onClick={handleSearchClick}
+                className="ml-4 md:ml-6 w-12 h-12 md:w-14 md:h-14 bg-[#83C12C] hover:bg-green-600 text-white rounded-full font-semibold shadow-lg transition-colors duration-200 flex items-center justify-center flex-shrink-0"
+              >
+                <svg className="w-5 h-5 md:w-6 md:h-6 cursor-pointer" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                 </svg>
               </button>
