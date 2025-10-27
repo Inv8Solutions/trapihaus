@@ -1,14 +1,13 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import AppImage from "../components/ui/AppImage";
 import { getListing } from "@/lib/services/listings";
 import type { PropertyListing } from "@/types/listing";
 
 export default function Listing() {
 	const router = useRouter();
-	const searchParams = useSearchParams();
 	const [guests, setGuests] = useState(0);
 	const [checkIn, setCheckIn] = useState("");
 	const [checkOut, setCheckOut] = useState("");
@@ -16,18 +15,17 @@ export default function Listing() {
 	const [errorMsg, setErrorMsg] = useState<string | null>(null);
 	const [listingData, setListingData] = useState<PropertyListing | null>(null);
 	const [loading, setLoading] = useState(true);
+	const [listingId, setListingId] = useState<string | null>(null);
 
-	// Get listing ID from URL parameters
-	const listingId = searchParams.get('id');
-	
-	// Get listing details from URL parameters (fallback if Firebase fetch fails)
-	const listingTitle = searchParams.get('title') || 'Loakan Heights Residences';
-	const listingLocation = searchParams.get('location') || 'Near Camp John Hay';
-	const listingPrice = searchParams.get('price') ? parseFloat(searchParams.get('price')!) : 2500;
-	const listingRating = searchParams.get('rating') ? parseFloat(searchParams.get('rating')!) : 4.6;
-	const listingImage = searchParams.get('image') || "https://images.unsplash.com/photo-1560066984-138dadb4c035?auto=format&fit=crop&w=1600&q=80";
-	const isVerified = searchParams.get('verified') === 'true';
-	const ratePeriod = searchParams.get('ratePeriod') || 'per night';
+	// Get listing ID from URL hash
+	useEffect(() => {
+		const hash = window.location.hash.slice(1); // Remove the # symbol
+		if (hash) {
+			setListingId(hash);
+		} else {
+			setLoading(false);
+		}
+	}, []);
 
 	// Fetch full listing details from Firebase
 	useEffect(() => {
@@ -50,16 +48,17 @@ export default function Listing() {
 		fetchListingDetails();
 	}, [listingId]);
 
-	// Use Firebase data if available, otherwise use URL params
-	const displayTitle = listingData?.propertyName || listingTitle;
-	const displayLocation = listingData ? `${listingData.barangay}, ${listingData.city}` : listingLocation;
-	const displayPrice = listingData ? parseFloat(listingData.rate.replace(/[^0-9]/g, "")) : listingPrice;
-	const displayRating = listingData?.averageRating || listingRating;
-	const displayImage = listingData?.coverPhoto || listingData?.photos?.[0] || listingImage;
-	const displayVerified = listingData?.status === "approved" || isVerified;
-	const displayDescription = listingData?.description || "Experience modern comfort in the cool highlands of Baguio at Loakan Heights Residences. Nestled near the Loakan area, this property offers a perfect mix of accessibility and serenity — just 15 minutes from Session Road and 10 minutes from the Baguio Airport.";
+	// Use Firebase data with sensible defaults
+	const displayTitle = listingData?.propertyName || 'Property Listing';
+	const displayLocation = listingData ? `${listingData.barangay}, ${listingData.city}` : 'Baguio City';
+	const displayPrice = listingData ? parseFloat(listingData.rate.replace(/[^0-9]/g, "")) : 2500;
+	const displayRating = listingData?.averageRating || 0;
+	const displayImage = listingData?.coverPhoto || listingData?.photos?.[0] || "https://images.unsplash.com/photo-1560066984-138dadb4c035?auto=format&fit=crop&w=1600&q=80";
+	const displayVerified = listingData?.status === "approved";
+	const displayDescription = listingData?.description || "No description available for this property.";
 	const displayAmenities = listingData?.amenities || [];
-	const displayHostName = listingData ? `${listingData.hostFirstName} ${listingData.hostLastName}` : "Mika De Guzman";
+	const displayHostName = listingData ? `${listingData.hostFirstName} ${listingData.hostLastName}` : "Host";
+	const displayRatePeriod = listingData?.ratePeriod || 'per night';
 
 	const CURRENCY = String.fromCharCode(0x20b1);
 	const PRICE_PER_NIGHT = displayPrice;
@@ -214,14 +213,14 @@ export default function Listing() {
 						<div className="flex items-center justify-between bg-[#F9FAFB] p-5 rounded-[20px] mb-5">
 							<div>
 								<div className="text-2xl font-bold font-lexend">{CURRENCY}{PRICE_PER_NIGHT.toLocaleString()}</div>
-								<div className="text-xs text-gray-500">{listingData?.ratePeriod || ratePeriod}</div>
+								<div className="text-xs text-gray-500">{displayRatePeriod}</div>
 							</div>
 							<div className="text-sm text-yellow-500 flex items-center gap-2">
 								<svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
 									<path d="M12 .587l3.668 7.431L23.4 9.748l-5.7 5.556L18.82 24 12 19.897 5.18 24l1.12-8.696L.6 9.748l7.732-1.73z" />
 								</svg>
 								<span className="font-medium text-gray-700">{displayRating.toFixed(1)}</span>
-								<span className="text-gray-400 text-xs">({listingData?.reviewCount || 17} Reviews)</span>
+								<span className="text-gray-400 text-xs">({listingData?.reviewCount || 0} Reviews)</span>
 							</div>
 						</div>
 

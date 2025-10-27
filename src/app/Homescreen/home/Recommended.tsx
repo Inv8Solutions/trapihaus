@@ -23,17 +23,8 @@ export default function Recommended() {
 	const router = useRouter();
 
 	const handleBookNow = (item: RecommendedItem) => {
-		const params = new URLSearchParams({
-			id: item.id,
-			title: item.title,
-			location: item.location,
-			price: item.price.toString(),
-			rating: item.rating.toString(),
-			image: item.image,
-			verified: item.verified ? 'true' : 'false',
-			ratePeriod: item.ratePeriod
-		});
-		router.push(`/PropertyListing?${params.toString()}`);
+		// Use hash with just the ID for cleaner URLs
+		router.push(`/PropertyListing#${item.id}`);
 	};
 
 	useEffect(() => {

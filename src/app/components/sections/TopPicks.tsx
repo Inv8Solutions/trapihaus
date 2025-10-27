@@ -42,18 +42,8 @@ const PropertyCard = ({ listing }: { listing: Listing }) => {
   const router = useRouter();
   
   const handleViewDetails = () => {
-    // Create URL with listing details as query parameters
-    const params = new URLSearchParams({
-      id: listing.id.toString(),
-      title: listing.title,
-      location: listing.location,
-      price: listing.price.toString(),
-      rating: listing.rating.toString(),
-      type: listing.type,
-      verified: listing.verified.toString()
-    });
-    
-    router.push(`/PropertyListing?${params.toString()}`);
+    // Use hash with just the ID for cleaner URLs
+    router.push(`/PropertyListing#${listing.id}`);
   };
   
   return (

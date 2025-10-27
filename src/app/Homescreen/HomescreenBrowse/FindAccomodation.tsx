@@ -45,7 +45,7 @@ const AccommodationCard = ({ id, name, location, price, rating, image, verified 
             <span className="text-gray-500 text-sm ml-1">per night</span>
           </div>
           <button 
-            onClick={() => router.push(`/PropertyListing?id=${id}`)}
+            onClick={() => router.push(`/PropertyListing#${id}`)}
             className="bg-[#1078CF] hover:bg-blue-600 text-white px-6 py-2 rounded-xl font-medium transition-colors duration-200 font-lexend"
           >
             Book Now
