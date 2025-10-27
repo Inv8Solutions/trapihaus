@@ -75,10 +75,8 @@ export default function Search({ onSearch }: SearchProps) {
 
   return (
     <div className="bg-gray-50 py-8">
-      {/* Blue Container with Iridescence Background */}
       <div className="max-w-full mx-auto px-6">
         <div className="relative rounded-3xl overflow-hidden shadow-2xl">
-          {/* Iridescence Background - Only for blue container */}
           <div className="absolute inset-0 z-0">
             <Iridescence
               color={[0.2, 0.5, 1]}
