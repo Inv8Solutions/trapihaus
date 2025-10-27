@@ -18,6 +18,10 @@ interface AccommodationCardProps {
   propertyType: string;
   minStay?: string;
   maxStay?: string;
+  amenities?: string[];
+  bedrooms?: number;
+  bathrooms?: number;
+  availability?: string;
 }
 
 const AccommodationCard = ({ name, location, price, rating, image, verified }: AccommodationCardProps) => {
@@ -65,7 +69,7 @@ interface AccommodationProps {
 export default function Accommodation({ searchParams, initialCategory }: AccommodationProps) {
   // Map URL category to display format (capitalize first letter)
   const getInitialPropertyType = (category: string | null | undefined) => {
-    if (!category) return 'Hotel';
+    if (!category) return 'All';
     
     const categoryMap: Record<string, string> = {
       'hotel': 'Hotel',
@@ -73,7 +77,7 @@ export default function Accommodation({ searchParams, initialCategory }: Accommo
       'transient': 'Transient',
     };
     
-    return categoryMap[category.toLowerCase()] || 'Hotel';
+    return categoryMap[category.toLowerCase()] || 'All';
   };
 
   const [selectedPropertyType, setSelectedPropertyType] = useState(() => getInitialPropertyType(initialCategory));
@@ -117,6 +121,10 @@ export default function Accommodation({ searchParams, initialCategory }: Accommo
           propertyType: listing.propertyType || 'hotel',
           minStay: listing.minStay,
           maxStay: listing.maxStay,
+          amenities: listing.amenities || [],
+          bedrooms: listing.bedrooms || 0,
+          bathrooms: listing.bathrooms || 0,
+          availability: listing.availability || 'Available for Booking',
         }));
         
         setAccommodations(transformed);
@@ -162,7 +170,7 @@ export default function Accommodation({ searchParams, initialCategory }: Accommo
       }
 
       // Also filter by sidebar property type selection
-      if (selectedPropertyType !== 'Hotel') {
+      if (selectedPropertyType && selectedPropertyType.toLowerCase() !== 'all') {
         const sidebarType = selectedPropertyType.toLowerCase();
         const accomType = (accommodation.propertyType || 'hotel').toLowerCase();
         if (accomType !== sidebarType) return false;
@@ -239,17 +247,38 @@ export default function Accommodation({ searchParams, initialCategory }: Accommo
         return false;
       }
 
-      // Filter by rooms, beds, bathrooms
-      if (rooms > 0 || beds > 0 || bathrooms > 0) {
-        // These would need to be added to the listing data
-        // For now, we'll skip this filter
+      // Filter by rooms (bedrooms), beds, bathrooms
+      if (rooms > 0 && (accommodation.bedrooms || 0) < rooms) {
+        return false;
+      }
+      if (beds > 0 && (accommodation.bedrooms || 0) < beds) {
+        return false;
+      }
+      if (bathrooms > 0 && (accommodation.bathrooms || 0) < bathrooms) {
+        return false;
+      }
+
+      // Filter by selected amenities (all must be present)
+      if (selectedAmenities.length > 0) {
+        const accomAmenities = (accommodation.amenities || []).map(a => a.toLowerCase());
+        const hasAllAmenities = selectedAmenities.every(selectedAmenity => 
+          accomAmenities.some(accomAmenity => 
+            accomAmenity.includes(selectedAmenity.toLowerCase())
+          )
+        );
+        if (!hasAllAmenities) return false;
+      }
+
+      // Filter by booking options
+      if (bookingOptions.includes('Instant Booking')) {
+        if (accommodation.availability !== 'Available for Booking') return false;
       }
 
       return true;
     });
-  }, [accommodations, searchParams, selectedPropertyType, priceRange, minRating, rooms, beds, bathrooms]);
+  }, [accommodations, searchParams, selectedPropertyType, priceRange, minRating, rooms, beds, bathrooms, selectedAmenities, bookingOptions]);
 
-  const propertyTypes = ['Hotel', 'Apartment', 'Transient'];
+  const propertyTypes = ['All', 'Hotel', 'Apartment', 'Transient'];
   const amenities = [
     { name: 'Wi-Fi', icon: '📶' },
     { name: 'Parking', icon: '🅿️' },
