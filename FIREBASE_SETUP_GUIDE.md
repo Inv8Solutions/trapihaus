@@ -284,9 +284,76 @@ The CSP changes won't take effect until you restart!
 🚀 **Action required:**
 1. Deploy Firestore rules to Firebase Console
 2. Deploy Storage rules to Firebase Console
-3. Restart development server
-4. Test profile functionality
+3. **Set up NextAuth environment variables** (see below)
+4. Restart development server
+5. Test profile functionality
 
 ---
 
-**Last Updated:** October 24, 2025
+## Step 6: NextAuth Environment Variables ⚡ NEW
+
+### Required Environment Variables
+
+NextAuth requires two environment variables to be set in your `.env.local` file:
+
+1. **NEXTAUTH_URL** - The URL of your application
+2. **NEXTAUTH_SECRET** - A secret key used to encrypt JWT tokens
+
+### Setup Instructions
+
+#### 1. Copy `.env.example` to `.env.local` (if not already done)
+
+```bash
+cp .env.example .env.local
+```
+
+#### 2. Set NEXTAUTH_URL
+
+For **local development**:
+```bash
+NEXTAUTH_URL=http://localhost:3000
+```
+
+For **production** (update when deploying):
+```bash
+NEXTAUTH_URL=https://your-domain.com
+```
+
+#### 3. Generate and Set NEXTAUTH_SECRET
+
+Run this command to generate a secure random secret:
+
+```bash
+node -e "console.log(require('crypto').randomBytes(32).toString('base64'))"
+```
+
+Copy the output and add it to your `.env.local`:
+
+```bash
+NEXTAUTH_SECRET=your_generated_secret_here
+```
+
+⚠️ **IMPORTANT:** 
+- Use a **different secret** for production
+- Never commit `.env.local` to git (it's already in `.gitignore`)
+- Keep your secret secure and private
+
+### Warnings Fixed
+
+After setting these variables, the following warnings will be resolved:
+- ✅ `[next-auth][warn][NEXTAUTH_URL]`
+- ✅ `[next-auth][warn][NO_SECRET]`
+
+### Restart Development Server
+
+After updating `.env.local`, restart your development server:
+
+```bash
+# Stop the server (Ctrl+C)
+# Start it again
+npm run dev
+```
+
+---
+
+**Last Updated:** October 27, 2025

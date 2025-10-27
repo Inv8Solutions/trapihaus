@@ -7,6 +7,7 @@ import { createListing, submitListingForReview } from "@/lib/services/listings";
 import type { CreateListingData } from "@/types/listing";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import { getBarangays, getCities } from "@/lib/data/barangays";
 
 interface BasicInfoData {
 	email: string;
@@ -205,6 +206,10 @@ export default function Listing() {
 	const [photoPreviews, setPhotoPreviews] = useState<string[]>([]);
 	const [uploadError, setUploadError] = useState<string | null>(null);
 
+	// Barangay auto-population
+	const [availableBarangays, setAvailableBarangays] = useState<string[]>([]);
+	const [availableCities] = useState<string[]>(getCities());
+
 	// Check authentication status
 	useEffect(() => {
 		const auth = getFirebaseAuth();
@@ -227,6 +232,20 @@ export default function Listing() {
 		});
 		return () => unsubscribe();
 	}, []);
+
+	// Auto-populate barangays when city changes
+	useEffect(() => {
+		const barangays = getBarangays(data.property.city);
+		setAvailableBarangays(barangays);
+		
+		// Reset barangay selection if it's not in the new list
+		if (data.property.barangay && !barangays.includes(data.property.barangay)) {
+			setData((prev) => ({
+				...prev,
+				property: { ...prev.property, barangay: "" }
+			}));
+		}
+	}, [data.property.city, data.property.barangay]);
 
 	const step = steps[current];
 
@@ -682,11 +701,22 @@ export default function Listing() {
 						<input
 							id="city"
 							type="text"
+							list="cities-list"
 							value={data.property.city}
 							onChange={(e) => updateProperty({ city: e.target.value })}
 							className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#1078CF]"
 							placeholder="Enter city or municipality"
 						/>
+						<datalist id="cities-list">
+							{availableCities.map((city) => (
+								<option key={city} value={city} />
+							))}
+						</datalist>
+						{availableBarangays.length > 0 && (
+							<p className="text-xs text-gray-500 mt-1">
+								{availableBarangays.length} barangay(s) available
+							</p>
+						)}
 					</div>
 					<div>
 						<label className="block text-sm font-medium mb-1" htmlFor="barangay">Barangay</label>
@@ -696,18 +726,28 @@ export default function Listing() {
 								value={data.property.barangay}
 								onChange={(e) => updateProperty({ barangay: e.target.value })}
 								className="w-full appearance-none rounded-md border border-gray-300 px-3 py-2 pr-8 text-sm focus:outline-none focus:ring-2 focus:ring-[#1078CF] bg-white"
+								disabled={availableBarangays.length === 0}
 							>
-								<option value="">Select Barangay</option>
-								<option value="Asin Road">Asin Road</option>
-								<option value="Bakakeng">Bakakeng</option>
-								<option value="Camp 7">Camp 7</option>
-								<option value="Irisan">Irisan</option>
-								<option value="Loakan">Loakan</option>
+								<option value="">
+									{availableBarangays.length === 0 
+										? "Select a city first" 
+										: "Select Barangay"}
+								</option>
+								{availableBarangays.map((barangay) => (
+									<option key={barangay} value={barangay}>
+										{barangay}
+									</option>
+								))}
 							</select>
 							<span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3 text-gray-500">
 								<svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M6 9l6 6 6-6" /></svg>
 							</span>
 						</div>
+						{availableBarangays.length === 0 && data.property.city && (
+							<p className="text-xs text-amber-600 mt-1">
+								⚠️ No barangays found for &quot;{data.property.city}&quot;. Please enter a valid city/municipality.
+							</p>
+						)}
 					</div>
 					<div>
 						<label className="block text-sm font-medium mb-1" htmlFor="streetAddress">Street Address</label>

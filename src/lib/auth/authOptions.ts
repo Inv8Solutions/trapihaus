@@ -5,6 +5,19 @@ import CredentialsProvider from "next-auth/providers/credentials";
 // Prefer a server-only key; fallback to NEXT_PUBLIC_* for convenience in dev
 const API_KEY = process.env.FIREBASE_WEB_API_KEY || process.env.NEXT_PUBLIC_FIREBASE_API_KEY || "";
 
+// Validate required environment variables
+if (!process.env.NEXTAUTH_SECRET) {
+  console.warn(
+    "[NextAuth] NEXTAUTH_SECRET is not set. Generate one with: node -e \"console.log(require('crypto').randomBytes(32).toString('base64'))\""
+  );
+}
+
+if (!process.env.NEXTAUTH_URL && process.env.NODE_ENV === "production") {
+  console.warn(
+    "[NextAuth] NEXTAUTH_URL is not set. This is required in production."
+  );
+}
+
 export const authOptions: NextAuthOptions = {
   secret: process.env.NEXTAUTH_SECRET,
   session: { strategy: "jwt" },
