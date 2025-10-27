@@ -49,6 +49,8 @@ const nextConfig: NextConfig = {
       { protocol: "https", hostname: "github.com" },
       { protocol: "https", hostname: "firebasestorage.googleapis.com" },
     ],
+    // Add formats for better optimization
+    formats: ["image/webp", "image/avif"],
   },
   async headers() {
     return [

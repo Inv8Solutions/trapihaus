@@ -53,7 +53,7 @@ export default function Listing() {
 	const displayLocation = listingData ? `${listingData.barangay}, ${listingData.city}` : 'Baguio City';
 	const displayPrice = listingData ? parseFloat(listingData.rate.replace(/[^0-9]/g, "")) : 2500;
 	const displayRating = listingData?.averageRating || 0;
-	const displayImage = listingData?.coverPhoto || listingData?.photos?.[0] || "https://images.unsplash.com/photo-1560066984-138dadb4c035?auto=format&fit=crop&w=1600&q=80";
+	const displayImage = listingData?.coverPhoto || listingData?.photos?.[0] || "https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?auto=format&fit=crop&w=1600&q=80";
 	const displayVerified = listingData?.status === "approved";
 	const displayDescription = listingData?.description || "No description available for this property.";
 	const displayAmenities = listingData?.amenities || [];
@@ -69,9 +69,9 @@ export default function Listing() {
 	const thumbs = [
 		displayImage,
 		...(listingData?.photos?.slice(1, 4) || [
-			"https://images.unsplash.com/photo-1505691723518-36a5ac3b2b8b?auto=format&fit=crop&w=800&q=80",
-			"https://images.unsplash.com/photo-1505692794403-34f9a53f1a5f?auto=format&fit=crop&w=800&q=80",
-			"https://images.unsplash.com/photo-1505693314120-6e2b274e82ab?auto=format&fit=crop&w=800&q=80",
+			"https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?auto=format&fit=crop&w=800&q=80",
+			"https://images.unsplash.com/photo-1540518614846-7eded433c457?auto=format&fit=crop&w=800&q=80",
+			"https://images.unsplash.com/photo-1616594039964-ae9021a400a0?auto=format&fit=crop&w=800&q=80",
 		])
 	];
 
@@ -367,7 +367,7 @@ export default function Listing() {
 						</div>
 						<div className="border-t border-gray-100 pt-4">
 							<div className="flex items-center gap-3">
-								<AppImage src="/woman.png" alt={`Photo of host, ${displayHostName}`} width={48} height={48} className="rounded-full object-contain" />
+								<AppImage src="/woman.png" alt={`Photo of host, ${displayHostName}`} width={48} height={48} className="rounded-full object-cover" style={{ width: '48px', height: '48px' }} />
 								<div>
 									<div className="text-sm font-semibold">Hosted by {displayHostName}</div>
 									<div className="text-xs text-gray-500">Verified Host</div>
@@ -462,7 +462,7 @@ export default function Listing() {
 									src={mainImage}
 									alt="Cozy bedroom with single bed, warm lighting, and window view"
 									fillParent
-									priority
+									priority={true}
 									sizes="(max-width: 768px) 100vw, 60vw"
 									className="object-cover rounded-[28px]"
 								/>
