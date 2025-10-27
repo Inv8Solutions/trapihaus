@@ -59,7 +59,12 @@ export default function Navbar() {
                 </Link>
 
                     <div className="flex-1 hidden md:flex justify-center space-x-10 text-white text-[16px]">
-                            <Link href="/home" className={pathname === "/" ? "font-black" : "font-medium"}>Home</Link>
+                            <Link 
+                                href={user ? "/Homescreen/home" : "/"} 
+                                className={pathname === "/Homescreen/home" || pathname === "/" ? "font-black" : "font-medium"}
+                            >
+                                Home
+                            </Link>
                             <Link href="/Homescreen/HomescreenBrowse" className={pathname === "/Homescreen/HomescreenBrowse" ? "font-black" : "font-medium"}>Browse</Link>
                             <Link href="/Homescreen/MyTrips" className={pathname === "/Homescreen/MyTrips" ? "font-black" : "font-medium"}>My Trips</Link>
                             <Link href="/List" className={pathname === "/List" ? "font-black" : "font-medium"}>List Property</Link>
