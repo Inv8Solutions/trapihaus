@@ -1,8 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import AppImage from "../components/ui/AppImage";
+import { getListing } from "@/lib/services/listings";
+import type { PropertyListing } from "@/types/listing";
 
 export default function Listing() {
 	const router = useRouter();
@@ -12,8 +14,13 @@ export default function Listing() {
 	const [checkOut, setCheckOut] = useState("");
 	const [quote, setQuote] = useState<null | { nights: number; subtotal: number; total: number }>(null);
 	const [errorMsg, setErrorMsg] = useState<string | null>(null);
+	const [listingData, setListingData] = useState<PropertyListing | null>(null);
+	const [loading, setLoading] = useState(true);
 
-	// Get listing details from URL parameters
+	// Get listing ID from URL parameters
+	const listingId = searchParams.get('id');
+	
+	// Get listing details from URL parameters (fallback if Firebase fetch fails)
 	const listingTitle = searchParams.get('title') || 'Loakan Heights Residences';
 	const listingLocation = searchParams.get('location') || 'Near Camp John Hay';
 	const listingPrice = searchParams.get('price') ? parseFloat(searchParams.get('price')!) : 2500;
@@ -22,17 +29,49 @@ export default function Listing() {
 	const isVerified = searchParams.get('verified') === 'true';
 	const ratePeriod = searchParams.get('ratePeriod') || 'per night';
 
+	// Fetch full listing details from Firebase
+	useEffect(() => {
+		async function fetchListingDetails() {
+			if (!listingId) {
+				setLoading(false);
+				return;
+			}
+
+			try {
+				const data = await getListing(listingId);
+				setListingData(data);
+			} catch (error) {
+				console.error("Failed to fetch listing details:", error);
+			} finally {
+				setLoading(false);
+			}
+		}
+
+		fetchListingDetails();
+	}, [listingId]);
+
+	// Use Firebase data if available, otherwise use URL params
+	const displayTitle = listingData?.propertyName || listingTitle;
+	const displayLocation = listingData ? `${listingData.barangay}, ${listingData.city}` : listingLocation;
+	const displayPrice = listingData ? parseFloat(listingData.rate.replace(/[^0-9]/g, "")) : listingPrice;
+	const displayRating = listingData?.averageRating || listingRating;
+	const displayImage = listingData?.coverPhoto || listingData?.photos?.[0] || listingImage;
+	const displayVerified = listingData?.status === "approved" || isVerified;
+	const displayDescription = listingData?.description || "Experience modern comfort in the cool highlands of Baguio at Loakan Heights Residences. Nestled near the Loakan area, this property offers a perfect mix of accessibility and serenity — just 15 minutes from Session Road and 10 minutes from the Baguio Airport.";
+
 	const CURRENCY = String.fromCharCode(0x20b1);
-	const PRICE_PER_NIGHT = listingPrice;
+	const PRICE_PER_NIGHT = displayPrice;
 	const SERVICE_FEE = 750;
 
 	// Bedroom images from Unsplash to match the provided visuals
-	const mainImage = listingImage;
+	const mainImage = displayImage;
 	const thumbs = [
-		listingImage,
-		"https://images.unsplash.com/photo-1505691723518-36a5ac3b2b8b?auto=format&fit=crop&w=800&q=80",
-		"https://images.unsplash.com/photo-1505692794403-34f9a53f1a5f?auto=format&fit=crop&w=800&q=80",
-		"https://images.unsplash.com/photo-1505693314120-6e2b274e82ab?auto=format&fit=crop&w=800&q=80",
+		displayImage,
+		...(listingData?.photos?.slice(1, 4) || [
+			"https://images.unsplash.com/photo-1505691723518-36a5ac3b2b8b?auto=format&fit=crop&w=800&q=80",
+			"https://images.unsplash.com/photo-1505692794403-34f9a53f1a5f?auto=format&fit=crop&w=800&q=80",
+			"https://images.unsplash.com/photo-1505693314120-6e2b274e82ab?auto=format&fit=crop&w=800&q=80",
+		])
 	];
 
 	// Mock details beneath About section
@@ -89,12 +128,18 @@ export default function Listing() {
 
 	return (
 		<main className="max-w-full mx-auto px-6 py-10 bg-[#F5F5F5] mb-[80px]">
+			{loading ? (
+				<div className="flex items-center justify-center py-12">
+					<div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#1078CF]"></div>
+				</div>
+			) : (
+				<>
 			{/* Page header */}
 			<header className="mb-6 flex items-start justify-between gap-4 bg-white px-7 py-5 rounded-[40]">
 				<div>
-					<h1 className="text-3xl md:text-[32px] leading-tight font-extrabold font-lexend">{listingTitle}</h1>
+					<h1 className="text-3xl md:text-[32px] leading-tight font-extrabold font-lexend">{displayTitle}</h1>
 					<div className="mt-2 flex items-center gap-3 text-sm text-gray-600">
-						{isVerified && (
+						{displayVerified && (
 							<span className="inline-flex items-center gap-1 bg-emerald-100 text-emerald-700 px-2.5 py-1 rounded-full text-xs font-medium">
 								{/* check icon */}
 								<svg className="w-3.5 h-3.5" viewBox="0 0 20 20" fill="currentColor" aria-hidden>
@@ -107,7 +152,7 @@ export default function Listing() {
 							<svg className="w-4 h-4 text-gray-500" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
 								<path d="M12 2C8.134 2 5 5.134 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.866-3.134-7-7-7zm0 9.5a2.5 2.5 0 110-5 2.5 2.5 0 010 5z"/>
 							</svg>
-							{listingLocation}
+							{displayLocation}
 						</span>
 					</div>
 				</div>
@@ -140,14 +185,14 @@ export default function Listing() {
 						<div className="flex items-center justify-between bg-[#F9FAFB] p-5 rounded-[20px] mb-5">
 							<div>
 								<div className="text-2xl font-bold font-lexend">{CURRENCY}{PRICE_PER_NIGHT.toLocaleString()}</div>
-								<div className="text-xs text-gray-500">{ratePeriod}</div>
+								<div className="text-xs text-gray-500">{listingData?.ratePeriod || ratePeriod}</div>
 							</div>
 							<div className="text-sm text-yellow-500 flex items-center gap-2">
 								<svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
 									<path d="M12 .587l3.668 7.431L23.4 9.748l-5.7 5.556L18.82 24 12 19.897 5.18 24l1.12-8.696L.6 9.748l7.732-1.73z" />
 								</svg>
-								<span className="font-medium text-gray-700">{listingRating.toFixed(1)}</span>
-								<span className="text-gray-400 text-xs">(17 Reviews)</span>
+								<span className="font-medium text-gray-700">{displayRating.toFixed(1)}</span>
+								<span className="text-gray-400 text-xs">({listingData?.reviewCount || 17} Reviews)</span>
 							</div>
 						</div>
 
@@ -305,15 +350,9 @@ export default function Listing() {
 
 					<div className="bg-white rounded-[28px] p-6 shadow-md border border-[#F3F4F6]">
 						<h3 className="text-lg font-semibold mb-3">About the Accommodation</h3>
-						<p className="text-sm text-gray-600 leading-relaxed mb-3">
-							Experience modern comfort in the cool highlands of Baguio at Loakan Heights Residences. Nestled near the Loakan area, this property offers a perfect mix of accessibility and serenity — just 15 minutes from Session Road and 10 minutes from the Baguio Airport.
+						<p className="text-sm text-gray-600 leading-relaxed whitespace-pre-line">
+							{displayDescription}
 						</p>
-						<ul className="text-sm text-gray-600 space-y-2">
-							<li>• Spacious rooms and apartments</li>
-							<li>• Walking distance to local eateries and transport hubs</li>
-							<li>• Quiet neighborhood with a refreshing mountain view</li>
-							<li>• Budget-friendly rates with flexible options</li>
-						</ul>
 					</div>
 
 					{/* What this place offers */}
@@ -412,6 +451,8 @@ export default function Listing() {
 					</div>
 				</section>
 			</div>
+			</>
+			)}
 		</main>
 	);
 }
