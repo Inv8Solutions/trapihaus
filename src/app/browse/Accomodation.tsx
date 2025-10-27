@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useMemo } from 'react';
+import { useRouter } from 'next/navigation';
 import AppImage from '../components/ui/AppImage';
 import { getApprovedListings } from '@/lib/services/listings';
 import type { PropertyListing } from '@/types/listing';
@@ -24,7 +25,9 @@ interface AccommodationCardProps {
   availability?: string;
 }
 
-const AccommodationCard = ({ name, location, price, rating, image, verified }: AccommodationCardProps) => {
+const AccommodationCard = ({ id, name, location, price, rating, image, verified }: AccommodationCardProps) => {
+  const router = useRouter();
+  
   return (
     <div className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300">
       <div className="relative w-full h-48">
@@ -52,7 +55,10 @@ const AccommodationCard = ({ name, location, price, rating, image, verified }: A
             <span className="text-2xl font-bold text-gray-900 font-lexend">₱{price.toLocaleString()}</span>
             <span className="text-gray-500 text-sm ml-1">per night</span>
           </div>
-          <button className="bg-[#1078CF] hover:bg-blue-600 text-white px-6 py-2 rounded-xl font-medium transition-colors duration-200 font-lexend">
+          <button 
+            onClick={() => router.push(`/PropertyListing?id=${id}`)}
+            className="bg-[#1078CF] hover:bg-blue-600 text-white px-6 py-2 rounded-xl font-medium transition-colors duration-200 font-lexend"
+          >
             Book Now
           </button>
         </div>

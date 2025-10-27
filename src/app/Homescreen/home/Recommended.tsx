@@ -1,5 +1,6 @@
 "use client";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 
 interface RecommendedItem {
 	id: string;
@@ -52,6 +53,7 @@ const recommended: RecommendedItem[] = [
 
 export default function Recommended() {
 	const phpFormatter = new Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP', minimumFractionDigits: 2 });
+	const router = useRouter();
 
 	return (
 		<section className="w-full mx-auto px-6 pb-6 mb-20">
@@ -100,7 +102,10 @@ export default function Recommended() {
 									{phpFormatter.format(item.priceMonthly)}
 									<span className="text-gray-500 text-xs font-medium block mt-1">per month</span>
 								</p>
-								<button className="px-5 py-2 rounded-full bg-[#1078CF] text-white text-xs font-semibold hover:bg-[#0d65ad] transition-colors shadow flex-none">
+								<button 
+									onClick={() => router.push(`/PropertyListing?id=${item.id}`)}
+									className="px-5 py-2 rounded-full bg-[#1078CF] text-white text-xs font-semibold hover:bg-[#0d65ad] transition-colors shadow flex-none"
+								>
 									Book Now
 								</button>
 							</div>
