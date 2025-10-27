@@ -26,6 +26,8 @@ export const AppImage: React.FC<AppImageProps> = ({
   height,
   fillParent,
   className = '',
+  sizes,
+  priority = false,
   ...rest
 }) => {
   if (fillParent) {
@@ -34,8 +36,9 @@ export const AppImage: React.FC<AppImageProps> = ({
         src={src}
         alt={alt}
         fill
+        priority={priority}
         className={className}
-        sizes="(max-width:768px) 100vw, 50vw"
+        sizes={sizes || "(max-width:768px) 100vw, 50vw"}
         {...rest}
       />
     );
@@ -49,8 +52,9 @@ export const AppImage: React.FC<AppImageProps> = ({
       alt={alt}
       width={finalWidth}
       height={finalHeight}
+      priority={priority}
       className={className}
-      sizes="(max-width:768px) 100vw, 33vw"
+      sizes={sizes || "(max-width:768px) 100vw, 33vw"}
       {...rest}
     />
   );

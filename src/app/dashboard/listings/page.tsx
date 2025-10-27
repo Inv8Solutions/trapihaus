@@ -20,6 +20,7 @@ import type { PropertyListing } from "@/types/listing";
 interface ListingItem {
   id: string;
   title: string;
+  description?: string;
   location: string;
   image: string; // prefer unsplash with query for perf
   rating: number;
@@ -212,7 +213,7 @@ export default function MyListingsPage() {
     const l = listings.find((x) => x.id === id);
     if (l) {
       setTitle(l.title);
-      setDescription("");
+      setDescription(l.description || "");
       setPropertyType("Apartment");
       setPrice(l.pricePerNight);
       setAddress(l.location);
@@ -295,6 +296,7 @@ export default function MyListingsPage() {
       const updateData: Record<string, unknown> = {};
       
       if (title && title !== listing.title) updateData.propertyName = title;
+      if (description && description.trim()) updateData.description = description;
       if (address && address !== listing.location) {
         // Parse address back to components
         const parts = address.split(",").map(s => s.trim());
@@ -362,6 +364,7 @@ export default function MyListingsPage() {
           const transformed: ListingItem[] = fetchedListings.map((listing: PropertyListing) => ({
             id: listing.id,
             title: listing.propertyName,
+            description: listing.description || "",
             location: `${listing.streetAddress}, ${listing.barangay}, ${listing.city}`.trim(),
             image: listing.coverPhoto || listing.photos?.[0] || "/placeholder-image.jpg",
             rating: listing.averageRating || 0,

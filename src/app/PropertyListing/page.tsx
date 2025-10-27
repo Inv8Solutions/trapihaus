@@ -7,11 +7,11 @@ import Footerr from "../components/layout/Footerr";
 export default function PropertyListingPage() {
     return (
         <>
-        <NavBar />
-        <main>
-            <Listing />
-        </main>
-        <Footerr />
+            <NavBar />
+            <main>
+                <Listing />
+            </main>
+            <Footerr />
         </>        
     );
 }
