@@ -65,24 +65,10 @@ const AccommodationCard = ({ id, name, location, price, rating, image, verified 
 
 interface AccommodationProps {
   searchParams: SearchParams;
-  initialCategory?: string | null;
 }
 
-export default function Accommodation({ searchParams, initialCategory }: AccommodationProps) {
-  // Map URL category to display format (capitalize first letter)
-  const getInitialPropertyType = (category: string | null | undefined) => {
-    if (!category) return 'Hotel';
-    
-    const categoryMap: Record<string, string> = {
-      'hotel': 'Hotel',
-      'apartment': 'Apartment',
-      'transient': 'Transient',
-    };
-    
-    return categoryMap[category.toLowerCase()] || 'Hotel';
-  };
-
-  const [selectedPropertyType, setSelectedPropertyType] = useState(() => getInitialPropertyType(initialCategory));
+export default function Accommodation({ searchParams }: AccommodationProps) {
+  const [selectedPropertyType, setSelectedPropertyType] = useState('All');
   const [priceRange, setPriceRange] = useState([0, 10000]);
   const [rooms, setRooms] = useState(0);
   const [beds, setBeds] = useState(0);
@@ -90,14 +76,6 @@ export default function Accommodation({ searchParams, initialCategory }: Accommo
   const [selectedAmenities, setSelectedAmenities] = useState<string[]>([]);
   const [minRating, setMinRating] = useState(0);
   const [bookingOptions, setBookingOptions] = useState<string[]>([]);
-  
-  // Update selected property type when URL category changes
-  useEffect(() => {
-    if (initialCategory) {
-      const newType = getInitialPropertyType(initialCategory);
-      setSelectedPropertyType(newType);
-    }
-  }, [initialCategory]);
   
   // Fetch listings from Firestore
   const [accommodations, setAccommodations] = useState<AccommodationCardProps[]>([]);
@@ -138,12 +116,12 @@ export default function Accommodation({ searchParams, initialCategory }: Accommo
     fetchListings();
   }, []);
 
-  // Filter accommodations based on search params
+  // Filter accommodations based on search params AND sidebar filters
   const filteredAccommodations = useMemo(() => {
     if (!accommodations.length) return [];
 
     return accommodations.filter((accommodation) => {
-      // Filter by property type from search
+      // Filter by property type from search params (only when search is performed)
       if (searchParams.propertyType) {
         const searchType = searchParams.propertyType.toLowerCase();
         const accomType = (accommodation.propertyType || 'hotel').toLowerCase();
@@ -167,8 +145,8 @@ export default function Accommodation({ searchParams, initialCategory }: Accommo
         if (!typeMatches) return false;
       }
 
-      // Also filter by sidebar property type selection
-      if (selectedPropertyType !== 'Hotel') {
+      // Filter by sidebar property type selection (independent of search)
+      if (selectedPropertyType !== 'All') {
         const sidebarType = selectedPropertyType.toLowerCase();
         const accomType = (accommodation.propertyType || 'hotel').toLowerCase();
         if (accomType !== sidebarType) return false;
@@ -241,7 +219,7 @@ export default function Accommodation({ searchParams, initialCategory }: Accommo
     });
   }, [accommodations, searchParams, selectedPropertyType, priceRange, minRating]);
 
-  const propertyTypes = ['Hotel', 'Apartment', 'Transient'];
+  const propertyTypes = ['All', 'Hotel', 'Apartment', 'Transient'];
   const amenities = [
     { name: 'Wi-Fi', icon: '📶' },
     { name: 'Parking', icon: '🅿️' },
@@ -348,7 +326,7 @@ export default function Accommodation({ searchParams, initialCategory }: Accommo
               {/* Property Type */}
               <div className="mb-6">
                 <h3 className="font-semibold mb-4 font-lexend">Property Type</h3>
-                <div className="grid grid-cols-3 gap-2">
+                <div className="grid grid-cols-2 gap-2">
                   {propertyTypes.map(type => (
                     <button
                       key={type}

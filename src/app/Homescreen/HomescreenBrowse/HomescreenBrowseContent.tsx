@@ -44,7 +44,7 @@ export default function HomescreenBrowseContent() {
   return (
     <>
       <Search onSearch={setSearchParamsState} />
-      <FindAccomodation searchParams={searchParamsState} initialCategory={categoryParam} />
+      <FindAccomodation searchParams={searchParamsState} />
     </>
   );
 }

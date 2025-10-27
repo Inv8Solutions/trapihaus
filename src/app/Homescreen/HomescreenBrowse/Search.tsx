@@ -57,8 +57,15 @@ export default function Search({ onSearch }: SearchProps) {
       }
     }
 
+    // Map plural tab names to singular for consistency with filter
+    const propertyTypeMap: Record<string, string> = {
+      'Hotels': 'Hotel',
+      'Apartments': 'Apartment',
+      'Transients': 'Transient',
+    };
+
     onSearch({
-      propertyType: activeTab,
+      propertyType: propertyTypeMap[activeTab] || activeTab,
       location,
       checkIn,
       checkOut,

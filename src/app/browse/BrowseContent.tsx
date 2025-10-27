@@ -44,7 +44,7 @@ export default function BrowseContent() {
   return (
     <>
       <Search onSearch={setSearchParamsState} />
-      <Accomodation searchParams={searchParamsState} initialCategory={categoryParam} />
+      <Accomodation searchParams={searchParamsState} />
     </>
   );
 }
