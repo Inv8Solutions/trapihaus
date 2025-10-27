@@ -1,9 +1,10 @@
 "use client";
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 
 interface Listing {
-  id: number;
+  id: string;
   title: string;
   location: string;
   price: number;
@@ -38,6 +39,23 @@ const PropertyTypeTab = ({
 );
 
 const PropertyCard = ({ listing }: { listing: Listing }) => {
+  const router = useRouter();
+  
+  const handleViewDetails = () => {
+    // Create URL with listing details as query parameters
+    const params = new URLSearchParams({
+      id: listing.id.toString(),
+      title: listing.title,
+      location: listing.location,
+      price: listing.price.toString(),
+      rating: listing.rating.toString(),
+      type: listing.type,
+      verified: listing.verified.toString()
+    });
+    
+    router.push(`/PropertyListing?${params.toString()}`);
+  };
+  
   return (
     <div className="bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300 border border-gray-100">
       {/* Image Container */}
@@ -87,7 +105,10 @@ const PropertyCard = ({ listing }: { listing: Listing }) => {
             <span className="text-2xl font-bold text-gray-900 font-lexend">₱{listing.price.toLocaleString()}</span>
             <span className="text-gray-500 text-sm font-lexend">per night</span>
           </div>
-          <button className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded-full transition-colors duration-200 font-lexend text-sm">
+          <button 
+            onClick={handleViewDetails}
+            className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded-full transition-colors duration-200 font-lexend text-sm"
+          >
             View Details
           </button>
         </div>
@@ -119,7 +140,7 @@ export default function TopPicks() {
   const listings: Listing[] = [
     // Apartments
     {
-      id: 1,
+      id: "apt-001",
       title: "Highland Accommodations",
       location: "Near University of the Cordilleras",
       price: 3170,
@@ -129,7 +150,7 @@ export default function TopPicks() {
       type: 'apartment'
     },
     {
-      id: 2,
+      id: "apt-002",
       title: "Session View Apartments",
       location: "Near Session Road",
       price: 5500,
@@ -139,7 +160,7 @@ export default function TopPicks() {
       type: 'apartment'
     },
     {
-      id: 3,
+      id: "apt-003",
       title: "Loakan Heights Residences",
       location: "Near Camp John Hay",
       price: 6300,
@@ -149,7 +170,7 @@ export default function TopPicks() {
       type: 'apartment'
     },
     {
-      id: 4,
+      id: "apt-004",
       title: "Burnham Park Residences",
       location: "Near Burnham Park",
       price: 8000,
@@ -159,7 +180,7 @@ export default function TopPicks() {
       type: 'apartment'
     },
     {
-      id: 5,
+      id: "apt-005",
       title: "Cordillera Heights Suites",
       location: "Near SM City Baguio",
       price: 4200,
@@ -169,7 +190,7 @@ export default function TopPicks() {
       type: 'apartment'
     },
     {
-      id: 6,
+      id: "apt-006",
       title: "Pine Ridge Apartments",
       location: "Near Baguio Country Club",
       price: 7500,
@@ -181,7 +202,7 @@ export default function TopPicks() {
     
     // Transients
     {
-      id: 7,
+      id: "trn-001",
       title: "Pinecrest Transient House",
       location: "Near Mines View Park",
       price: 2405,
@@ -191,7 +212,7 @@ export default function TopPicks() {
       type: 'transient'
     },
     {
-      id: 8,
+      id: "trn-002",
       title: "Mountain View Transient",
       location: "Near Teachers Camp",
       price: 1800,
@@ -201,7 +222,7 @@ export default function TopPicks() {
       type: 'transient'
     },
     {
-      id: 9,
+      id: "trn-003",
       title: "Cozy Pine Transient",
       location: "Near La Trinidad",
       price: 2200,
@@ -211,7 +232,7 @@ export default function TopPicks() {
       type: 'transient'
     },
     {
-      id: 10,
+      id: "trn-004",
       title: "Garden Transient House",
       location: "Near Botanical Garden",
       price: 2800,
@@ -221,7 +242,7 @@ export default function TopPicks() {
       type: 'transient'
     },
     {
-      id: 11,
+      id: "trn-005",
       title: "Valley View Transient",
       location: "Near Baguio Cathedral",
       price: 3200,
@@ -231,7 +252,7 @@ export default function TopPicks() {
       type: 'transient'
     },
     {
-      id: 12,
+      id: "trn-006",
       title: "Strawberry Farm Transient",
       location: "Near Strawberry Farm",
       price: 1950,
@@ -243,7 +264,7 @@ export default function TopPicks() {
 
     // Hotels
     {
-      id: 13,
+      id: "htl-001",
       title: "Sunrise Pines Lodge",
       location: "Near SM Lowa Dinagyang",
       price: 1450,
@@ -253,7 +274,7 @@ export default function TopPicks() {
       type: 'hotel'
     },
     {
-      id: 14,
+      id: "htl-002",
       title: "Grand Sierra Pines Hotel",
       location: "Near Session Road",
       price: 4500,
@@ -263,7 +284,7 @@ export default function TopPicks() {
       type: 'hotel'
     },
     {
-      id: 15,
+      id: "htl-003",
       title: "Baguio Country Club Hotel",
       location: "Near Country Club",
       price: 6800,
@@ -273,7 +294,7 @@ export default function TopPicks() {
       type: 'hotel'
     },
     {
-      id: 16,
+      id: "htl-004",
       title: "Mountain Lodge Hotel",
       location: "Near Mines View Park",
       price: 3200,
@@ -283,7 +304,7 @@ export default function TopPicks() {
       type: 'hotel'
     },
     {
-      id: 17,
+      id: "htl-005",
       title: "Pine Crest Inn",
       location: "Near Burnham Park",
       price: 2800,
@@ -293,7 +314,7 @@ export default function TopPicks() {
       type: 'hotel'
     },
     {
-      id: 18,
+      id: "htl-006",
       title: "Cordillera Grand Hotel",
       location: "Near University Belt",
       price: 5200,
@@ -402,7 +423,7 @@ export default function TopPicks() {
 
         {/* View All Link */}
         <div className="text-center">
-          <a href="#" className="text-blue-600 hover:text-blue-700 font-medium inline-flex items-center gap-2 text-base md:text-lg">
+          <a href="/browse" className="text-blue-600 hover:text-blue-700 font-medium inline-flex items-center gap-2 text-base md:text-lg">
             View All Listings
             <svg className="w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
