@@ -1,21 +1,64 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
+import { useSearchParams } from 'next/navigation';
 import Iridescence from '../../browse/Iridescence';
+import type { SearchParams } from './page';
 
-export default function Search() {
+interface SearchProps {
+  onSearch: (params: SearchParams) => void;
+}
+
+export default function Search({ onSearch }: SearchProps) {
+  const searchParams = useSearchParams();
+  const categoryParam = searchParams.get('category');
+  
   const [activeTab, setActiveTab] = useState('Hotels');
   const [location, setLocation] = useState('');
   const [checkIn, setCheckIn] = useState('');
   const [checkOut, setCheckOut] = useState('');
   const [guests, setGuests] = useState('');
 
+  // Map URL category to display format
+  const getTabFromCategory = useCallback((category: string | null) => {
+    if (!category) return 'Hotels';
+    
+    const categoryMap: Record<string, string> = {
+      'hotel': 'Hotels',
+      'apartment': 'Apartments',
+      'transient': 'Transients',
+    };
+    
+    return categoryMap[category.toLowerCase()] || 'Hotels';
+  }, []);
+
+  // Update active tab when URL category changes
+  useEffect(() => {
+    if (categoryParam) {
+      const newTab = getTabFromCategory(categoryParam);
+      setActiveTab(newTab);
+    }
+  }, [categoryParam, getTabFromCategory]);
+
   const tabs = ['Hotels', 'Apartments', 'Transients'];
 
+  // Get today's date in YYYY-MM-DD format for min date validation
+  const today = new Date().toISOString().split('T')[0];
+
   const handleSearch = () => {
-    // Handle search logic here
-    console.log({
-      type: activeTab,
+    // Validate dates before searching
+    if (checkIn && checkOut) {
+      const checkInDate = new Date(checkIn);
+      const checkOutDate = new Date(checkOut);
+      
+      if (checkOutDate <= checkInDate) {
+        alert('Check-out date must be after check-in date');
+        return;
+      }
+    }
+
+    onSearch({
+      propertyType: activeTab,
       location,
       checkIn,
       checkOut,
@@ -110,6 +153,7 @@ export default function Search() {
                     type="date"
                     value={checkIn}
                     onChange={(e) => setCheckIn(e.target.value)}
+                    min={today}
                     className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#1078CF] focus:border-transparent font-lexend"
                   />
                 </div>
@@ -130,6 +174,7 @@ export default function Search() {
                     type="date"
                     value={checkOut}
                     onChange={(e) => setCheckOut(e.target.value)}
+                    min={checkIn || today}
                     className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#1078CF] focus:border-transparent font-lexend"
                   />
                 </div>
