@@ -22,6 +22,20 @@ export default function Recommended() {
 	const phpFormatter = new Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP', minimumFractionDigits: 2 });
 	const router = useRouter();
 
+	const handleBookNow = (item: RecommendedItem) => {
+		const params = new URLSearchParams({
+			id: item.id,
+			title: item.title,
+			location: item.location,
+			price: item.price.toString(),
+			rating: item.rating.toString(),
+			image: item.image,
+			verified: item.verified ? 'true' : 'false',
+			ratePeriod: item.ratePeriod
+		});
+		router.push(`/PropertyListing?${params.toString()}`);
+	};
+
 	useEffect(() => {
 		async function fetchRecommendedListings() {
 			try {
@@ -120,7 +134,7 @@ export default function Recommended() {
 										<span className="text-gray-500 text-xs font-medium block mt-1">{item.ratePeriod}</span>
 									</p>
 									<button 
-										onClick={() => router.push(`/PropertyListing?id=${item.id}`)}
+										onClick={() => handleBookNow(item)}
 										className="px-5 py-2 rounded-full bg-[#1078CF] text-white text-xs font-semibold hover:bg-[#0d65ad] transition-colors shadow flex-none"
 									>
 										Book Now

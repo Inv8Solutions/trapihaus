@@ -1,25 +1,35 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import AppImage from "../components/ui/AppImage";
 
 export default function Listing() {
 	const router = useRouter();
+	const searchParams = useSearchParams();
 	const [guests, setGuests] = useState(0);
 	const [checkIn, setCheckIn] = useState("");
 	const [checkOut, setCheckOut] = useState("");
 	const [quote, setQuote] = useState<null | { nights: number; subtotal: number; total: number }>(null);
 	const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
+	// Get listing details from URL parameters
+	const listingTitle = searchParams.get('title') || 'Loakan Heights Residences';
+	const listingLocation = searchParams.get('location') || 'Near Camp John Hay';
+	const listingPrice = searchParams.get('price') ? parseFloat(searchParams.get('price')!) : 2500;
+	const listingRating = searchParams.get('rating') ? parseFloat(searchParams.get('rating')!) : 4.6;
+	const listingImage = searchParams.get('image') || "https://images.unsplash.com/photo-1560066984-138dadb4c035?auto=format&fit=crop&w=1600&q=80";
+	const isVerified = searchParams.get('verified') === 'true';
+	const ratePeriod = searchParams.get('ratePeriod') || 'per night';
+
 	const CURRENCY = String.fromCharCode(0x20b1);
-	const PRICE_PER_NIGHT = 2500;
+	const PRICE_PER_NIGHT = listingPrice;
 	const SERVICE_FEE = 750;
 
 	// Bedroom images from Unsplash to match the provided visuals
-	const mainImage =
-		"https://images.unsplash.com/photo-1560066984-138dadb4c035?auto=format&fit=crop&w=1600&q=80";
+	const mainImage = listingImage;
 	const thumbs = [
+		listingImage,
 		"https://images.unsplash.com/photo-1505691723518-36a5ac3b2b8b?auto=format&fit=crop&w=800&q=80",
 		"https://images.unsplash.com/photo-1505692794403-34f9a53f1a5f?auto=format&fit=crop&w=800&q=80",
 		"https://images.unsplash.com/photo-1505693314120-6e2b274e82ab?auto=format&fit=crop&w=800&q=80",
@@ -82,20 +92,22 @@ export default function Listing() {
 			{/* Page header */}
 			<header className="mb-6 flex items-start justify-between gap-4 bg-white px-7 py-5 rounded-[40]">
 				<div>
-					<h1 className="text-3xl md:text-[32px] leading-tight font-extrabold font-lexend">Loakan Heights Residences</h1>
+					<h1 className="text-3xl md:text-[32px] leading-tight font-extrabold font-lexend">{listingTitle}</h1>
 					<div className="mt-2 flex items-center gap-3 text-sm text-gray-600">
-						<span className="inline-flex items-center gap-1 bg-emerald-100 text-emerald-700 px-2.5 py-1 rounded-full text-xs font-medium">
-							{/* check icon */}
-							<svg className="w-3.5 h-3.5" viewBox="0 0 20 20" fill="currentColor" aria-hidden>
-								<path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-7.071 7.07a1 1 0 01-1.415 0L3.293 9.95a1 1 0 011.414-1.414l3.1 3.1 6.364-6.364a1 1 0 011.536.021z" clipRule="evenodd" />
-							</svg>
-							Verified
-						</span>
+						{isVerified && (
+							<span className="inline-flex items-center gap-1 bg-emerald-100 text-emerald-700 px-2.5 py-1 rounded-full text-xs font-medium">
+								{/* check icon */}
+								<svg className="w-3.5 h-3.5" viewBox="0 0 20 20" fill="currentColor" aria-hidden>
+									<path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-7.071 7.07a1 1 0 01-1.415 0L3.293 9.95a1 1 0 011.414-1.414l3.1 3.1 6.364-6.364a1 1 0 011.536.021z" clipRule="evenodd" />
+								</svg>
+								Verified
+							</span>
+						)}
 						<span className="inline-flex items-center gap-2">
 							<svg className="w-4 h-4 text-gray-500" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
 								<path d="M12 2C8.134 2 5 5.134 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.866-3.134-7-7-7zm0 9.5a2.5 2.5 0 110-5 2.5 2.5 0 010 5z"/>
 							</svg>
-							Near Camp John Hay
+							{listingLocation}
 						</span>
 					</div>
 				</div>
@@ -128,13 +140,13 @@ export default function Listing() {
 						<div className="flex items-center justify-between bg-[#F9FAFB] p-5 rounded-[20px] mb-5">
 							<div>
 								<div className="text-2xl font-bold font-lexend">{CURRENCY}{PRICE_PER_NIGHT.toLocaleString()}</div>
-								<div className="text-xs text-gray-500">per night</div>
+								<div className="text-xs text-gray-500">{ratePeriod}</div>
 							</div>
 							<div className="text-sm text-yellow-500 flex items-center gap-2">
 								<svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
 									<path d="M12 .587l3.668 7.431L23.4 9.748l-5.7 5.556L18.82 24 12 19.897 5.18 24l1.12-8.696L.6 9.748l7.732-1.73z" />
 								</svg>
-								<span className="font-medium text-gray-700">4.6</span>
+								<span className="font-medium text-gray-700">{listingRating.toFixed(1)}</span>
 								<span className="text-gray-400 text-xs">(17 Reviews)</span>
 							</div>
 						</div>
