@@ -1,8 +1,11 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import AppImage from '../../components/ui/AppImage';
+import { getApprovedListings } from '@/lib/services/listings';
+import type { PropertyListing } from '@/types/listing';
+import type { SearchParams } from './page';
 
 interface AccommodationCardProps {
   id: string;
@@ -12,6 +15,10 @@ interface AccommodationCardProps {
   rating: number;
   image: string;
   verified: boolean;
+  guests: number;
+  propertyType: string;
+  minStay?: string;
+  maxStay?: string;
 }
 
 const AccommodationCard = ({ id, name, location, price, rating, image, verified }: AccommodationCardProps) => {
@@ -56,8 +63,12 @@ const AccommodationCard = ({ id, name, location, price, rating, image, verified 
   );
 };
 
-export default function Accommodation() {
-  const [selectedPropertyType, setSelectedPropertyType] = useState('Hotel');
+interface AccommodationProps {
+  searchParams: SearchParams;
+}
+
+export default function Accommodation({ searchParams }: AccommodationProps) {
+  const [selectedPropertyType, setSelectedPropertyType] = useState('All');
   const [priceRange, setPriceRange] = useState([0, 10000]);
   const [rooms, setRooms] = useState(0);
   const [beds, setBeds] = useState(0);
@@ -65,65 +76,150 @@ export default function Accommodation() {
   const [selectedAmenities, setSelectedAmenities] = useState<string[]>([]);
   const [minRating, setMinRating] = useState(0);
   const [bookingOptions, setBookingOptions] = useState<string[]>([]);
+  
+  // Fetch listings from Firestore
+  const [accommodations, setAccommodations] = useState<AccommodationCardProps[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const accommodations = [
-    {
-      id: '1',
-      name: 'Loakan Heights Residences',
-      location: 'Near Police Station',
-      price: 6300,
-      rating: 4.6,
-      image: '/hotel1.jpg',
-      verified: true
-    },
-    {
-      id: '2',
-      name: 'Sunrise Pines Lodge',
-      location: 'Near Saint Louis University',
-      price: 1450,
-      rating: 4.8,
-      image: '/hotel2.jpg',
-      verified: true
-    },
-    {
-      id: '3',
-      name: 'Loakan Heights Residences',
-      location: 'Near Police Station',
-      price: 6300,
-      rating: 4.6,
-      image: '/hotel1.jpg',
-      verified: true
-    },
-    {
-      id: '4',
-      name: 'Sunrise Pines Lodge',
-      location: 'Near Saint Louis University',
-      price: 1450,
-      rating: 4.8,
-      image: '/hotel2.jpg',
-      verified: true
-    },
-    {
-      id: '5',
-      name: 'Loakan Heights Residences',
-      location: 'Near Police Station',
-      price: 6300,
-      rating: 4.6,
-      image: '/hotel1.jpg',
-      verified: true
-    },
-    {
-      id: '6',
-      name: 'Sunrise Pines Lodge',
-      location: 'Near Saint Louis University',
-      price: 1450,
-      rating: 4.8,
-      image: '/hotel2.jpg',
-      verified: true
-    }
-  ];
+  useEffect(() => {
+    const fetchListings = async () => {
+      try {
+        setLoading(true);
+        const listings = await getApprovedListings();
+        
+        // Transform PropertyListing to AccommodationCardProps
+        const transformed: AccommodationCardProps[] = listings.map((listing: PropertyListing) => ({
+          id: listing.id,
+          name: listing.propertyName,
+          location: `${listing.barangay}, ${listing.city}`,
+          price: parseInt(listing.rate.replace(/[^0-9]/g, "")) || 0,
+          rating: listing.averageRating || 4.5,
+          image: listing.coverPhoto || listing.photos?.[0] || '/placeholder-image.jpg',
+          verified: listing.status === "approved",
+          guests: listing.guests || 1,
+          propertyType: listing.propertyType || 'hotel',
+          minStay: listing.minStay,
+          maxStay: listing.maxStay,
+        }));
+        
+        setAccommodations(transformed);
+        setError(null);
+      } catch (err) {
+        console.error("Failed to fetch listings:", err);
+        setError("Failed to load accommodations. Please try again later.");
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  const propertyTypes = ['Hotel', 'Apartment', 'Transient'];
+    fetchListings();
+  }, []);
+
+  // Filter accommodations based on search params AND sidebar filters
+  const filteredAccommodations = useMemo(() => {
+    if (!accommodations.length) return [];
+
+    return accommodations.filter((accommodation) => {
+      // Filter by property type from search params (only when search is performed)
+      if (searchParams.propertyType) {
+        const searchType = searchParams.propertyType.toLowerCase();
+        const accomType = (accommodation.propertyType || 'hotel').toLowerCase();
+        
+        // Map plural search terms to singular property types
+        const typeMapping: Record<string, string[]> = {
+          'hotel': ['hotels', 'hotel'],
+          'apartment': ['apartments', 'apartment'],
+          'transient': ['transients', 'transient']
+        };
+        
+        // Check if accommodation type matches search type
+        let typeMatches = false;
+        for (const [key, values] of Object.entries(typeMapping)) {
+          if (values.includes(searchType) && accomType === key) {
+            typeMatches = true;
+            break;
+          }
+        }
+        
+        if (!typeMatches) return false;
+      }
+
+      // Filter by sidebar property type selection (independent of search)
+      if (selectedPropertyType !== 'All') {
+        const sidebarType = selectedPropertyType.toLowerCase();
+        const accomType = (accommodation.propertyType || 'hotel').toLowerCase();
+        if (accomType !== sidebarType) return false;
+      }
+
+      // Filter by location (search in location string)
+      if (searchParams.location) {
+        const locationLower = accommodation.location.toLowerCase();
+        const searchLower = searchParams.location.toLowerCase();
+        if (!locationLower.includes(searchLower)) return false;
+      }
+
+      // Filter by number of guests
+      if (searchParams.guests) {
+        let guestCount = 0;
+        if (searchParams.guests === '5+') {
+          guestCount = 5;
+        } else {
+          guestCount = parseInt(searchParams.guests) || 0;
+        }
+        if (accommodation.guests < guestCount) return false;
+      }
+
+      // Filter by check-in and check-out dates
+      if (searchParams.checkIn && searchParams.checkOut) {
+        const checkInDate = new Date(searchParams.checkIn);
+        const checkOutDate = new Date(searchParams.checkOut);
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        if (checkInDate < today || checkOutDate <= checkInDate) {
+          return false;
+        }
+
+        const stayDuration = Math.ceil((checkOutDate.getTime() - checkInDate.getTime()) / (1000 * 60 * 60 * 24));
+
+        const parseStayDuration = (stayStr: string): number => {
+          const match = stayStr.match(/(\d+)\s*(night|day|week|month)/i);
+          if (!match) return 0;
+          
+          const value = parseInt(match[1]);
+          const unit = match[2].toLowerCase();
+          
+          if (unit === 'night' || unit === 'day') return value;
+          if (unit === 'week') return value * 7;
+          if (unit === 'month') return value * 30;
+          
+          return 0;
+        };
+
+        const minNights = accommodation.minStay ? parseStayDuration(accommodation.minStay) : 0;
+        const maxNights = accommodation.maxStay ? parseStayDuration(accommodation.maxStay) : 365;
+
+        if (stayDuration < minNights || stayDuration > maxNights) {
+          return false;
+        }
+      }
+
+      // Filter by price range
+      if (accommodation.price < priceRange[0] || accommodation.price > priceRange[1]) {
+        return false;
+      }
+
+      // Filter by minimum rating
+      if (minRating > 0 && accommodation.rating < minRating) {
+        return false;
+      }
+
+      return true;
+    });
+  }, [accommodations, searchParams, selectedPropertyType, priceRange, minRating]);
+
+  const propertyTypes = ['All', 'Hotel', 'Apartment', 'Transient'];
   const amenities = [
     { name: 'Wi-Fi', icon: '📶' },
     { name: 'Parking', icon: '🅿️' },
@@ -168,7 +264,9 @@ export default function Accommodation() {
             {/* Results Header */}
             <div className="flex items-center justify-between mb-6">
               <div>
-                <h1 className="text-[40px] font-extrabold text-[#1078CF] font-lexend">6 accommodations found</h1>
+                <h1 className="text-[40px] font-extrabold text-[#1078CF] font-lexend">
+                  {loading ? "Loading..." : `${filteredAccommodations.length} accommodation${filteredAccommodations.length !== 1 ? 's' : ''} found`}
+                </h1>
                 <p className="text-[#9E9E9E] font-lexend text-[24px]">Stays in Baguio City with trusted local hosts</p>
               </div>
               <div className="flex gap-2">
@@ -181,12 +279,43 @@ export default function Accommodation() {
               </div>
             </div>
 
+            {/* Loading State */}
+            {loading && (
+              <div className="flex items-center justify-center py-12">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#1078CF]"></div>
+              </div>
+            )}
+
+            {/* Error State */}
+            {error && (
+              <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+                <p className="text-red-600 font-lexend">{error}</p>
+              </div>
+            )}
+
+            {/* Empty State */}
+            {!loading && !error && filteredAccommodations.length === 0 && (
+              <div className="flex flex-col items-center justify-center py-12 text-center">
+                <svg className="w-16 h-16 text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                </svg>
+                <h3 className="text-lg font-lexend font-semibold text-gray-900 mb-2">No accommodations found</h3>
+                <p className="text-sm text-gray-600 font-lexend">
+                  {accommodations.length > 0 
+                    ? "Try adjusting your search filters to see more results."
+                    : "No listings available. Check back later."}
+                </p>
+              </div>
+            )}
+
             {/* Accommodations Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {accommodations.map((accommodation) => (
-                <AccommodationCard key={accommodation.id} {...accommodation} />
-              ))}
-            </div>
+            {!loading && !error && filteredAccommodations.length > 0 && (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {filteredAccommodations.map((accommodation) => (
+                  <AccommodationCard key={accommodation.id} {...accommodation} />
+                ))}
+              </div>
+            )}
           </div>
 
           {/* Filters Sidebar */}
@@ -197,7 +326,7 @@ export default function Accommodation() {
               {/* Property Type */}
               <div className="mb-6">
                 <h3 className="font-semibold mb-4 font-lexend">Property Type</h3>
-                <div className="grid grid-cols-3 gap-2">
+                <div className="grid grid-cols-2 gap-2">
                   {propertyTypes.map(type => (
                     <button
                       key={type}

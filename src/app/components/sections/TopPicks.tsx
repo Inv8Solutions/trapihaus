@@ -1,7 +1,9 @@
 "use client";
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
+import { getApprovedListings } from '@/lib/services/listings';
+import type { PropertyListing } from '@/types/listing';
 
 interface Listing {
   id: string;
@@ -42,7 +44,6 @@ const PropertyCard = ({ listing }: { listing: Listing }) => {
   const router = useRouter();
   
   const handleViewDetails = () => {
-    // Use hash with just the ID for cleaner URLs
     router.push(`/PropertyListing#${listing.id}`);
   };
   
@@ -53,7 +54,7 @@ const PropertyCard = ({ listing }: { listing: Listing }) => {
         <div className="absolute inset-0 p-[16px]">
           <div className="relative w-full h-full rounded-3xl overflow-hidden">
             <Image
-              src={`https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=640&h=480&fit=crop&crop=center`}
+              src={listing.image || 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=640&h=480&fit=crop&crop=center'}
               alt={listing.title}
               fill
               className="object-cover"
@@ -110,6 +111,43 @@ const PropertyCard = ({ listing }: { listing: Listing }) => {
 export default function TopPicks() {
   const [activeTab, setActiveTab] = useState<'apartment' | 'transient' | 'hotel'>('apartment');
   const [lastPressed, setLastPressed] = useState<'prev' | 'next' | null>(null);
+  const [listings, setListings] = useState<Listing[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchTopRatedListings = async () => {
+      try {
+        setLoading(true);
+        const approvedListings = await getApprovedListings();
+        
+        // Transform PropertyListing to Listing interface
+        const transformedListings: Listing[] = approvedListings.map((listing: PropertyListing) => ({
+          id: listing.id,
+          title: listing.propertyName,
+          location: `${listing.barangay}, ${listing.city}`,
+          price: parseInt(listing.rate.replace(/[^0-9]/g, "")) || 0,
+          rating: listing.averageRating || 4.5,
+          image: listing.coverPhoto || listing.photos?.[0] || 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=640&h=480&fit=crop&crop=center',
+          verified: listing.status === "approved",
+          type: (listing.propertyType?.toLowerCase() || 'hotel') as 'apartment' | 'transient' | 'hotel',
+        }));
+
+        // Sort by rating (highest first) and take top listings
+        const sortedByRating = transformedListings.sort((a, b) => b.rating - a.rating);
+        
+        setListings(sortedByRating);
+        setError(null);
+      } catch (err) {
+        console.error("Failed to fetch top rated listings:", err);
+        setError("Failed to load listings");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchTopRatedListings();
+  }, []);
 
   const tabOrder: ('apartment' | 'transient' | 'hotel')[] = ['apartment', 'transient', 'hotel'];
 
@@ -127,194 +165,7 @@ export default function TopPicks() {
     setActiveTab(tabOrder[nextIndex]);
   };
 
-  const listings: Listing[] = [
-    // Apartments
-    {
-      id: "apt-001",
-      title: "Highland Accommodations",
-      location: "Near University of the Cordilleras",
-      price: 3170,
-      rating: 4.3,
-      image: "/placeholder1.jpg",
-      verified: true,
-      type: 'apartment'
-    },
-    {
-      id: "apt-002",
-      title: "Session View Apartments",
-      location: "Near Session Road",
-      price: 5500,
-      rating: 4.7,
-      image: "/placeholder3.jpg",
-      verified: true,
-      type: 'apartment'
-    },
-    {
-      id: "apt-003",
-      title: "Loakan Heights Residences",
-      location: "Near Camp John Hay",
-      price: 6300,
-      rating: 4.6,
-      image: "/placeholder4.jpg",
-      verified: true,
-      type: 'apartment'
-    },
-    {
-      id: "apt-004",
-      title: "Burnham Park Residences",
-      location: "Near Burnham Park",
-      price: 8000,
-      rating: 4.9,
-      image: "/placeholder6.jpg",
-      verified: true,
-      type: 'apartment'
-    },
-    {
-      id: "apt-005",
-      title: "Cordillera Heights Suites",
-      location: "Near SM City Baguio",
-      price: 4200,
-      rating: 4.5,
-      image: "/placeholder7.jpg",
-      verified: true,
-      type: 'apartment'
-    },
-    {
-      id: "apt-006",
-      title: "Pine Ridge Apartments",
-      location: "Near Baguio Country Club",
-      price: 7500,
-      rating: 4.8,
-      image: "/placeholder8.jpg",
-      verified: true,
-      type: 'apartment'
-    },
-    
-    // Transients
-    {
-      id: "trn-001",
-      title: "Pinecrest Transient House",
-      location: "Near Mines View Park",
-      price: 2405,
-      rating: 4.7,
-      image: "/placeholder2.jpg",
-      verified: true,
-      type: 'transient'
-    },
-    {
-      id: "trn-002",
-      title: "Mountain View Transient",
-      location: "Near Teachers Camp",
-      price: 1800,
-      rating: 4.4,
-      image: "/placeholder9.jpg",
-      verified: true,
-      type: 'transient'
-    },
-    {
-      id: "trn-003",
-      title: "Cozy Pine Transient",
-      location: "Near La Trinidad",
-      price: 2200,
-      rating: 4.3,
-      image: "/placeholder10.jpg",
-      verified: true,
-      type: 'transient'
-    },
-    {
-      id: "trn-004",
-      title: "Garden Transient House",
-      location: "Near Botanical Garden",
-      price: 2800,
-      rating: 4.6,
-      image: "/placeholder11.jpg",
-      verified: true,
-      type: 'transient'
-    },
-    {
-      id: "trn-005",
-      title: "Valley View Transient",
-      location: "Near Baguio Cathedral",
-      price: 3200,
-      rating: 4.5,
-      image: "/placeholder12.jpg",
-      verified: true,
-      type: 'transient'
-    },
-    {
-      id: "trn-006",
-      title: "Strawberry Farm Transient",
-      location: "Near Strawberry Farm",
-      price: 1950,
-      rating: 4.2,
-      image: "/placeholder13.jpg",
-      verified: true,
-      type: 'transient'
-    },
-
-    // Hotels
-    {
-      id: "htl-001",
-      title: "Sunrise Pines Lodge",
-      location: "Near SM Lowa Dinagyang",
-      price: 1450,
-      rating: 4.8,
-      image: "/placeholder5.jpg",
-      verified: true,
-      type: 'hotel'
-    },
-    {
-      id: "htl-002",
-      title: "Grand Sierra Pines Hotel",
-      location: "Near Session Road",
-      price: 4500,
-      rating: 4.6,
-      image: "/placeholder14.jpg",
-      verified: true,
-      type: 'hotel'
-    },
-    {
-      id: "htl-003",
-      title: "Baguio Country Club Hotel",
-      location: "Near Country Club",
-      price: 6800,
-      rating: 4.9,
-      image: "/placeholder15.jpg",
-      verified: true,
-      type: 'hotel'
-    },
-    {
-      id: "htl-004",
-      title: "Mountain Lodge Hotel",
-      location: "Near Mines View Park",
-      price: 3200,
-      rating: 4.4,
-      image: "/placeholder16.jpg",
-      verified: true,
-      type: 'hotel'
-    },
-    {
-      id: "htl-005",
-      title: "Pine Crest Inn",
-      location: "Near Burnham Park",
-      price: 2800,
-      rating: 4.3,
-      image: "/placeholder17.jpg",
-      verified: true,
-      type: 'hotel'
-    },
-    {
-      id: "htl-006",
-      title: "Cordillera Grand Hotel",
-      location: "Near University Belt",
-      price: 5200,
-      rating: 4.7,
-      image: "/placeholder18.jpg",
-      verified: true,
-      type: 'hotel'
-    }
-  ];
-
+  // Filter listings by active tab
   const filteredListings = listings.filter(listing => listing.type === activeTab);
 
   return (
@@ -404,12 +255,35 @@ export default function TopPicks() {
           </div>
         </div>
 
+        {/* Loading State */}
+        {loading && (
+          <div className="flex items-center justify-center py-12">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#1078CF]"></div>
+          </div>
+        )}
+
+        {/* Error State */}
+        {error && (
+          <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6 text-center">
+            <p className="text-red-600 font-lexend">{error}</p>
+          </div>
+        )}
+
+        {/* Empty State */}
+        {!loading && !error && filteredListings.length === 0 && (
+          <div className="text-center py-12">
+            <p className="text-gray-500 font-lexend">No {activeTab} listings available yet.</p>
+          </div>
+        )}
+
         {/* Property Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 mb-6 md:mb-8">
-          {filteredListings.map((listing) => (
-            <PropertyCard key={listing.id} listing={listing} />
-          ))}
-        </div>
+        {!loading && !error && filteredListings.length > 0 && (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 mb-6 md:mb-8">
+            {filteredListings.slice(0, 6).map((listing) => (
+              <PropertyCard key={listing.id} listing={listing} />
+            ))}
+          </div>
+        )}
 
         {/* View All Link */}
         <div className="text-center">

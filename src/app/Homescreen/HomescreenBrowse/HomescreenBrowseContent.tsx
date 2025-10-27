@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import Search from "./Search";
-import Accomodation from "./Accomodation";
+import FindAccomodation from "./FindAccomodation";
 import type { SearchParams } from "./page";
 
 // Map URL category to search property type format
@@ -19,7 +19,7 @@ const getCategoryDisplayName = (category: string | null) => {
   return categoryMap[category.toLowerCase()] || 'Hotels';
 };
 
-export default function BrowseContent() {
+export default function HomescreenBrowseContent() {
   const searchParams = useSearchParams();
   const categoryParam = searchParams.get('category');
   
@@ -44,7 +44,7 @@ export default function BrowseContent() {
   return (
     <>
       <Search onSearch={setSearchParamsState} />
-      <Accomodation searchParams={searchParamsState} />
+      <FindAccomodation searchParams={searchParamsState} />
     </>
   );
 }
