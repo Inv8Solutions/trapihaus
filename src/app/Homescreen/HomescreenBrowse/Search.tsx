@@ -119,9 +119,9 @@ export default function Search({ onSearch }: SearchProps) {
                 </div>
               </div>
 
-              {/* Search Form */}
+              {/* search Form */}
               <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-              {/* Location */}
+              {/* location */}
               <div className="md:col-span-1">
                 <label className="block text-sm font-medium text-gray-700 mb-2 font-lexend">
                   Location
@@ -143,7 +143,7 @@ export default function Search({ onSearch }: SearchProps) {
                 </div>
               </div>
 
-              {/* Check-in */}
+              {/* check-in */}
               <div className="md:col-span-1">
                 <label className="block text-sm font-medium text-gray-700 mb-2 font-lexend">
                   Check-in
@@ -164,7 +164,7 @@ export default function Search({ onSearch }: SearchProps) {
                 </div>
               </div>
 
-              {/* Check-out */}
+              {/* check-out */}
               <div className="md:col-span-1">
                 <label className="block text-sm font-medium text-gray-700 mb-2 font-lexend">
                   Check-out
