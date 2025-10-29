@@ -19,7 +19,7 @@ export default function Search({ onSearch }: SearchProps) {
   const [checkOut, setCheckOut] = useState('');
   const [guests, setGuests] = useState('');
 
-  // Map URL category to display format
+  // map URL category to display format
   const getTabFromCategory = useCallback((category: string | null) => {
     if (!category) return 'Hotels';
     
@@ -32,7 +32,7 @@ export default function Search({ onSearch }: SearchProps) {
     return categoryMap[category.toLowerCase()] || 'Hotels';
   }, []);
 
-  // Update active tab when URL category changes
+  // update active tab when URL category changes
   useEffect(() => {
     if (categoryParam) {
       const newTab = getTabFromCategory(categoryParam);
@@ -42,11 +42,11 @@ export default function Search({ onSearch }: SearchProps) {
 
   const tabs = ['Hotels', 'Apartments', 'Transients'];
 
-  // Get today's date in YYYY-MM-DD format for min date validation
+  // get today's date in YYYY-MM-DD format for min date validation
   const today = new Date().toISOString().split('T')[0];
 
   const handleSearch = () => {
-    // Validate dates before searching
+    // validate dates before searching
     if (checkIn && checkOut) {
       const checkInDate = new Date(checkIn);
       const checkOutDate = new Date(checkOut);
@@ -57,7 +57,7 @@ export default function Search({ onSearch }: SearchProps) {
       }
     }
 
-    // Map plural tab names to singular for consistency with filter
+    // map plural tab names to singular for consistency with filter
     const propertyTypeMap: Record<string, string> = {
       'Hotels': 'Hotel',
       'Apartments': 'Apartment',
@@ -86,7 +86,7 @@ export default function Search({ onSearch }: SearchProps) {
             />
           </div>
           
-          {/* Content inside blue container */}
+          {/* content inside blue container */}
           <div className="relative z-10 px-12 pt-12 pb-8">
             {/* Header */}
             <div className="text-center mb-12">
@@ -98,9 +98,9 @@ export default function Search({ onSearch }: SearchProps) {
               </p>
             </div>
 
-            {/* Search Card */}
+            {/* search Card */}
             <div className="bg-white/95 backdrop-blur-sm rounded-3xl p-8 shadow-2xl">
-              {/* Tabs */}
+              {/* tabs */}
               <div className="flex mb-8">
                 <div className="flex bg-gray-100 rounded-full p-1">
                   {tabs.map((tab) => (
@@ -119,9 +119,9 @@ export default function Search({ onSearch }: SearchProps) {
                 </div>
               </div>
 
-              {/* Search Form */}
+              {/* search Form */}
               <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-              {/* Location */}
+              {/* location */}
               <div className="md:col-span-1">
                 <label className="block text-sm font-medium text-gray-700 mb-2 font-lexend">
                   Location
@@ -143,7 +143,7 @@ export default function Search({ onSearch }: SearchProps) {
                 </div>
               </div>
 
-              {/* Check-in */}
+              {/* check-in */}
               <div className="md:col-span-1">
                 <label className="block text-sm font-medium text-gray-700 mb-2 font-lexend">
                   Check-in
@@ -164,7 +164,7 @@ export default function Search({ onSearch }: SearchProps) {
                 </div>
               </div>
 
-              {/* Check-out */}
+              {/* check-out */}
               <div className="md:col-span-1">
                 <label className="block text-sm font-medium text-gray-700 mb-2 font-lexend">
                   Check-out
@@ -185,7 +185,7 @@ export default function Search({ onSearch }: SearchProps) {
                 </div>
               </div>
 
-              {/* Guests */}
+              {/* guests */}
               <div className="md:col-span-1">
                 <label className="block text-sm font-medium text-gray-700 mb-2 font-lexend">
                   Guests
@@ -211,7 +211,7 @@ export default function Search({ onSearch }: SearchProps) {
                 </div>
               </div>
 
-              {/* Search Button */}
+              {/* search Button */}
               <div className="md:col-span-1 flex items-end">
                 <button
                   onClick={handleSearch}
