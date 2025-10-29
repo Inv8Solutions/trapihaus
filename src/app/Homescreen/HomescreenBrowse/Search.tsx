@@ -185,7 +185,7 @@ export default function Search({ onSearch }: SearchProps) {
                 </div>
               </div>
 
-              {/* Guests */}
+              {/* guests */}
               <div className="md:col-span-1">
                 <label className="block text-sm font-medium text-gray-700 mb-2 font-lexend">
                   Guests
@@ -211,7 +211,7 @@ export default function Search({ onSearch }: SearchProps) {
                 </div>
               </div>
 
-              {/* Search Button */}
+              {/* search Button */}
               <div className="md:col-span-1 flex items-end">
                 <button
                   onClick={handleSearch}
