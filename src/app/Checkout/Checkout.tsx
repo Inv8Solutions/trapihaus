@@ -1,18 +1,33 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 import AppImage from "../components/ui/AppImage";
 
 export default function Checkout() {
+	const searchParams = useSearchParams();
+	
+	// Get booking details from URL params (passed from PropertyListing page)
+	const urlCheckIn = searchParams.get('checkIn');
+	const urlCheckOut = searchParams.get('checkOut');
+	const urlGuests = searchParams.get('guests');
+	
 	// Mocked booking info — in a real app, this would come from prev page/state
 	const PRICE_PER_NIGHT = 2500;
 	const SERVICE_FEE = 500; // matches screenshot
 	const VAT_RATE = 0.12; // 12%
 
-	// Example selected details
-	const [checkIn] = useState<string>(new Date().toISOString().slice(0, 10));
-	const [checkOut] = useState<string>(new Date(Date.now() + 2 * 86400000).toISOString().slice(0, 10));
-	const [guests] = useState<number>(2);
+	// Use URL params if available, otherwise use defaults
+	const [checkIn, setCheckIn] = useState<string>(urlCheckIn || new Date().toISOString().slice(0, 10));
+	const [checkOut, setCheckOut] = useState<string>(urlCheckOut || new Date(Date.now() + 2 * 86400000).toISOString().slice(0, 10));
+	const [guests, setGuests] = useState<number>(urlGuests ? parseInt(urlGuests) : 2);
+
+	// Update state when URL params change
+	useEffect(() => {
+		if (urlCheckIn) setCheckIn(urlCheckIn);
+		if (urlCheckOut) setCheckOut(urlCheckOut);
+		if (urlGuests) setGuests(parseInt(urlGuests));
+	}, [urlCheckIn, urlCheckOut, urlGuests]);
 
 	// Guest details form
 	const [firstName, setFirstName] = useState("");
