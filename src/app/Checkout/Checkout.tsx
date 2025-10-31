@@ -11,11 +11,25 @@ export default function Checkout() {
 	const urlCheckIn = searchParams.get('checkIn');
 	const urlCheckOut = searchParams.get('checkOut');
 	const urlGuests = searchParams.get('guests');
+	const urlPricePerNight = searchParams.get('pricePerNight');
+	const urlServiceFee = searchParams.get('serviceFee');
+	const urlPropertyName = searchParams.get('propertyName');
+	const urlPropertyLocation = searchParams.get('propertyLocation');
+	const urlPropertyImage = searchParams.get('propertyImage');
+	const urlPropertyType = searchParams.get('propertyType');
+	const urlVerified = searchParams.get('verified');
 	
-	// Mocked booking info — in a real app, this would come from prev page/state
-	const PRICE_PER_NIGHT = 2500;
-	const SERVICE_FEE = 500; // matches screenshot
+	// Use URL params if available, otherwise use defaults
+	const PRICE_PER_NIGHT = urlPricePerNight ? parseFloat(urlPricePerNight) : 2500;
+	const SERVICE_FEE = urlServiceFee ? parseFloat(urlServiceFee) : 500;
 	const VAT_RATE = 0.12; // 12%
+	
+	// Property details
+	const propertyName = urlPropertyName || 'Loakan Heights Residences';
+	const propertyLocation = urlPropertyLocation || 'Baguio City';
+	const propertyImage = urlPropertyImage || 'https://images.unsplash.com/photo-1560066984-138dadb4c035?auto=format&fit=crop&w=320&q=60';
+	const propertyType = urlPropertyType || 'Transient';
+	const isVerified = urlVerified === 'true';
 
 	// Use URL params if available, otherwise use defaults
 	const [checkIn, setCheckIn] = useState<string>(urlCheckIn || new Date().toISOString().slice(0, 10));
@@ -97,17 +111,19 @@ export default function Checkout() {
 						<h2 className="text-lg font-semibold mb-4">Booking Summary</h2>
 						<div className="flex items-center gap-4 mb-4">
 							<div className="relative w-24 h-20 rounded-xl overflow-hidden">
-								<AppImage src="https://images.unsplash.com/photo-1560066984-138dadb4c035?auto=format&fit=crop&w=320&q=60" alt="Room thumbnail" fillParent className="object-cover" />
+								<AppImage src={propertyImage} alt="Room thumbnail" fillParent className="object-cover" />
 							</div>
 							<div className="flex-1">
-								<p className="font-semibold">Loakan Heights Residences</p>
-								<p className="text-xs text-gray-500">Baguio City • Transient</p>
-								<span className="mt-1 inline-flex items-center gap-1 bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full text-[10px] font-medium">
-									<svg className="w-3 h-3" viewBox="0 0 20 20" fill="currentColor" aria-hidden>
-										<path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-7.071 7.07a1 1 0 01-1.415 0L3.293 9.95a1 1 0 011.414-1.414l3.1 3.1 6.364-6.364a1 1 0 011.536.021z" clipRule="evenodd" />
-									</svg>
-									Verified
-								</span>
+								<p className="font-semibold">{propertyName}</p>
+								<p className="text-xs text-gray-500">{propertyLocation} • {propertyType}</p>
+								{isVerified && (
+									<span className="mt-1 inline-flex items-center gap-1 bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full text-[10px] font-medium">
+										<svg className="w-3 h-3" viewBox="0 0 20 20" fill="currentColor" aria-hidden>
+											<path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-7.071 7.07a1 1 0 01-1.415 0L3.293 9.95a1 1 0 011.414-1.414l3.1 3.1 6.364-6.364a1 1 0 011.536.021z" clipRule="evenodd" />
+										</svg>
+										Verified
+									</span>
+								)}
 							</div>
 						</div>
 						<div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-sm">
@@ -281,17 +297,19 @@ export default function Checkout() {
 
 						<div className="flex items-center gap-3 mb-4">
 							<div className="relative w-20 h-16 rounded-xl overflow-hidden">
-								<AppImage src="https://images.unsplash.com/photo-1560066984-138dadb4c035?auto=format&fit=crop&w=320&q=60" alt="Room thumbnail" fillParent className="object-cover" />
+								<AppImage src={propertyImage} alt="Room thumbnail" fillParent className="object-cover" />
 							</div>
 							<div className="flex-1">
-								<p className="text-sm font-semibold">Loakan Heights Residences</p>
-								<p className="text-xs text-gray-500">Baguio City • Transient</p>
-								<span className="mt-1 inline-flex items-center gap-1 bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full text-[10px] font-medium">
-									<svg className="w-3 h-3" viewBox="0 0 20 20" fill="currentColor" aria-hidden>
-										<path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-7.071 7.07a1 1 0 01-1.415 0L3.293 9.95a1 1 0 011.414-1.414l3.1 3.1 6.364-6.364a1 1 0 011.536.021z" clipRule="evenodd" />
-									</svg>
-									Verified
-								</span>
+								<p className="text-sm font-semibold">{propertyName}</p>
+								<p className="text-xs text-gray-500">{propertyLocation} • {propertyType}</p>
+								{isVerified && (
+									<span className="mt-1 inline-flex items-center gap-1 bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full text-[10px] font-medium">
+										<svg className="w-3 h-3" viewBox="0 0 20 20" fill="currentColor" aria-hidden>
+											<path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-7.071 7.07a1 1 0 01-1.415 0L3.293 9.95a1 1 0 011.414-1.414l3.1 3.1 6.364-6.364a1 1 0 011.536.021z" clipRule="evenodd" />
+										</svg>
+										Verified
+									</span>
+								)}
 							</div>
 						</div>
 
