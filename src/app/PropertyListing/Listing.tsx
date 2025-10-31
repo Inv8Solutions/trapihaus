@@ -349,8 +349,15 @@ export default function Listing() {
 													checkOut,
 													guests: String(guests),
 													nights: String(quote.nights),
+													pricePerNight: String(PRICE_PER_NIGHT),
+													serviceFee: String(SERVICE_FEE),
 													subtotal: String(quote.subtotal),
 													total: String(quote.total),
+													propertyName: displayTitle,
+													propertyLocation: displayLocation,
+													propertyImage: displayImage,
+													propertyType: listingData?.propertyType || 'Transient',
+													verified: String(displayVerified),
 												});
 												router.push(`/Checkout?${params.toString()}`);
 											}}
