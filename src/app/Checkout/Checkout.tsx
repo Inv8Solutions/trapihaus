@@ -7,7 +7,7 @@ import AppImage from "../components/ui/AppImage";
 export default function Checkout() {
 	const searchParams = useSearchParams();
 	
-	// Get booking details from URL params (passed from PropertyListing page)
+	// get booking details from URL params (passed from PropertyListing page)
 	const urlCheckIn = searchParams.get('checkIn');
 	const urlCheckOut = searchParams.get('checkOut');
 	const urlGuests = searchParams.get('guests');
@@ -19,12 +19,12 @@ export default function Checkout() {
 	const urlPropertyType = searchParams.get('propertyType');
 	const urlVerified = searchParams.get('verified');
 	
-	// Use URL params if available, otherwise use defaults
+	// use URL params if available, otherwise use defaults
 	const PRICE_PER_NIGHT = urlPricePerNight ? parseFloat(urlPricePerNight) : 2500;
 	const SERVICE_FEE = urlServiceFee ? parseFloat(urlServiceFee) : 500;
 	const VAT_RATE = 0.12; // 12%
 	
-	// Property details
+	// property details
 	const propertyName = urlPropertyName || 'Loakan Heights Residences';
 	const propertyLocation = urlPropertyLocation || 'Baguio City';
 	const propertyImage = urlPropertyImage || 'https://images.unsplash.com/photo-1560066984-138dadb4c035?auto=format&fit=crop&w=320&q=60';
