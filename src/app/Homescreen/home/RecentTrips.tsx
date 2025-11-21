@@ -32,11 +32,12 @@ export default function RecentTrips() {
       try {
         // Fetch all reservations for the user (completed and past trips)
         const userReservations = await getUserReservations(user.uid, "completed");
+        console.log("🔍 Recent Trips - Completed reservations found:", userReservations.length, userReservations);
         // Sort by most recent first and limit to 4 for display
         const recentTrips = userReservations.slice(0, 4);
         setReservations(recentTrips);
       } catch (error) {
-        console.error("Error fetching reservations:", error);
+        console.error("❌ Error fetching reservations:", error);
         setReservations([]);
       } finally {
         setLoading(false);
