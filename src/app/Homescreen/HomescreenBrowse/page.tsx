@@ -26,7 +26,9 @@ export default function HomescreenBrowse() {
           <HomescreenBrowseContent />
         </Suspense>
       </main>
-      <Footer />
+      <div className="mt-[80px]">
+        <Footer />
+      </div>
     </>
   );
 }
