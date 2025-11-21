@@ -260,6 +260,8 @@ export default function Accommodation({ searchParams }: AccommodationProps) {
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
           
           {/* Results Section */}
+          {/* Results Section */}
+          {/* Results Section */}
           <div className="lg:col-span-3 lg:order-1">
             {/* Results Header */}
             <div className="flex items-center justify-between mb-6">
