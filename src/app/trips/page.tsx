@@ -55,11 +55,15 @@ export default function TripsPage() {
 					getCancelledReservations(userId),
 				]);
 
+				console.log("🔍 Upcoming trips:", upcoming.length, upcoming);
+				console.log("🔍 Past trips:", past.length, past);
+				console.log("🔍 Cancelled trips:", cancelled.length, cancelled);
+
 				setUpcomingTrips(upcoming);
 				setPastTrips(past);
 				setCancelledTrips(cancelled);
 			} catch (error) {
-				console.error("Error fetching reservations:", error);
+				console.error("❌ Error fetching reservations:", error);
 			} finally {
 				setLoading(false);
 			}
@@ -323,7 +327,7 @@ function TripCard({ trip, onCancel }: TripCardProps) {
 						</div>
 					</div>
 
-					<div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4 text-sm">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4 text-sm">
 						<div>
 							<p className="text-gray-500 mb-1">Check-in</p>
 							<p className="font-semibold">{formatDate(trip.checkInDate)}</p>
@@ -342,7 +346,23 @@ function TripCard({ trip, onCancel }: TripCardProps) {
 						</div>
 					</div>
 
-					{isCancelled && trip.cancellationReason && (
+					<div className="mb-4 p-3 bg-blue-50 border border-blue-100 rounded-lg">
+						<div className="flex items-start gap-3">
+							<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-5 h-5 text-blue-600 mt-0.5">
+								<path d="M10 8a3 3 0 100-6 3 3 0 000 6zM3.465 14.493a1.23 1.23 0 00.41 1.412A9.957 9.957 0 0010 18c2.31 0 4.438-.784 6.131-2.1.43-.333.604-.903.408-1.41a7.002 7.002 0 00-13.074.003z" />
+							</svg>
+							<div>
+								<p className="text-sm font-semibold text-gray-900 mb-1">Guest Information</p>
+								<p className="text-sm text-gray-700">
+									<span className="font-medium">{trip.guestFirstName} {trip.guestLastName}</span>
+								</p>
+								<p className="text-xs text-gray-600 mt-1">{trip.guestEmail}</p>
+								{trip.guestPhone && (
+									<p className="text-xs text-gray-600">{trip.guestPhone}</p>
+								)}
+							</div>
+						</div>
+					</div>					{isCancelled && trip.cancellationReason && (
 						<div className="mb-4 p-3 bg-red-50 border border-red-100 rounded-lg">
 							<p className="text-sm text-red-700">
 								<span className="font-semibold">Reason: </span>

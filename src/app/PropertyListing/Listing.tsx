@@ -358,6 +358,11 @@ export default function Listing() {
 													propertyImage: displayImage,
 													propertyType: listingData?.propertyType || 'Transient',
 													verified: String(displayVerified),
+													// Add required fields for reservation creation
+													listingId: listingData?.id || '',
+													hostId: listingData?.userId || '',
+													hostName: listingData ? `${listingData.hostFirstName} ${listingData.hostLastName}` : 'Property Host',
+													hostEmail: listingData?.hostEmail || '',
 												});
 												router.push(`/Checkout?${params.toString()}`);
 											}}

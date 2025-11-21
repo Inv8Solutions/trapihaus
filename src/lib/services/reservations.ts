@@ -65,7 +65,7 @@ export async function createReservation(data: CreateReservationData): Promise<st
 	const total = subtotal + data.serviceFee + data.vat;
 	const bookingReference = generateBookingReference();
 
-	const reservation: Omit<Reservation, "id" | "createdAt" | "updatedAt"> = {
+	const reservation: Record<string, any> = {
 		userId: data.userId,
 		listingId: data.listingId,
 		status: determineStatus(data.checkInDate, data.checkOutDate),
@@ -81,14 +81,12 @@ export async function createReservation(data: CreateReservationData): Promise<st
 		guestLastName: data.guestLastName,
 		guestEmail: data.guestEmail,
 		guestPhone: data.guestPhone,
-		specialRequest: data.specialRequest,
 
 		// Property Snapshot
 		propertyName: data.propertyName,
 		propertyLocation: data.propertyLocation,
 		propertyImage: data.propertyImage,
 		propertyType: data.propertyType,
-		isVerified: data.isVerified,
 
 		// Pricing
 		pricePerNight: data.pricePerNight,
@@ -106,8 +104,12 @@ export async function createReservation(data: CreateReservationData): Promise<st
 		hostId: data.hostId,
 		hostName: data.hostName,
 		hostEmail: data.hostEmail,
-		hostPhone: data.hostPhone,
 	};
+
+	// Add optional fields only if they exist
+	if (data.specialRequest) reservation.specialRequest = data.specialRequest;
+	if (data.isVerified !== undefined) reservation.isVerified = data.isVerified;
+	if (data.hostPhone) reservation.hostPhone = data.hostPhone;
 
 	await setDoc(newReservationRef, {
 		...reservation,
