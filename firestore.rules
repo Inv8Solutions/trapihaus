@@ -44,9 +44,10 @@ service cloud.firestore {
                     && request.resource.data.hostEmail is string
                     && request.resource.data.propertyName is string;
       
-      // Only the owner can update their listing
+      // Owner can update their listing, OR authenticated users can update averageRating/reviewCount
       allow update: if isOwner(resource.data.userId)
-                    && request.resource.data.userId == resource.data.userId; // Cannot transfer ownership
+                    || (isSignedIn() 
+                        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['averageRating', 'reviewCount']));
       
       // Only the owner can delete their listing
       allow delete: if isOwner(resource.data.userId);
@@ -73,6 +74,32 @@ service cloud.firestore {
                     && request.resource.data.listingId == resource.data.listingId; // Cannot change listing
       
       // Only the guest can delete their reservation
+      allow delete: if isOwner(resource.data.userId);
+    }
+    
+    // Reviews collection
+    match /reviews/{reviewId} {
+      // Anyone can read reviews (for displaying on listings and testimonials)
+      // Also allows authenticated users to check if they've already reviewed
+      allow read: if true;
+      
+      // Only authenticated users can create reviews
+      allow create: if isSignedIn()
+                    && request.resource.data.userId == request.auth.uid
+                    && request.resource.data.userName is string
+                    && request.resource.data.listingId is string
+                    && request.resource.data.rating is number
+                    && request.resource.data.rating >= 1
+                    && request.resource.data.rating <= 5
+                    && request.resource.data.comment is string
+                    && request.resource.data.createdAt is timestamp;
+      
+      // Only the review author can update their review
+      allow update: if isOwner(resource.data.userId)
+                    && request.resource.data.userId == resource.data.userId // Cannot transfer ownership
+                    && request.resource.data.listingId == resource.data.listingId; // Cannot change listing
+      
+      // Only the review author can delete their review
       allow delete: if isOwner(resource.data.userId);
     }
     

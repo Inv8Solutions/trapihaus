@@ -1,6 +1,8 @@
 "use client";
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
+import { getTopReviews } from '@/lib/services/reviews';
+import { Review } from '@/types/review';
 
 interface TestimonialProps {
   quote: string;
@@ -47,8 +49,42 @@ const TestimonialCard = ({ quote, name, role, avatar, rating }: TestimonialProps
 export default function JoinUs() {
   const [currentPage, setCurrentPage] = useState(0);
   const [lastPressed, setLastPressed] = useState<'prev' | 'next' | null>(null);
+  const [allTestimonials, setAllTestimonials] = useState<TestimonialProps[][]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const allTestimonials: TestimonialProps[][] = [
+  useEffect(() => {
+    const fetchReviews = async () => {
+      try {
+        const reviews = await getTopReviews(16); // Fetch 16 reviews for 4 pages
+        
+        // Transform Review[] to TestimonialProps[]
+        const testimonials = reviews.map((review: Review) => ({
+          quote: review.comment,
+          name: review.userName,
+          role: 'Guest', // Default role since we don't track this in reviews
+          avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(review.userName)}&background=random&size=100`,
+          rating: review.rating
+        }));
+
+        // Split into pages of 4 testimonials each
+        const pages: TestimonialProps[][] = [];
+        for (let i = 0; i < testimonials.length; i += 4) {
+          pages.push(testimonials.slice(i, i + 4));
+        }
+
+        setAllTestimonials(pages.length > 0 ? pages : []);
+      } catch (error) {
+        console.error('Error fetching reviews:', error);
+        setAllTestimonials([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchReviews();
+  }, []);
+
+  const fallbackTestimonials: TestimonialProps[][] = [
     // Page 1
     [
       {
@@ -177,13 +213,29 @@ export default function JoinUs() {
 
   const handlePrevious = () => {
     setLastPressed('prev');
-    setCurrentPage((prev) => prev === 0 ? allTestimonials.length - 1 : prev - 1);
+    const testimonials = allTestimonials.length > 0 ? allTestimonials : fallbackTestimonials;
+    setCurrentPage((prev) => prev === 0 ? testimonials.length - 1 : prev - 1);
   };
 
   const handleNext = () => {
     setLastPressed('next');
-    setCurrentPage((prev) => prev === allTestimonials.length - 1 ? 0 : prev + 1);
+    const testimonials = allTestimonials.length > 0 ? allTestimonials : fallbackTestimonials;
+    setCurrentPage((prev) => prev === testimonials.length - 1 ? 0 : prev + 1);
   };
+
+  const displayTestimonials = allTestimonials.length > 0 ? allTestimonials : fallbackTestimonials;
+
+  if (loading) {
+    return (
+      <section className="py-12 bg-gray-50 mb-[100px]">
+        <div className="max-w-full mx-auto px-6">
+          <div className="flex items-center justify-center py-12">
+            <p className="text-gray-600 font-lexend">Loading reviews...</p>
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className="py-12 bg-gray-50 mb-[100px]">
@@ -240,7 +292,7 @@ export default function JoinUs() {
 
         {/* Testimonials Grid */}
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {allTestimonials[currentPage].map((testimonial, index) => (
+          {displayTestimonials[currentPage]?.map((testimonial, index) => (
             <TestimonialCard key={`${currentPage}-${index}`} {...testimonial} />
           ))}
         </div>
