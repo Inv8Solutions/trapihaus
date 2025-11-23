@@ -468,7 +468,7 @@ export default function Checkout() {
 						>
 							{processing ? "Processing..." : "Pay My Booking"}
 						</button>
-						<p className="mt-2 text-[11px] text-gray-400">Listings are vetted for safety and compliance (Mayor's permit / DOT: Tourist Inn / Transient accreditation where applicable).</p>
+						<p className="mt-2 text-[11px] text-gray-400">Listings are vetted for safety and compliance (Mayor&apos;s permit / DOT: Tourist Inn / Transient accreditation where applicable).</p>
 					</div>
 				</aside>
 			</div>

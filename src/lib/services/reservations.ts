@@ -65,7 +65,7 @@ export async function createReservation(data: CreateReservationData): Promise<st
 	const total = subtotal + data.serviceFee + data.vat;
 	const bookingReference = generateBookingReference();
 
-	const reservation: Record<string, any> = {
+	const reservation: Record<string, unknown> = {
 		userId: data.userId,
 		listingId: data.listingId,
 		status: determineStatus(data.checkInDate, data.checkOutDate),
@@ -202,28 +202,48 @@ export async function getUpcomingReservations(userId: string): Promise<Reservati
 	const db = getFirestoreClient();
 	const reservationsRef = collection(db, RESERVATIONS_COLLECTION);
 	
+	// Get all non-cancelled reservations
 	const upcomingQuery = query(
 		reservationsRef,
 		where("userId", "==", userId),
-		where("status", "in", ["upcoming", "ongoing"]),
+		where("status", "!=", "cancelled"),
+		orderBy("status"),
 		orderBy("checkInDate", "asc")
 	);
 
 	const querySnapshot = await getDocs(upcomingQuery);
 	const reservations: Reservation[] = [];
 
-	querySnapshot.forEach((doc) => {
-		const data = doc.data();
-		reservations.push({
-			id: doc.id,
-			...data,
-			checkInDate: data.checkInDate instanceof Timestamp ? data.checkInDate.toDate() : new Date(data.checkInDate),
-			checkOutDate: data.checkOutDate instanceof Timestamp ? data.checkOutDate.toDate() : new Date(data.checkOutDate),
-			createdAt: data.createdAt instanceof Timestamp ? data.createdAt.toDate() : new Date(),
-			updatedAt: data.updatedAt instanceof Timestamp ? data.updatedAt.toDate() : new Date(),
-			cancelledAt: data.cancelledAt instanceof Timestamp ? data.cancelledAt.toDate() : undefined,
-		} as Reservation);
-	});
+	for (const docSnap of querySnapshot.docs) {
+		const data = docSnap.data();
+		const checkInDate = data.checkInDate instanceof Timestamp ? data.checkInDate.toDate() : new Date(data.checkInDate);
+		const checkOutDate = data.checkOutDate instanceof Timestamp ? data.checkOutDate.toDate() : new Date(data.checkOutDate);
+		
+		// Recalculate status based on current date
+		const actualStatus = determineStatus(checkInDate, checkOutDate, data.status);
+		
+		// Update status in database if it changed and is not completed
+		if (actualStatus !== data.status && actualStatus !== "completed") {
+			await updateDoc(doc(db, RESERVATIONS_COLLECTION, docSnap.id), {
+				status: actualStatus,
+				updatedAt: serverTimestamp(),
+			});
+		}
+		
+		// Only include if status is upcoming or ongoing
+		if (actualStatus === "upcoming" || actualStatus === "ongoing") {
+			reservations.push({
+				id: docSnap.id,
+				...data,
+				status: actualStatus,
+				checkInDate,
+				checkOutDate,
+				createdAt: data.createdAt instanceof Timestamp ? data.createdAt.toDate() : new Date(),
+				updatedAt: data.updatedAt instanceof Timestamp ? data.updatedAt.toDate() : new Date(),
+				cancelledAt: data.cancelledAt instanceof Timestamp ? data.cancelledAt.toDate() : undefined,
+			} as Reservation);
+		}
+	}
 
 	return reservations;
 }
@@ -234,7 +254,53 @@ export async function getUpcomingReservations(userId: string): Promise<Reservati
  * @returns Array of completed Reservation
  */
 export async function getPastReservations(userId: string): Promise<Reservation[]> {
-	return getUserReservations(userId, "completed");
+	const db = getFirestoreClient();
+	const reservationsRef = collection(db, RESERVATIONS_COLLECTION);
+	
+	// Get all non-cancelled reservations
+	const allQuery = query(
+		reservationsRef,
+		where("userId", "==", userId),
+		where("status", "!=", "cancelled"),
+		orderBy("status"),
+		orderBy("checkInDate", "desc")
+	);
+
+	const querySnapshot = await getDocs(allQuery);
+	const completedReservations: Reservation[] = [];
+
+	for (const docSnap of querySnapshot.docs) {
+		const data = docSnap.data();
+		const checkInDate = data.checkInDate instanceof Timestamp ? data.checkInDate.toDate() : new Date(data.checkInDate);
+		const checkOutDate = data.checkOutDate instanceof Timestamp ? data.checkOutDate.toDate() : new Date(data.checkOutDate);
+		
+		// Recalculate status based on current date
+		const actualStatus = determineStatus(checkInDate, checkOutDate, data.status);
+		
+		// Update status in database if it changed to completed
+		if (actualStatus === "completed" && data.status !== "completed") {
+			await updateDoc(doc(db, RESERVATIONS_COLLECTION, docSnap.id), {
+				status: actualStatus,
+				updatedAt: serverTimestamp(),
+			});
+		}
+		
+		// Only include if status is completed
+		if (actualStatus === "completed") {
+			completedReservations.push({
+				id: docSnap.id,
+				...data,
+				status: actualStatus,
+				checkInDate,
+				checkOutDate,
+				createdAt: data.createdAt instanceof Timestamp ? data.createdAt.toDate() : new Date(),
+				updatedAt: data.updatedAt instanceof Timestamp ? data.updatedAt.toDate() : new Date(),
+				cancelledAt: data.cancelledAt instanceof Timestamp ? data.cancelledAt.toDate() : undefined,
+			} as Reservation);
+		}
+	}
+
+	return completedReservations;
 }
 
 /**

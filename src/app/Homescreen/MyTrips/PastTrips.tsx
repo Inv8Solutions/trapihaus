@@ -28,7 +28,6 @@ const tabs: { key: TabType; label: string }[] = [
 export default function PastTrips() {
     const [active, setActive] = useState<TabType>("past");
     const [loading, setLoading] = useState(true);
-    const [userId, setUserId] = useState<string | null>(null);
     const [upcomingTrips, setUpcomingTrips] = useState<Reservation[]>([]);
     const [pastTrips, setPastTrips] = useState<Reservation[]>([]);
     const [cancelledTrips, setCancelledTrips] = useState<Reservation[]>([]);
