@@ -2,11 +2,12 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { onAuthStateChanged } from "firebase/auth";
+import { onAuthStateChanged, User } from "firebase/auth";
 import { getFirebaseAuth } from "@/lib/auth/firebaseClient";
 import Navbar from "../components/layout/Navbar";
 import Footerr from "../components/layout/Footerr";
 import AppImage from "../components/ui/AppImage";
+import ReviewModal from "../components/ui/ReviewModal";
 import {
 	getUpcomingReservations,
 	getPastReservations,
@@ -14,6 +15,7 @@ import {
 	cancelReservation,
 } from "@/lib/services/reservations";
 import type { Reservation } from "@/types/reservation";
+import { hasUserReviewedListing } from "@/lib/services/reviews";
 
 type TabType = "upcoming" | "past" | "cancelled";
 
@@ -21,20 +23,27 @@ export default function TripsPage() {
 	const router = useRouter();
 	const [activeTab, setActiveTab] = useState<TabType>("upcoming");
 	const [userId, setUserId] = useState<string | null>(null);
+	const [user, setUser] = useState<User | null>(null);
 	const [loading, setLoading] = useState(true);
 	
 	const [upcomingTrips, setUpcomingTrips] = useState<Reservation[]>([]);
 	const [pastTrips, setPastTrips] = useState<Reservation[]>([]);
 	const [cancelledTrips, setCancelledTrips] = useState<Reservation[]>([]);
+	
+	const [reviewModalOpen, setReviewModalOpen] = useState(false);
+	const [selectedReservation, setSelectedReservation] = useState<Reservation | null>(null);
+	const [reviewedListings, setReviewedListings] = useState<Set<string>>(new Set());
 
 	// Auth state listener
 	useEffect(() => {
 		const auth = getFirebaseAuth();
-		const unsubscribe = onAuthStateChanged(auth, (user) => {
-			if (user) {
-				setUserId(user.uid);
+		const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+			if (currentUser) {
+				setUserId(currentUser.uid);
+				setUser(currentUser);
 			} else {
 				setUserId(null);
+				setUser(null);
 				router.push("/login");
 			}
 		});
@@ -62,6 +71,16 @@ export default function TripsPage() {
 				setUpcomingTrips(upcoming);
 				setPastTrips(past);
 				setCancelledTrips(cancelled);
+
+				// Check which listings have been reviewed
+				const reviewedSet = new Set<string>();
+				for (const trip of past) {
+					const hasReviewed = await hasUserReviewedListing(userId, trip.listingId);
+					if (hasReviewed) {
+						reviewedSet.add(trip.listingId);
+					}
+				}
+				setReviewedListings(reviewedSet);
 			} catch (error) {
 				console.error("❌ Error fetching reservations:", error);
 			} finally {
@@ -189,11 +208,45 @@ export default function TripsPage() {
 								trip={trip}
 								tab={activeTab}
 								onCancel={handleCancelTrip}
+								onReview={(reservation) => {
+									setSelectedReservation(reservation);
+									setReviewModalOpen(true);
+								}}
+								hasReviewed={reviewedListings.has(trip.listingId)}
 							/>
 						))}
 					</div>
 				)}
 			</section>
+			
+			{/* Review Modal */}
+			{user && selectedReservation && (
+				<ReviewModal
+					isOpen={reviewModalOpen}
+					onClose={() => {
+						setReviewModalOpen(false);
+						setSelectedReservation(null);
+					}}
+					reservationId={selectedReservation.id}
+					listingId={selectedReservation.listingId}
+					propertyName={selectedReservation.propertyName}
+					propertyLocation={selectedReservation.propertyLocation}
+					userId={user.uid}
+					userName={user.displayName || selectedReservation.guestFirstName + " " + selectedReservation.guestLastName}
+					userEmail={user.email || selectedReservation.guestEmail}
+					userAvatar={user.photoURL || undefined}
+					onSuccess={async () => {
+						// Refresh past trips and mark as reviewed
+						if (userId && selectedReservation) {
+							const past = await getPastReservations(userId);
+							setPastTrips(past);
+							// Mark this listing as reviewed
+							setReviewedListings(prev => new Set(prev).add(selectedReservation.listingId));
+						}
+						alert("Thank you for your review!");
+					}}
+				/>
+			)}
 			
 			<Footerr />
 		</main>
@@ -251,9 +304,11 @@ interface TripCardProps {
 	trip: Reservation;
 	tab: TabType;
 	onCancel: (reservationId: string) => void;
+	onReview: (reservation: Reservation) => void;
+	hasReviewed?: boolean;
 }
 
-function TripCard({ trip, onCancel }: TripCardProps) {
+function TripCard({ trip, onCancel, onReview, hasReviewed }: TripCardProps) {
 	const formatDate = (date: Date) => {
 		return new Date(date).toLocaleDateString("en-US", {
 			weekday: "short",
@@ -418,7 +473,15 @@ function TripCard({ trip, onCancel }: TripCardProps) {
 						
 						{isPast && (
 							<>
-								<button className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-medium transition-colors">
+								<button 
+									onClick={() => onReview(trip)}
+									disabled={hasReviewed}
+									className={`flex items-center gap-2 px-4 py-2 rounded-xl font-medium transition-colors ${
+										hasReviewed 
+											? 'bg-gray-400 cursor-not-allowed text-white' 
+											: 'bg-blue-600 hover:bg-blue-700 text-white'
+									}`}
+								>
 									<svg
 										className="w-4 h-4"
 										fill="none"
@@ -430,9 +493,9 @@ function TripCard({ trip, onCancel }: TripCardProps) {
 											strokeLinejoin="round"
 											strokeWidth={2}
 											d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"
-										/>
-									</svg>
-									Leave a Review
+											/>
+										</svg>
+									{hasReviewed ? 'Already Reviewed' : 'Leave a Review'}
 								</button>
 								<button className="flex items-center gap-2 px-4 py-2 border border-gray-300 text-gray-700 hover:bg-gray-50 rounded-xl font-medium transition-colors">
 									<svg
