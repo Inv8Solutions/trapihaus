@@ -36,12 +36,10 @@ export default function PastTrips() {
         const auth = getFirebaseAuth();
         const unsubscribe = onAuthStateChanged(auth, async (user) => {
             if (!user) {
-                setUserId(null);
                 setLoading(false);
                 return;
             }
 
-            setUserId(user.uid);
             try {
                 const [upcoming, past, cancelled] = await Promise.all([
                     getUpcomingReservations(user.uid),

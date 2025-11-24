@@ -37,18 +37,10 @@ function calculateNights(checkIn: Date, checkOut: Date): number {
 /**
  * Determine reservation status based on dates
  */
-function determineStatus(checkIn: Date, checkOut: Date, currentStatus?: string): Reservation["status"] {
-	if (currentStatus === "cancelled") return "cancelled";
-	
-	const now = new Date();
-	const checkInTime = checkIn.getTime();
-	const checkOutTime = checkOut.getTime();
-	const nowTime = now.getTime();
-
-	if (nowTime < checkInTime) return "upcoming";
-	if (nowTime >= checkInTime && nowTime < checkOutTime) return "ongoing";
-	return "completed";
-}
+// Note: Status is now manually managed through host actions:
+// pending → confirmed → checked-in → completed
+// or pending → declined
+// or any status → cancelled (by guest)
 
 /**
  * Create a new reservation
@@ -68,7 +60,7 @@ export async function createReservation(data: CreateReservationData): Promise<st
 	const reservation: Record<string, unknown> = {
 		userId: data.userId,
 		listingId: data.listingId,
-		status: determineStatus(data.checkInDate, data.checkOutDate),
+		status: "pending", // All new bookings start as pending, awaiting host confirmation
 		
 		// Booking Details
 		checkInDate: data.checkInDate,
@@ -214,36 +206,22 @@ export async function getUpcomingReservations(userId: string): Promise<Reservati
 	const querySnapshot = await getDocs(upcomingQuery);
 	const reservations: Reservation[] = [];
 
-	for (const docSnap of querySnapshot.docs) {
+	querySnapshot.forEach((docSnap) => {
 		const data = docSnap.data();
 		const checkInDate = data.checkInDate instanceof Timestamp ? data.checkInDate.toDate() : new Date(data.checkInDate);
 		const checkOutDate = data.checkOutDate instanceof Timestamp ? data.checkOutDate.toDate() : new Date(data.checkOutDate);
 		
-		// Recalculate status based on current date
-		const actualStatus = determineStatus(checkInDate, checkOutDate, data.status);
-		
-		// Update status in database if it changed and is not completed
-		if (actualStatus !== data.status && actualStatus !== "completed") {
-			await updateDoc(doc(db, RESERVATIONS_COLLECTION, docSnap.id), {
-				status: actualStatus,
-				updatedAt: serverTimestamp(),
-			});
-		}
-		
-		// Only include if status is upcoming or ongoing
-		if (actualStatus === "upcoming" || actualStatus === "ongoing") {
-			reservations.push({
-				id: docSnap.id,
-				...data,
-				status: actualStatus,
-				checkInDate,
-				checkOutDate,
-				createdAt: data.createdAt instanceof Timestamp ? data.createdAt.toDate() : new Date(),
-				updatedAt: data.updatedAt instanceof Timestamp ? data.updatedAt.toDate() : new Date(),
-				cancelledAt: data.cancelledAt instanceof Timestamp ? data.cancelledAt.toDate() : undefined,
-			} as Reservation);
-		}
-	}
+		// Status is now manually managed by hosts, no auto-updates
+		reservations.push({
+			id: docSnap.id,
+			...data,
+			checkInDate,
+			checkOutDate,
+			createdAt: data.createdAt instanceof Timestamp ? data.createdAt.toDate() : new Date(),
+			updatedAt: data.updatedAt instanceof Timestamp ? data.updatedAt.toDate() : new Date(),
+			cancelledAt: data.cancelledAt instanceof Timestamp ? data.cancelledAt.toDate() : undefined,
+		} as Reservation);
+	});
 
 	return reservations;
 }
@@ -269,36 +247,22 @@ export async function getPastReservations(userId: string): Promise<Reservation[]
 	const querySnapshot = await getDocs(allQuery);
 	const completedReservations: Reservation[] = [];
 
-	for (const docSnap of querySnapshot.docs) {
+	querySnapshot.forEach((docSnap) => {
 		const data = docSnap.data();
 		const checkInDate = data.checkInDate instanceof Timestamp ? data.checkInDate.toDate() : new Date(data.checkInDate);
 		const checkOutDate = data.checkOutDate instanceof Timestamp ? data.checkOutDate.toDate() : new Date(data.checkOutDate);
 		
-		// Recalculate status based on current date
-		const actualStatus = determineStatus(checkInDate, checkOutDate, data.status);
-		
-		// Update status in database if it changed to completed
-		if (actualStatus === "completed" && data.status !== "completed") {
-			await updateDoc(doc(db, RESERVATIONS_COLLECTION, docSnap.id), {
-				status: actualStatus,
-				updatedAt: serverTimestamp(),
-			});
-		}
-		
-		// Only include if status is completed
-		if (actualStatus === "completed") {
-			completedReservations.push({
-				id: docSnap.id,
-				...data,
-				status: actualStatus,
-				checkInDate,
-				checkOutDate,
-				createdAt: data.createdAt instanceof Timestamp ? data.createdAt.toDate() : new Date(),
-				updatedAt: data.updatedAt instanceof Timestamp ? data.updatedAt.toDate() : new Date(),
-				cancelledAt: data.cancelledAt instanceof Timestamp ? data.cancelledAt.toDate() : undefined,
-			} as Reservation);
-		}
-	}
+		// Status is now manually managed by hosts, no auto-updates
+		completedReservations.push({
+			id: docSnap.id,
+			...data,
+			checkInDate,
+			checkOutDate,
+			createdAt: data.createdAt instanceof Timestamp ? data.createdAt.toDate() : new Date(),
+			updatedAt: data.updatedAt instanceof Timestamp ? data.updatedAt.toDate() : new Date(),
+			cancelledAt: data.cancelledAt instanceof Timestamp ? data.cancelledAt.toDate() : undefined,
+		} as Reservation);
+	});
 
 	return completedReservations;
 }
@@ -380,7 +344,7 @@ export async function getListingReservations(
 ): Promise<Reservation[]> {
 	const db = getFirestoreClient();
 	const reservationsRef = collection(db, RESERVATIONS_COLLECTION);
-	
+
 	const q = query(
 		reservationsRef,
 		where("listingId", "==", listingId),
@@ -405,4 +369,188 @@ export async function getListingReservations(
 	});
 
 	return reservations;
+}
+
+/**
+ * Get all reservations for a host (across all their listings)
+ * @param hostId - Host's Firebase Auth UID
+ * @param status - Optional status filter
+ * @returns Array of Reservation
+ */
+export async function getHostReservations(
+	hostId: string,
+	status?: Reservation["status"]
+): Promise<Reservation[]> {
+	const db = getFirestoreClient();
+	const reservationsRef = collection(db, RESERVATIONS_COLLECTION);
+	
+	let q = query(
+		reservationsRef,
+		where("hostId", "==", hostId),
+		orderBy("createdAt", "desc")
+	);
+
+	if (status) {
+		q = query(
+			reservationsRef,
+			where("hostId", "==", hostId),
+			where("status", "==", status),
+			orderBy("createdAt", "desc")
+		);
+	}
+
+	const querySnapshot = await getDocs(q);
+	const reservations: Reservation[] = [];
+
+	querySnapshot.forEach((doc) => {
+		const data = doc.data();
+		reservations.push({
+			id: doc.id,
+			...data,
+			checkInDate: data.checkInDate instanceof Timestamp ? data.checkInDate.toDate() : new Date(data.checkInDate),
+			checkOutDate: data.checkOutDate instanceof Timestamp ? data.checkOutDate.toDate() : new Date(data.checkOutDate),
+			createdAt: data.createdAt instanceof Timestamp ? data.createdAt.toDate() : new Date(),
+			updatedAt: data.updatedAt instanceof Timestamp ? data.updatedAt.toDate() : new Date(),
+			cancelledAt: data.cancelledAt instanceof Timestamp ? data.cancelledAt.toDate() : undefined,
+		} as Reservation);
+	});
+
+	return reservations;
+}
+
+/**
+ * Host accepts a pending reservation
+ * @param reservationId - Reservation document ID
+ * @param hostId - Host's Firebase Auth UID (for verification)
+ */
+export async function acceptReservation(
+	reservationId: string,
+	hostId: string
+): Promise<void> {
+	const db = getFirestoreClient();
+	const reservationRef = doc(db, RESERVATIONS_COLLECTION, reservationId);
+
+	const reservationSnap = await getDoc(reservationRef);
+	if (!reservationSnap.exists()) {
+		throw new Error("Reservation not found");
+	}
+
+	const reservationData = reservationSnap.data();
+	if (reservationData.hostId !== hostId) {
+		throw new Error("Unauthorized: You can only manage your own listings' reservations");
+	}
+
+	if (reservationData.status !== "pending") {
+		throw new Error("Can only accept pending reservations");
+	}
+
+	await updateDoc(reservationRef, {
+		status: "confirmed",
+		updatedAt: serverTimestamp(),
+	});
+}
+
+/**
+ * Host declines a pending reservation
+ * @param reservationId - Reservation document ID
+ * @param hostId - Host's Firebase Auth UID (for verification)
+ * @param reason - Decline reason
+ */
+export async function declineReservation(
+	reservationId: string,
+	hostId: string,
+	reason?: string
+): Promise<void> {
+	const db = getFirestoreClient();
+	const reservationRef = doc(db, RESERVATIONS_COLLECTION, reservationId);
+
+	const reservationSnap = await getDoc(reservationRef);
+	if (!reservationSnap.exists()) {
+		throw new Error("Reservation not found");
+	}
+
+	const reservationData = reservationSnap.data();
+	if (reservationData.hostId !== hostId) {
+		throw new Error("Unauthorized: You can only manage your own listings' reservations");
+	}
+
+	if (reservationData.status !== "pending") {
+		throw new Error("Can only decline pending reservations");
+	}
+
+	const updateData: {
+		status: string;
+		updatedAt: ReturnType<typeof serverTimestamp>;
+		declineReason?: string;
+	} = {
+		status: "declined",
+		updatedAt: serverTimestamp(),
+	};
+	if (reason) updateData.declineReason = reason;
+
+	await updateDoc(reservationRef, updateData);
+}
+
+/**
+ * Host marks a confirmed reservation as checked-in
+ * @param reservationId - Reservation document ID
+ * @param hostId - Host's Firebase Auth UID (for verification)
+ */
+export async function checkInReservation(
+	reservationId: string,
+	hostId: string
+): Promise<void> {
+	const db = getFirestoreClient();
+	const reservationRef = doc(db, RESERVATIONS_COLLECTION, reservationId);
+
+	const reservationSnap = await getDoc(reservationRef);
+	if (!reservationSnap.exists()) {
+		throw new Error("Reservation not found");
+	}
+
+	const reservationData = reservationSnap.data();
+	if (reservationData.hostId !== hostId) {
+		throw new Error("Unauthorized: You can only manage your own listings' reservations");
+	}
+
+	if (reservationData.status !== "confirmed") {
+		throw new Error("Can only check in confirmed reservations");
+	}
+
+	await updateDoc(reservationRef, {
+		status: "checked-in",
+		updatedAt: serverTimestamp(),
+	});
+}
+
+/**
+ * Host marks a checked-in reservation as completed
+ * @param reservationId - Reservation document ID
+ * @param hostId - Host's Firebase Auth UID (for verification)
+ */
+export async function completeReservation(
+	reservationId: string,
+	hostId: string
+): Promise<void> {
+	const db = getFirestoreClient();
+	const reservationRef = doc(db, RESERVATIONS_COLLECTION, reservationId);
+
+	const reservationSnap = await getDoc(reservationRef);
+	if (!reservationSnap.exists()) {
+		throw new Error("Reservation not found");
+	}
+
+	const reservationData = reservationSnap.data();
+	if (reservationData.hostId !== hostId) {
+		throw new Error("Unauthorized: You can only manage your own listings' reservations");
+	}
+
+	if (reservationData.status !== "checked-in") {
+		throw new Error("Can only complete checked-in reservations");
+	}
+
+	await updateDoc(reservationRef, {
+		status: "completed",
+		updatedAt: serverTimestamp(),
+	});
 }

@@ -318,10 +318,10 @@ function TripCard({ trip, onCancel, onReview, hasReviewed }: TripCardProps) {
 		});
 	};
 
-	const isUpcoming = trip.status === "upcoming" || trip.status === "ongoing";
-	const isOngoing = trip.status === "ongoing";
+	const isUpcoming = trip.status === "pending" || trip.status === "confirmed" || trip.status === "checked-in";
+	const isOngoing = trip.status === "checked-in";
 	const isPast = trip.status === "completed";
-	const isCancelled = trip.status === "cancelled";
+	const isCancelled = trip.status === "cancelled" || trip.status === "declined";
 
 	return (
 		<div className="bg-white rounded-2xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow overflow-hidden">
