@@ -432,6 +432,8 @@ export default function Listing() {
 				barangay: data.property.barangay,
 				streetAddress: data.property.streetAddress,
 				landmark: data.property.landmark,
+				latitude: data.property.latitude,
+				longitude: data.property.longitude,
 
 				// Property Specifications
 				bedrooms: data.photos.bedrooms,

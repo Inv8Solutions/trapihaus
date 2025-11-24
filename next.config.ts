@@ -8,7 +8,7 @@ const cspDev = [
   // Allow inline scripts in dev for Next.js HMR/dev overlays. Remove in prod.
   "script-src 'self' 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval' https://apis.google.com",
   "style-src 'self' 'unsafe-inline'",
-  "img-src 'self' https://images.unsplash.com https://github.com https://firebasestorage.googleapis.com https://*.tile.openstreetmap.org https://cdnjs.cloudflare.com data: blob:",
+  "img-src 'self' https://images.unsplash.com https://github.com https://firebasestorage.googleapis.com https://ui-avatars.com https://*.tile.openstreetmap.org https://cdnjs.cloudflare.com data: blob:",
   "font-src 'self' data:",
   // Allow websockets for HMR in dev, Firebase endpoints, and Google APIs
   "connect-src 'self' ws: wss: https://auth.googleapis.com https://securetoken.googleapis.com https://identitytoolkit.googleapis.com https://firestore.googleapis.com https://firebase.googleapis.com https://www.googleapis.com https://firebasestorage.googleapis.com https://storage.googleapis.com",

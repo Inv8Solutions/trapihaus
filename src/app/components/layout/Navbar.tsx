@@ -20,10 +20,15 @@ export default function Navbar() {
     const [menuOpen, setMenuOpen] = useState(false);
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [showLoginModal, setShowLoginModal] = useState(false);
+    const [mounted, setMounted] = useState(false);
     const menuRef = useRef<HTMLDivElement | null>(null);
     const mobileMenuRef = useRef<HTMLDivElement | null>(null);
     const mobileButtonRef = useRef<HTMLButtonElement | null>(null);
     const router = useRouter();
+
+    useEffect(() => {
+        setMounted(true);
+    }, []);
 
     useEffect(() => {
         const auth = getFirebaseAuth();
@@ -105,18 +110,18 @@ export default function Navbar() {
                 <div className="flex-1 hidden md:flex justify-center space-x-10 text-white text-[16px]">
                         <Link 
                             href={user ? "/Homescreen/home" : "/"} 
-                            className={pathname === "/" || pathname === "/Homescreen/home" ? "font-black" : "font-medium"}
+                            className={mounted && (pathname === "/" || pathname === "/Homescreen/home") ? "font-black" : "font-medium"}
                         >
                             Home
                         </Link>
-                        <Link href="/browse" className={pathname === "/browse" ? "font-black" : "font-medium"}>Browse Accommodations</Link>
-                        <Link href="/trips" className={pathname === "/trips" ? "font-black" : "font-medium"}>My Trips</Link>
+                        <Link href="/browse" className={mounted && pathname === "/browse" ? "font-black" : "font-medium"}>Browse Accommodations</Link>
+                        <Link href="/trips" className={mounted && pathname === "/trips" ? "font-black" : "font-medium"}>My Trips</Link>
                         {user ? (
-                            <Link href="/dashboard" className={pathname === "/dashboard" ? "font-black" : "font-medium"}>Dashboard</Link>
+                            <Link href="/dashboard" className={mounted && pathname === "/dashboard" ? "font-black" : "font-medium"}>Dashboard</Link>
                         ) : (
                             <button 
                                 onClick={() => setShowLoginModal(true)}
-                                className={pathname === "/dashboard" ? "font-black" : "font-medium"}
+                                className={mounted && pathname === "/dashboard" ? "font-black" : "font-medium"}
                             >
                                 Dashboard
                             </button>
@@ -215,21 +220,21 @@ export default function Navbar() {
                         <Link 
                             href={user ? "/Homescreen/home" : "/"} 
                             onClick={() => setMobileMenuOpen(false)}
-                            className={`block px-6 py-3 text-sm ${pathname === "/" || pathname === "/Homescreen/home" ? "font-bold text-[#1078CF] bg-blue-50" : "text-gray-700"} hover:bg-gray-50`}
+                            className={`block px-6 py-3 text-sm ${mounted && (pathname === "/" || pathname === "/Homescreen/home") ? "font-bold text-[#1078CF] bg-blue-50" : "text-gray-700"} hover:bg-gray-50`}
                         >
                             Home
                         </Link>
                         <Link 
                             href="/browse" 
                             onClick={() => setMobileMenuOpen(false)}
-                            className={`block px-6 py-3 text-sm ${pathname === "/browse" ? "font-bold text-[#1078CF] bg-blue-50" : "text-gray-700"} hover:bg-gray-50`}
+                            className={`block px-6 py-3 text-sm ${mounted && pathname === "/browse" ? "font-bold text-[#1078CF] bg-blue-50" : "text-gray-700"} hover:bg-gray-50`}
                         >
                             Browse Accommodations
                         </Link>
                         <Link 
                             href="/trips" 
                             onClick={() => setMobileMenuOpen(false)}
-                            className={`block px-6 py-3 text-sm ${pathname === "/trips" ? "font-bold text-[#1078CF] bg-blue-50" : "text-gray-700"} hover:bg-gray-50`}
+                            className={`block px-6 py-3 text-sm ${mounted && pathname === "/trips" ? "font-bold text-[#1078CF] bg-blue-50" : "text-gray-700"} hover:bg-gray-50`}
                         >
                             My Trips
                         </Link>
@@ -237,7 +242,7 @@ export default function Navbar() {
                             <Link 
                                 href="/dashboard" 
                                 onClick={() => setMobileMenuOpen(false)}
-                                className={`block px-6 py-3 text-sm ${pathname === "/dashboard" ? "font-bold text-[#1078CF] bg-blue-50" : "text-gray-700"} hover:bg-gray-50`}
+                                className={`block px-6 py-3 text-sm ${mounted && pathname === "/dashboard" ? "font-bold text-[#1078CF] bg-blue-50" : "text-gray-700"} hover:bg-gray-50`}
                             >
                                 Dashboard
                             </Link>
@@ -247,7 +252,7 @@ export default function Navbar() {
                                     setMobileMenuOpen(false);
                                     setShowLoginModal(true);
                                 }}
-                                className={`block w-full text-left px-6 py-3 text-sm ${pathname === "/dashboard" ? "font-bold text-[#1078CF] bg-blue-50" : "text-gray-700"} hover:bg-gray-50`}
+                                className={`block w-full text-left px-6 py-3 text-sm ${mounted && pathname === "/dashboard" ? "font-bold text-[#1078CF] bg-blue-50" : "text-gray-700"} hover:bg-gray-50`}
                             >
                                 Dashboard
                             </button>

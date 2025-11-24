@@ -2,9 +2,13 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import dynamic from "next/dynamic";
 import AppImage from "../components/ui/AppImage";
 import { getListing } from "@/lib/services/listings";
 import type { PropertyListing } from "@/types/listing";
+
+// Dynamically import PropertyMap to avoid SSR issues with Leaflet
+const PropertyMap = dynamic(() => import("./PropertyMap"), { ssr: false });
 
 export default function Listing() {
 	const router = useRouter();
@@ -412,18 +416,32 @@ export default function Listing() {
 						)}
 					</div>
 
-					{/* Where you’ll be section */}
+					{/* Where you'll be section */}
 					<div className="bg-white rounded-[28px] p-6 shadow-md border border-[#F3F4F6]">
-						<h3 className="text-lg font-semibold mb-4">Where you’ll be</h3>
+						<h3 className="text-lg font-semibold mb-4">Where you'll be</h3>
 						<div className="mb-4 inline-flex items-center gap-2 text-gray-600 text-sm">
 							<svg className="w-4 h-4 text-gray-500" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
 								<path d="M12 2C8.134 2 5 5.134 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.866-3.134-7-7-7zm0 9.5a2.5 2.5 0 110-5 2.5 2.5 0 010 5z"/>
 							</svg>
-							Near Camp John Hay
+							<span>{displayLocation}</span>
 						</div>
-						<div className="h-48 rounded-2xl border border-gray-200 bg-[#F3F4F6] flex items-center justify-center text-gray-400 text-sm">
-							Google Maps
-						</div>
+						{listingData?.latitude && listingData?.longitude ? (
+							<PropertyMap 
+								latitude={listingData.latitude} 
+								longitude={listingData.longitude}
+								propertyName={displayTitle}
+							/>
+						) : (
+							<div className="h-64 rounded-2xl border border-gray-200 bg-[#F3F4F6] flex items-center justify-center text-gray-400 text-sm">
+								<div className="text-center">
+									<svg className="w-12 h-12 mx-auto mb-2 text-gray-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden>
+										<path d="M12 2C8.134 2 5 5.134 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.866-3.134-7-7-7zm0 9.5a2.5 2.5 0 110-5 2.5 2.5 0 010 5z"/>
+									</svg>
+									<p>Location map unavailable</p>
+									<p className="text-xs mt-1">Host hasn't pinned exact location yet</p>
+								</div>
+							</div>
+						)}
 					</div>
 
 					{/* Reviews */}

@@ -26,6 +26,8 @@ export interface PropertyListing {
 	barangay: string;
 	streetAddress: string;
 	landmark?: string;
+	latitude?: number;
+	longitude?: number;
 
 	// Property Specifications
 	bedrooms: number;
@@ -72,6 +74,8 @@ export interface CreateListingData {
 	barangay: string;
 	streetAddress: string;
 	landmark?: string;
+	latitude?: number;
+	longitude?: number;
 
 	// Property Specifications
 	bedrooms: number;
