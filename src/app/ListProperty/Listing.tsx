@@ -8,6 +8,16 @@ import type { CreateListingData } from "@/types/listing";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { getBarangays, getCities } from "@/lib/data/barangays";
+import dynamic from "next/dynamic";
+
+const LocationPicker = dynamic(() => import("./LocationPicker"), {
+	ssr: false,
+	loading: () => (
+		<div className="w-full h-[400px] bg-gray-100 rounded-2xl flex items-center justify-center">
+			<div className="text-gray-500 font-lexend">Loading map...</div>
+		</div>
+	),
+});
 
 interface BasicInfoData {
 	email: string;
@@ -26,6 +36,8 @@ interface PropertyDetailsData {
 	barangay: string;
 	streetAddress: string;
 	landmark?: string;
+	latitude?: number;
+	longitude?: number;
 }
 
 interface PhotosPricingData {
@@ -71,6 +83,8 @@ const initialState: ListingState = {
 			barangay: "",
 			streetAddress: "",
 			landmark: "",
+			latitude: 16.4023,
+			longitude: 120.596,
 		},
 		photos: {
 			bedrooms: 0,
@@ -733,8 +747,8 @@ export default function Listing() {
 										? "Select a city first" 
 										: "Select Barangay"}
 								</option>
-								{availableBarangays.map((barangay) => (
-									<option key={barangay} value={barangay}>
+								{availableBarangays.map((barangay, index) => (
+									<option key={`${data.property.city}-${barangay}-${index}`} value={barangay}>
 										{barangay}
 									</option>
 								))}
@@ -770,6 +784,22 @@ export default function Listing() {
 							className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#1078CF]"
 							placeholder="e.g., Near Burnham Park"
 						/>
+					</div>
+					<div>
+						<label className="block text-sm font-medium mb-2">Pin Your Property Location*</label>
+						<p className="text-xs text-gray-600 mb-3">Click on the map to mark the exact location of your property</p>
+						<LocationPicker
+							onLocationSelect={(lat, lng) => {
+								updateProperty({ latitude: lat, longitude: lng });
+							}}
+							initialLat={data.property.latitude}
+							initialLng={data.property.longitude}
+						/>
+						{data.property.latitude && data.property.longitude && (
+							<p className="text-xs text-green-600 mt-2">
+								✓ Location set: {data.property.latitude.toFixed(6)}, {data.property.longitude.toFixed(6)}
+							</p>
+						)}
 					</div>
 				</div>
 			);
