@@ -418,7 +418,7 @@ export default function Listing() {
 
 					{/* Where you'll be section */}
 					<div className="bg-white rounded-[28px] p-6 shadow-md border border-[#F3F4F6]">
-						<h3 className="text-lg font-semibold mb-4">Where you'll be</h3>
+						<h3 className="text-lg font-semibold mb-4">Where you&apos;ll be</h3>
 						<div className="mb-4 inline-flex items-center gap-2 text-gray-600 text-sm">
 							<svg className="w-4 h-4 text-gray-500" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
 								<path d="M12 2C8.134 2 5 5.134 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.866-3.134-7-7-7zm0 9.5a2.5 2.5 0 110-5 2.5 2.5 0 010 5z"/>
@@ -438,7 +438,7 @@ export default function Listing() {
 										<path d="M12 2C8.134 2 5 5.134 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.866-3.134-7-7-7zm0 9.5a2.5 2.5 0 110-5 2.5 2.5 0 010 5z"/>
 									</svg>
 									<p>Location map unavailable</p>
-									<p className="text-xs mt-1">Host hasn't pinned exact location yet</p>
+									<p className="text-xs mt-1">Host hasn&apos;t pinned exact location yet</p>
 								</div>
 							</div>
 						)}

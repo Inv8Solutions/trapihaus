@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import type * as L from "leaflet";
 
 interface PropertyMapProps {
 	latitude: number;
@@ -10,7 +11,7 @@ interface PropertyMapProps {
 
 export default function PropertyMap({ latitude, longitude, propertyName }: PropertyMapProps) {
 	const mapRef = useRef<HTMLDivElement>(null);
-	const mapInstanceRef = useRef<any>(null);
+	const mapInstanceRef = useRef<L.Map | null>(null);
 
 	useEffect(() => {
 		// Only run on client side
