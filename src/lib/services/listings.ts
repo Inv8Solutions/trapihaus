@@ -50,6 +50,8 @@ export async function createListing(
 		barangay: data.barangay,
 		streetAddress: data.streetAddress,
 		landmark: data.landmark,
+		...(data.latitude !== undefined && { latitude: data.latitude }),
+		...(data.longitude !== undefined && { longitude: data.longitude }),
 
 		// Property Specifications
 		bedrooms: data.bedrooms,
@@ -270,4 +272,33 @@ export async function searchListings(searchTerm: string): Promise<PropertyListin
 	});
 
 	return listings;
+}
+
+/**
+ * Mark a listing as temporarily unavailable (booked)
+ * Single accommodations are automatically marked unavailable when booked
+ * @param listingId - Listing document ID
+ */
+export async function markListingUnavailable(listingId: string): Promise<void> {
+	const db = getFirestoreClient();
+	const listingRef = doc(db, LISTINGS_COLLECTION, listingId);
+
+	await updateDoc(listingRef, {
+		availability: "Temporarily Unavailable",
+		updatedAt: serverTimestamp(),
+	});
+}
+
+/**
+ * Mark a listing as available again
+ * @param listingId - Listing document ID
+ */
+export async function markListingAvailable(listingId: string): Promise<void> {
+	const db = getFirestoreClient();
+	const listingRef = doc(db, LISTINGS_COLLECTION, listingId);
+
+	await updateDoc(listingRef, {
+		availability: "Available for Booking",
+		updatedAt: serverTimestamp(),
+	});
 }

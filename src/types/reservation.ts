@@ -8,7 +8,7 @@ export interface Reservation {
 	id: string;
 	userId: string; // Guest's Firebase Auth UID
 	listingId: string; // Reference to PropertyListing
-	status: "upcoming" | "ongoing" | "completed" | "cancelled";
+	status: "pending" | "confirmed" | "checked-in" | "completed" | "cancelled" | "declined";
 	createdAt: Date;
 	updatedAt: Date;
 
@@ -98,5 +98,6 @@ export interface UpdateReservationData {
 	status?: Reservation["status"];
 	paymentStatus?: Reservation["paymentStatus"];
 	cancellationReason?: string;
+	declineReason?: string;
 	reviewId?: string;
 }
