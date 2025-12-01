@@ -135,6 +135,14 @@ export default function RevenueChart({ data }: RevenueChartProps) {
             const heightPercent = (d.value / max) * 100;
             const isHighest = d.value === maxValue;
             
+            // Color scheme: Blue (#1078CF), Green (#83C12C), Orange (#F68109)
+            const colors = [
+              { base: "#1078CF", gradient: "from-[#1078CF] to-[#3B99E8]", text: "#1078CF" }, // Blue
+              { base: "#83C12C", gradient: "from-[#83C12C] to-[#9DD947]", text: "#83C12C" }, // Green
+              { base: "#F68109", gradient: "from-[#F68109] to-[#FF9A3D]", text: "#F68109" }, // Orange
+            ];
+            const color = colors[index % 3];
+            
             return (
               <div key={d.label} className="flex flex-col items-center gap-3 w-full group">
                 <div className="relative w-full">
@@ -148,18 +156,22 @@ export default function RevenueChart({ data }: RevenueChartProps) {
                   <div
                     className={`w-full rounded-t-xl transition-all duration-300 ${
                       isHighest 
-                        ? "bg-gradient-to-t from-[#1078CF] to-[#3B99E8]" 
-                        : "bg-[#1078CF]"
+                        ? `bg-gradient-to-t ${color.gradient}` 
+                        : ""
                     } hover:opacity-80`}
                     style={{ 
                       height: `${Math.max(heightPercent, 5)}%`,
-                      minHeight: d.value > 0 ? '20px' : '0'
+                      minHeight: d.value > 0 ? '20px' : '0',
+                      backgroundColor: isHighest ? undefined : color.base
                     }}
                     aria-label={`${d.label} revenue: ${formatCurrency(d.value)}`}
                   >
                     {/* Value label on top of bar for highest value */}
                     {isHighest && d.value > 0 && (
-                      <div className="absolute -top-6 left-1/2 transform -translate-x-1/2 text-xs font-semibold text-[#1078CF]">
+                      <div 
+                        className="absolute -top-6 left-1/2 transform -translate-x-1/2 text-xs font-semibold"
+                        style={{ color: color.text }}
+                      >
                         {formatCurrency(d.value)}
                       </div>
                     )}
