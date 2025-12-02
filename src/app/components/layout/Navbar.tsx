@@ -108,7 +108,7 @@ export default function Navbar() {
 
                 {/* Desktop Navigation */}
                 <div className="flex-1 hidden md:flex justify-center space-x-10 text-white text-[16px]">
-                        <Link href="/Homescreen" className={mounted && pathname === "/Homescreen" ? "font-black" : "font-medium"}>Home</Link>
+                        <Link href="/Homescreen/home" className={mounted && pathname === "/Homescreen/home" ? "font-black" : "font-medium"}>Home</Link>
                         <Link href="/browse" className={mounted && pathname === "/browse" ? "font-black" : "font-medium"}>Browse</Link>
                         <Link href="/about" className={mounted && pathname === "/about" ? "font-black" : "font-medium"}>About</Link>
                         <Link href="/List" className={mounted && pathname === "/List" ? "font-black" : "font-medium"}>List Property</Link>
@@ -205,9 +205,9 @@ export default function Navbar() {
                 >
                     <div className="py-2">
                         <Link 
-                            href="/Homescreen" 
+                            href="/Homescreen/home" 
                             onClick={() => setMobileMenuOpen(false)}
-                            className={`block px-6 py-3 text-sm ${mounted && pathname === "/Homescreen" ? "font-bold text-[#1078CF] bg-blue-50" : "text-gray-700"} hover:bg-gray-50`}
+                            className={`block px-6 py-3 text-sm ${mounted && pathname === "/Homescreen/home" ? "font-bold text-[#1078CF] bg-blue-50" : "text-gray-700"} hover:bg-gray-50`}
                         >
                             Home
                         </Link>
