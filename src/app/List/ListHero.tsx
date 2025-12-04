@@ -20,7 +20,7 @@ export default function ListHero() {
       <div className="grid md:grid-cols-2 gap-2 items-center">
         {/* Left */}
         <div>
-          <h1 className="text-4xl md:text-5xl lg:text-[72px] font-extrabold leading-tight font-lexend mb-6">
+          <h1 className="text-4xl md:text-[72px] lg:text-[72px] font-extrabold leading-tight font-lexend mb-6">
             List your Property
             <br />
             on <span className="text-blue-600">Trapihaus</span>
